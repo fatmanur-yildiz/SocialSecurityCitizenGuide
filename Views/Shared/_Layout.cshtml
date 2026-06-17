@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SGK Akıllı Vatandaş Rehberi</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="logo-mark">SGK</div>
+            <div>
+                <div class="brand-title">Sosyal Güvenlik Vatandaş Rehberi</div>
+                <div class="brand-subtitle">Emeklilik ve Hizmet Bilgilendirme Sistemi</div>
+            </div>
+        </div>
+
+        <nav class="topbar-nav">
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+{
+    if (User.IsInRole("Vatandas"))
+    {
+        <a href="/Citizen">Ana Sayfa</a>
+    }
+    else if (User.IsInRole("Memur"))
+    {
+        <a href="/Officer">Ana Sayfa</a>
+    }
+    else if (User.IsInRole("Admin"))
+    {
+        <a href="/Admin">Ana Sayfa</a>
+    }
+}
+else
+{
+    <a href="/">Ana Sayfa</a>
+}
+            <a href="#">Rehber</a>
+            <a href="#">Sık Sorulan Sorular</a>
+        </nav>
+
+        <div class="topbar-auth">
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <span class="user-name">@User.Identity.Name</span>
+        <a class="login-link" href="/Account/Logout">Çıkış Yap</a>
+    }
+    else
+    {
+        <a class="login-link" href="/Account/Login">Giriş Yap</a>
+        <a class="register-link" href="/Account/Register">Kayıt Ol</a>
+    }
+</div>
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer class="footer">
+    <div class="footer-content">
+        <div>
+            <strong>Sosyal Güvenlik Vatandaş Rehberi</strong>
+            <p>Emeklilik, hizmet dökümü ve prim süreçleri için bilgilendirme platformu.</p>
+        </div>
+
+        <div class="footer-links">
+            <a href="#">Kullanım Koşulları</a>
+            <a href="#">Gizlilik</a>
+            <a href="#">İletişim</a>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

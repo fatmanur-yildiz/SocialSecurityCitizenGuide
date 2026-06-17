@@ -1,0 +1,68 @@
+@{
+    ViewData["Title"] = "Ana Sayfa";
+    ViewData["ActivePage"] = "Home";
+}
+
+<section class="dashboard-page">
+    @await Html.PartialAsync("_CitizenSidebar")
+
+    <main class="dashboard-content">
+        <div class="citizen-header">
+            <div>
+                <h1>Hoş geldiniz, @User.Identity?.Name</h1>
+                <p>
+                    Prim, emeklilik, borçlanma ve hizmet birleştirme işlemleri hakkında
+                    size uygun bilgilere ulaşabilirsiniz.
+                </p>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" placeholder="Ne yapmak istiyorsunuz? Örn: Prim bilgilerimi öğrenmek istiyorum..." />
+            <button>Ara</button>
+        </div>
+
+        <div class="section-title-row">
+            <h2>Sık Kullanılan Hizmetler</h2>
+        </div>
+
+        <div class="service-dashboard-grid main-service-grid">
+            <a class="service-tile" href="/Citizen/PremiumInfo">
+                <h3>Prim Bilgilerim</h3>
+                <p>
+                    Prim günlerinizi, dönemsel kayıtları, eksik günleri ve prime esas kazanç gibi bilgileri sade şekilde inceleyin.
+                </p>
+            </a>
+
+            <a class="service-tile" href="/Citizen/RetirementStatus">
+                <h3>Emeklilik Durumu</h3>
+                <p>
+                    Emeklilik değerlendirmesinde hangi bilgilere bakıldığını ve hangi bilgilerinizin eksik olduğunu görün.
+                </p>
+            </a>
+
+            <a class="service-tile" href="/Citizen/DebtOptions">
+                <h3>Borçlanma İşlemleri</h3>
+                <p>
+                    Doğum, askerlik veya yurtdışı borçlanması gibi işlemlerin sizin durumunuzda incelenip incelenemeyeceğini öğrenin.
+                </p>
+            </a>
+
+            <a class="service-tile" href="/Citizen/ServiceMerge">
+                <h3>Hizmet Birleştirme</h3>
+                <p>
+                    4A, 4B ve 4C gibi farklı sigorta statülerindeki hizmetlerin nasıl değerlendirildiğini anlayın.
+                </p>
+            </a>
+        </div>
+
+        <div class="last-actions">
+            <h2>Son İşlemler</h2>
+
+            <div class="empty-state">
+                <p>Henüz kayıtlı işlem bulunmamaktadır.</p>
+                <span>İlk işleminizi başlatmak için yukarıdaki hizmetlerden birini seçebilirsiniz.</span>
+            </div>
+        </div>
+    </main>
+</section>

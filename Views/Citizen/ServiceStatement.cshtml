@@ -1,0 +1,107 @@
+@model EmekliRehberi.ViewModels.ServiceStatementViewModel
+@using EmekliRehberi.Models
+
+@{
+    ViewData["Title"] = "Hizmet Dökümü";
+    var records = ViewBag.Records as List<ServiceStatement>;
+    var latestRecord = records?.FirstOrDefault();
+}
+
+<section class="dashboard-page">
+    <aside class="sidebar">
+        <div class="sidebar-title">Hizmetler</div>
+
+        <a href="/Citizen">Ana Sayfa</a>
+        <a class="active" href="/Citizen/ServiceStatement">Hizmet Dökümü</a>
+        <a href="/Citizen/PremiumInfo">Prim Bilgilerim</a>
+        <a href="/Citizen/RetirementStatus">Emeklilik Durumu</a>
+        <a href="/Citizen/DebtOptions">Borçlanma İşlemleri</a>
+        <a href="/Citizen/ServiceMerge">Hizmet Birleştirme</a>
+        <a href="/Citizen/ApplicationGuide">Başvuru Rehberi</a>
+        <a href="/Citizen/RecentActions">Son İşlemler</a>
+        <a href="/Citizen/Profile">Profilim</a>
+    </aside>
+
+    <main class="dashboard-content">
+        <div class="page-title">
+            <h1>Hizmet Dökümü</h1>
+            <p>
+                e-Devlet üzerinden aldığınız hizmet dökümü belgesini yükleyerek çalışma ve prim bilgilerinizi
+                daha düzenli şekilde inceleyebilirsiniz.
+            </p>
+        </div>
+
+        @if (latestRecord == null)
+        {
+            <div class="upload-card">
+                <div>
+                    <h2>Hizmet Dökümü Yükle</h2>
+                    <p>4A hizmet dökümü PDF dosyanızı seçerek sisteme ekleyin.</p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" class="upload-form">
+                    <input asp-for="PdfFile" type="file" accept="application/pdf" />
+                    <button type="submit">Belgeyi Yükle</button>
+                </form>
+            </div>
+
+            <div class="info-warning">
+                Henüz hizmet dökümü yüklenmemiştir. Belge yüklendikten sonra ilgili işlemler bu sayfada görüntülenecektir.
+            </div>
+        }
+        else
+        {
+            <div class="uploaded-main-card">
+                <div>
+                    <h2>Hizmet dökümünüz sisteme eklendi</h2>
+                    <p>
+                        <strong>@latestRecord.OriginalFileName</strong> adlı belge
+                        @latestRecord.CreatedAt.ToString("dd.MM.yyyy HH:mm") tarihinde yüklenmiştir.
+                    </p>
+                </div>
+
+                <span class="document-status">@latestRecord.Status</span>
+            </div>
+
+            <div class="analysis-placeholder">
+                <h2>Belge Analizi</h2>
+                <p>
+                    Bir sonraki aşamada bu bölümde belgeden alınan ilk işe giriş tarihi, prim günleri,
+                    dönem bilgileri ve sigorta statüsü özetlenecektir.
+                </p>
+            </div>
+        }
+
+        <div class="process-card">
+            <h2>Bu belgeyle devam edebileceğiniz işlemler</h2>
+
+            <div class="process-list">
+                <a href="/Citizen/PremiumInfo">Prim bilgilerini görüntüle</a>
+                <a href="/Citizen/RetirementStatus">Emeklilik durumunu incele</a>
+                <a href="/Citizen/DebtOptions">Borçlanma seçeneklerini gör</a>
+                <a href="/Citizen/ServiceMerge">Hizmet birleştirme bilgisini incele</a>
+            </div>
+        </div>
+
+        @if (records != null && records.Count > 1)
+        {
+            <div class="uploaded-documents">
+                <h2>Önceki Belgeler</h2>
+
+                <div class="document-list">
+                    @foreach (var item in records.Skip(1))
+                    {
+                        <div class="document-item">
+                            <div>
+                                <strong>@item.OriginalFileName</strong>
+                                <span>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm") tarihinde yüklendi</span>
+                            </div>
+
+                            <div class="document-status">@item.Status</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </main>
+</section>

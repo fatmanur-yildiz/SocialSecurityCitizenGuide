@@ -1,0 +1,489 @@
+@model EmekliRehberi.ViewModels.PremiumUploadViewModel
+@using EmekliRehberi.Models
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Prim Bilgilerim";
+    ViewData["ActivePage"] = "PremiumInfo";
+
+    var doc = ViewBag.LatestPremiumDocument as PremiumDocument;
+
+    var monthlyRecords = doc?.Records?
+        .Where(r => !r.IsYearTotal)
+        .OrderByDescending(r => r.Period)
+        .ToList() ?? new List<PremiumRecord>();
+
+    var missingDayRecords = monthlyRecords
+        .Where(r => r.Days > 0 && r.Days < 30)
+        .ToList();
+
+    var pekRecords = monthlyRecords.Where(r => r.PekAmount.HasValue).ToList();
+    decimal? avgPek  = pekRecords.Any() ? pekRecords.Average(r => r.PekAmount!.Value) : null;
+    decimal? minPek  = pekRecords.Any() ? pekRecords.Min(r => r.PekAmount!.Value) : null;
+    decimal? maxPek  = pekRecords.Any() ? pekRecords.Max(r => r.PekAmount!.Value) : null;
+    decimal? lastPek = monthlyRecords.FirstOrDefault()?.PekAmount;
+
+    bool lastPeriodFull = monthlyRecords.FirstOrDefault()?.Days == 30;
+
+    int totalDays = doc?.TotalPremiumDays ?? 0;
+    string totalDayComment =
+        totalDays == 0    ? "" :
+        totalDays < 3600  ? "Emeklilik için gereken asgari prim günü koşulunu henüz karşılamıyor olabilirsiniz." :
+        totalDays < 5400  ? "Prim gün sayınız belirli emeklilik koşulları için yeterli olabilir." :
+                            "Prim gün sayınız emeklilik değerlendirmesinde önemli bir eşiğe ulaşmış görünmektedir.";
+}
+
+<section class="dashboard-page">
+    @await Html.PartialAsync("_CitizenSidebar")
+
+    <main class="dashboard-content">
+
+        <div class="page-title">
+            <h1>Prim Bilgilerim</h1>
+            <p>
+                SGK Tescil ve Hizmet Dökümü belgenizi yükleyin; sistem verilerinizi okuyarak
+                prim günlerinizi, dönemsel bildirimlerinizi ve prime esas kazanç bilgilerinizi
+                sade ve anlaşılır biçimde özetlesin.
+            </p>
+        </div>
+
+        <div class="upload-card">
+            <div>
+                <h2>SGK Tescil ve Hizmet Dökümü Yükle</h2>
+                @if (doc == null)
+                {
+                    <p>Prim bilgilerinizin analiz edilebilmesi için PDF belgenizi yükleyin.</p>
+                }
+                else
+                {
+                    <p>
+                        <strong>@doc.OriginalFileName</strong> adlı belge
+                        @doc.CreatedAt.ToString("dd.MM.yyyy HH:mm") tarihinde yüklenmiştir.
+                        Yeni belge yüklerseniz sistem en son yüklenen belgeyi esas alır.
+                    </p>
+                }
+            </div>
+            <form method="post" enctype="multipart/form-data" class="upload-form">
+                <input asp-for="PdfFile" type="file" accept="application/pdf" />
+                <span asp-validation-for="PdfFile" class="text-danger"></span>
+                <button type="submit">
+                    @(doc == null ? "Belgeyi Yükle" : "Yeni Belge Yükle")
+                </button>
+            </form>
+        </div>
+
+        @if (doc == null)
+        {
+            <div class="empty-service-warning">
+                <h2>Henüz prim belgesi yüklenmemiştir</h2>
+                <p>
+                    Belge yüklendikten sonra sistem PDF içindeki prim bilgilerini otomatik
+                    okuyacak ve size özel bir değerlendirme sunacaktır.
+                </p>
+            </div>
+
+            <div class="premium-detail-card">
+                <h2>Ne Tür Bilgiler Analiz Edilir?</h2>
+                <p style="color:#4b5563;line-height:1.7;margin:0 0 12px;">
+                    Yüklediğiniz SGK Tescil ve Hizmet Dökümü belgesinden şu bilgiler
+                    otomatik olarak okunacaktır:
+                </p>
+                <ul style="color:#4b5563;line-height:2;margin:0;padding-left:20px;">
+                    <li>Toplam uzun vade prim gün sayısı</li>
+                    <li>Son bildirilen sigortalılık dönemi</li>
+                    <li>Eksik gün bildirimi olan dönemler</li>
+                    <li>Dönemsel prime esas kazanç (P.E.K.) değerleri</li>
+                </ul>
+            </div>
+        }
+        else
+        {
+            <div class="uploaded-main-card">
+                <div>
+                    <h2>Yüklenen Belge</h2>
+                    <p>
+                        <strong>@doc.OriginalFileName</strong> —
+                        @doc.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                    </p>
+                </div>
+                <span class="document-status">@doc.Status</span>
+            </div>
+
+            <div class="premium-summary-grid">
+                <div class="premium-box">
+                    <span>Toplam Prim Günü</span>
+                    <strong>
+                        @(doc.TotalPremiumDays.HasValue
+                            ? doc.TotalPremiumDays.Value + " gün"
+                            : "Bulunamadı")
+                    </strong>
+                </div>
+                <div class="premium-box">
+                    <span>Son Bildirilen Dönem</span>
+                    <strong>
+                        @(string.IsNullOrWhiteSpace(doc.LastPeriod)
+                            ? "Bulunamadı"
+                            : doc.LastPeriod)
+                    </strong>
+                </div>
+                <div class="premium-box">
+                    <span>Eksik Gün Durumu</span>
+                    <strong style="@(doc.HasMissingDays ? "color:#b45309;" : "color:#15803d;")">
+                        @(doc.HasMissingDays ? "Eksik gün var" : "Eksik gün görünmüyor")
+                    </strong>
+                </div>
+                <div class="premium-box">
+                    <span>Belge Türü</span>
+                    <strong>@doc.DocumentType</strong>
+                </div>
+            </div>
+
+            <div class="premium-detail-card">
+                <h2>Prim Bilgileriniz Ne Anlama Geliyor?</h2>
+                <div class="prim-yorum-listesi">
+
+                    @if (doc.TotalPremiumDays.HasValue)
+                    {
+                        <div class="yorum-satiri">
+                            <div class="yorum-baslik">Toplam Prim Gününüz</div>
+                            <div class="yorum-metin">
+                                SGK kayıtlarında toplam <strong>@doc.TotalPremiumDays.Value gün</strong>
+                                uzun vade prim bildiriminiz görünmektedir.
+                                @if (!string.IsNullOrEmpty(totalDayComment))
+                                {
+                                    <span> @totalDayComment</span>
+                                }
+                                Prim günü emeklilik değerlendirmesinde önemli bir kriterdir; ancak
+                                yaş, ilk sigorta başlangıcı, sigorta statüsü ve borçlanma gibi
+                                ek bilgiler olmadan kesin bir yorum yapılamamaktadır.
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(doc.LastPeriod))
+                    {
+                        <div class="yorum-satiri">
+                            <div class="yorum-baslik">Son Bildirilen Dönem</div>
+                            <div class="yorum-metin">
+                                Belgede en güncel kayıt <strong>@doc.LastPeriod</strong> dönemine aittir.
+                                @if (lastPeriodFull)
+                                {
+                                    <span>
+                                        Bu dönemde <strong>tam ay (30 gün)</strong> bildirimi
+                                        görünmektedir; sigortalılığınızın aktif olduğuna işaret eder.
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        Bu dönemde eksik gün bildirimi görünmektedir.
+                                        İşe giriş/çıkış, rapor veya kısmi çalışma gibi nedenler olabilir.
+                                    </span>
+                                }
+                                SGK bildirimleri zaman zaman geriden yansıyabilir; bu nedenle
+                                en güncel dönemin kaydı henüz sisteme işlenmemiş olabilir.
+                            </div>
+                        </div>
+                    }
+
+                    @if (doc.HasMissingDays)
+                    {
+                        <div class="yorum-satiri">
+                            <div class="yorum-baslik">Eksik Gün Bildirimi</div>
+                            <div class="yorum-metin">
+                                Bazı dönemlerde 30 günden az bildirim görünmektedir.
+                                Bu durum; işe giriş veya çıkış tarihleri, raporlu süre,
+                                ücretsiz izin, kısmi süreli çalışma ya da işyeri değişikliği
+                                gibi nedenlerden kaynaklanabilir.
+                                Bilginiz dışında bir eksiklik olduğunu düşünüyorsanız
+                                işvereniniz veya SGK ile görüşmeniz önerilir.
+                            </div>
+                        </div>
+                    }
+
+                    <div class="yorum-satiri" style="border-bottom:none;">
+                        <div class="yorum-baslik">Prim Günü Tek Başına Yeterli Mi?</div>
+                        <div class="yorum-metin">
+                            Hayır. Emeklilik hakkı; prim günü sayısının yanı sıra
+                            <strong>yaş koşulu</strong>, <strong>sigortalılık süresi</strong>,
+                            <strong>sigorta başlangıç tarihi</strong> ve
+                            <strong>sigorta statüsü (4A/4B/4C)</strong> gibi kriterlerin
+                            birlikte sağlanmasını gerektirir. Bu sayfa yalnızca prim günü
+                            ve P.E.K. bilgilerinizi özetlemektedir; kesin emeklilik
+                            değerlendirmesi için lütfen <strong>Emeklilik Durumu</strong>
+                            sayfasını inceleyin.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            @if (pekRecords.Any())
+            {
+                <div class="premium-detail-card">
+                    <h2>Prime Esas Kazanç (P.E.K.) Özeti</h2>
+                    <p style="color:#6b7280;margin:0 0 20px;line-height:1.7;">
+                        P.E.K., SGK'ya bildirilen kazanç matrahıdır. Emekli aylığı hesabında
+                        kullanılan önemli bir değerdir; bildirilen kazanç arttıkça emekli
+                        aylığı üzerindeki olumlu etkisi de artar. Aşağıdaki özet, belgedeki
+                        kayıtlardan otomatik hesaplanmıştır.
+                    </p>
+                    <div class="premium-summary-grid">
+                        @if (lastPek.HasValue)
+                        {
+                            <div class="premium-box">
+                                <span>Son Dönem P.E.K.</span>
+                                <strong>@lastPek.Value.ToString("N2") TL</strong>
+                            </div>
+                        }
+                        @if (avgPek.HasValue)
+                        {
+                            <div class="premium-box">
+                                <span>Ortalama P.E.K.</span>
+                                <strong>@avgPek.Value.ToString("N2") TL</strong>
+                            </div>
+                        }
+                        @if (minPek.HasValue)
+                        {
+                            <div class="premium-box">
+                                <span>En Düşük P.E.K.</span>
+                                <strong>@minPek.Value.ToString("N2") TL</strong>
+                            </div>
+                        }
+                        @if (maxPek.HasValue)
+                        {
+                            <div class="premium-box">
+                                <span>En Yüksek P.E.K.</span>
+                                <strong>@maxPek.Value.ToString("N2") TL</strong>
+                            </div>
+                        }
+                    </div>
+                    <p style="color:#9ca3af;margin:14px 0 0;font-size:13px;">
+                        * Asgari ücret veya tavan karşılaştırması için dönemsel resmi limitler
+                        gerektiğinden bu sayfada kesin bir kıyaslama yapılmamaktadır.
+                    </p>
+                </div>
+            }
+
+            @if (missingDayRecords.Any())
+            {
+                <div class="premium-detail-card">
+                    <h2>Eksik Gün Analizi</h2>
+                    <p style="color:#6b7280;margin:0 0 16px;line-height:1.7;">
+                        Aşağıdaki dönemlerde 30 günden az bildirim görünmektedir.
+                        Bu durum tek başına hata anlamına gelmez; ancak bilginiz
+                        dışındaki bir eksiklik varsa işvereniniz veya SGK ile
+                        kontrol etmeniz önerilir.
+                    </p>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Dönem</th>
+                                <th>Bildirilen Gün</th>
+                                <th>Eksik Gün</th>
+                                <th>P.E.K.</th>
+                                <th>Olası Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in missingDayRecords)
+                            {
+                                <tr>
+                                    <td>@item.Period</td>
+                                    <td><strong>@item.Days gün</strong></td>
+                                    <td style="color:#b45309;font-weight:600;">@(30 - item.Days) gün eksik</td>
+                                    <td>
+                                        @(item.PekAmount.HasValue
+                                            ? item.PekAmount.Value.ToString("N2") + " TL"
+                                            : "-")
+                                    </td>
+                                    <td style="color:#6b7280;font-size:13px;">
+                                        İşe giriş/çıkış, rapor veya kısmi çalışma olabilir
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <div class="premium-detail-card">
+                <h2>Dönemsel Prim Kayıtları</h2>
+                @if (monthlyRecords.Any())
+                {
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Dönem</th>
+                                <th>Gün</th>
+                                <th>P.E.K.</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in monthlyRecords)
+                            {
+                                <tr>
+                                    <td>@item.Period</td>
+                                    <td>@item.Days</td>
+                                    <td>
+                                        @(item.PekAmount.HasValue
+                                            ? item.PekAmount.Value.ToString("N2") + " TL"
+                                            : "-")
+                                    </td>
+                                    <td>
+                                        @if (item.Days == 30)
+                                        {
+                                            <span style="color:#15803d;font-weight:600;">Tam ay bildirimi</span>
+                                        }
+                                        else if (item.Days > 0 && item.Days < 30)
+                                        {
+                                            <span style="color:#b45309;font-weight:600;">Eksik gün olabilir</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color:#6b7280;">Gün bilgisi okunamadı</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p style="color:#6b7280;">Dönemsel kayıtlar otomatik olarak ayrıştırılamadı.</p>
+                }
+            </div>
+
+            <div class="premium-detail-card" style="border-left:5px solid #005BAC;">
+                <h2>Dikkat Edilmesi Gerekenler</h2>
+                <ul style="margin:0;padding-left:20px;color:#4b5563;line-height:2.1;">
+                    <li>
+                        Bu analiz <strong>resmi bir emeklilik kararı değildir</strong>;
+                        yüklenen belgedeki okunabilir verilerden otomatik üretilmiştir.
+                    </li>
+                    <li>
+                        Emeklilik değerlendirmesi için <strong>yaş, ilk sigorta başlangıcı,
+                        sigorta statüsü, borçlanma ve güncel mevzuat</strong> bilgileri
+                        ayrıca gereklidir.
+                    </li>
+                    <li>
+                        Eksik veya hatalı görünen kayıtlar için
+                        <strong>işvereniniz ya da SGK</strong> ile iletişime geçmeniz önerilir.
+                    </li>
+                    <li>
+                        SGK bildirimleri zaman zaman geriden sisteme yansıyabilir;
+                        en güncel bilgi için e-Devlet üzerinden kontrol ediniz.
+                    </li>
+                </ul>
+            </div>
+        }
+
+        <div class="premium-detail-card">
+            <h2>Sık Sorulan Sorular</h2>
+
+            <div class="sss-item">
+                <div class="sss-soru">Prim günü nedir?</div>
+                <div class="sss-cevap">
+                    Sigortalı olarak çalışıldığı ve SGK'ya bildirildiği gün sayısıdır.
+                    Emeklilik hakkının doğması için belirli bir prim günü koşulunun
+                    sağlanması zorunludur; ancak prim günü tek başına yeterli değildir.
+                </div>
+            </div>
+
+            <div class="sss-item">
+                <div class="sss-soru">Uzun vade prim gün sayısı ne anlama gelir?</div>
+                <div class="sss-cevap">
+                    SGK sigortaları kısa vade (iş kazası, hastalık) ve uzun vade
+                    (yaşlılık, malullük, ölüm) olarak ikiye ayrılır. Emeklilik
+                    değerlendirmesinde esas alınan, uzun vade prim günüdür.
+                </div>
+            </div>
+
+            <div class="sss-item">
+                <div class="sss-soru">P.E.K. nedir ve neden önemlidir?</div>
+                <div class="sss-cevap">
+                    Prime Esas Kazanç; SGK'ya bildirilen kazanç matrahıdır. Emekli aylığı
+                    hesabında kullanılır. Daha yüksek P.E.K. bildirimi emekli aylığını
+                    olumlu yönde etkiler.
+                </div>
+            </div>
+
+            <div class="sss-item">
+                <div class="sss-soru">Son bildirilen dönem neden önemlidir?</div>
+                <div class="sss-cevap">
+                    Sigortalılığın hâlâ devam edip etmediğini ve işvereninizin bildirimlerini
+                    düzenli yapıp yapmadığını anlamak için son bildirilen dönem bir gösterge
+                    niteliği taşır. Belge tarihinden önceki döneme ait kayıt bulunmaması
+                    halinde işvereninizle veya SGK ile kontrol etmeniz önerilir.
+                </div>
+            </div>
+
+            <div class="sss-item" style="border-bottom:none;padding-bottom:0;">
+                <div class="sss-soru">Eksik gün ne anlama gelebilir?</div>
+                <div class="sss-cevap">
+                    Bir ayda 30 günden az bildirim yapılması; ayın ortasında işe başlama
+                    veya ayrılma, raporlu süre, ücretsiz izin ya da kısmi süreli çalışma
+                    gibi durumlardan kaynaklanabilir. Bu durum her zaman bir hata anlamına
+                    gelmez; bağlamına göre değerlendirilmelidir.
+                </div>
+            </div>
+        </div>
+
+    </main>
+</section>
+
+<style>
+    .prim-yorum-listesi {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .yorum-satiri {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 20px;
+        padding: 18px 0;
+        border-bottom: 1px solid #e5e7eb;
+        align-items: start;
+    }
+
+    .yorum-baslik {
+        font-weight: 700;
+        color: #004B93;
+        font-size: 14px;
+        padding-top: 2px;
+    }
+
+    .yorum-metin {
+        color: #4b5563;
+        line-height: 1.7;
+        font-size: 14px;
+    }
+
+    .sss-item {
+        padding: 18px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .sss-soru {
+        font-weight: 700;
+        color: #004B93;
+        margin-bottom: 8px;
+        font-size: 15px;
+    }
+
+    .sss-cevap {
+        color: #4b5563;
+        line-height: 1.7;
+        font-size: 14px;
+    }
+
+    @@media (max-width: 700px) {
+        .yorum-satiri {
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+    }
+</style>

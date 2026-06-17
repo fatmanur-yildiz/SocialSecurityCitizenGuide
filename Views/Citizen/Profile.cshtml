@@ -1,0 +1,52 @@
+@using EmekliRehberi.Models
+
+@{
+    ViewData["Title"] = "Profilim";
+    ViewData["ActivePage"] = "Profile";
+    var currentUser = ViewBag.CurrentUser as AppUser;
+}
+<section class="dashboard-page">
+    @await Html.PartialAsync("_CitizenSidebar")
+
+    <main class="dashboard-content">
+        <div class="page-title">
+            <h1>Profilim</h1>
+            <p>Hesap bilgilerinizi ve sistemde kayıtlı temel kullanıcı bilgilerinizi görüntüleyebilirsiniz.</p>
+        </div>
+
+        <div class="profile-card">
+            <h2>Kullanıcı Bilgileri</h2>
+
+            @if (currentUser != null)
+            {
+                <div class="profile-row">
+                    <span>Ad Soyad</span>
+                    <strong>@currentUser.FirstName @currentUser.LastName</strong>
+                </div>
+
+                <div class="profile-row">
+                    <span>E-posta</span>
+                    <strong>@currentUser.Email</strong>
+                </div>
+
+                <div class="profile-row">
+                    <span>T.C. Kimlik No</span>
+                    <strong>*******@currentUser.TcKimlikNo.Substring(7, 4)</strong>
+                </div>
+
+                <div class="profile-row">
+                    <span>Kullanıcı Tipi</span>
+                    <strong>Vatandaş</strong>
+                </div>
+            }
+            else
+            {
+                <p>Kullanıcı bilgileri görüntülenemedi.</p>
+            }
+        </div>
+
+        <div class="info-warning">
+            Güvenlik nedeniyle hassas kimlik bilgileri sistem ekranlarında maskeli olarak gösterilir.
+        </div>
+    </main>
+</section>

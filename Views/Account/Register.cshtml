@@ -1,0 +1,57 @@
+@model EmekliRehberi.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<section class="auth-page">
+    <div class="auth-card large">
+        <h2>Kayıt Ol</h2>
+        <p>Sistemi kullanmak için hesap oluşturun.</p>
+
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="All" class="validation-summary"></div>
+
+            <div class="form-row">
+                <div>
+                    <label>Ad</label>
+                    <input asp-for="FirstName" placeholder="Adınız" />
+                </div>
+
+                <div>
+                    <label>Soyad</label>
+                    <input asp-for="LastName" placeholder="Soyadınız" />
+                </div>
+            </div>
+
+            <label>T.C. Kimlik No</label>
+            <input asp-for="TcKimlikNo" placeholder="11 haneli T.C. kimlik no" />
+
+            <label>E-posta</label>
+            <input asp-for="Email" placeholder="ornek@mail.com" />
+<label>Şifre</label>
+<input asp-for="Password" type="password" placeholder="Şifre oluşturun" />
+
+<label>Şifre Tekrarı</label>
+<input asp-for="ConfirmPassword" type="password" placeholder="Şifrenizi tekrar girin" />
+
+<small class="password-info">
+    Şifre en az 6 karakter olmalı; en az 1 büyük harf, 1 küçük harf ve 1 sayı içermelidir.
+</small>
+
+            <label>Kullanıcı Tipi</label>
+            <select asp-for="Role">
+                <option value="Vatandas">Vatandaş</option>
+                <option value="Memur">Memur</option>
+                <option value="Admin">Yönetici</option>
+            </select>
+
+            <button type="submit">Kayıt Ol</button>
+        </form>
+
+        <div class="auth-bottom">
+            Zaten hesabınız var mı?
+            <a href="/Account/Login">Giriş Yap</a>
+        </div>
+    </div>
+</section>

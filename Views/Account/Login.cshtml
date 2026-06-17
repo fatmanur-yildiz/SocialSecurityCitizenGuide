@@ -1,0 +1,29 @@
+@model EmekliRehberi.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+<section class="auth-page">
+    <div class="auth-card">
+        <h2>Giriş Yap</h2>
+        <p>Hesabınızla sisteme giriş yapın.</p>
+
+        <form asp-action="Login" method="post">
+            <div asp-validation-summary="All" class="validation-summary"></div>
+
+            <label>T.C. Kimlik No / E-posta</label>
+            <input asp-for="TcKimlikNoOrEmail" placeholder="Kullanıcı bilginizi giriniz" />
+
+            <label>Şifre</label>
+            <input asp-for="Password" type="password" placeholder="Şifrenizi giriniz" />
+
+            <button type="submit">Giriş Yap</button>
+        </form>
+
+        <div class="auth-bottom">
+            Hesabınız yok mu?
+            <a href="/Account/Register">Kayıt Ol</a>
+        </div>
+    </div>
+</section>

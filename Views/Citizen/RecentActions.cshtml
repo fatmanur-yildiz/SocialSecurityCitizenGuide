@@ -1,0 +1,48 @@
+@using EmekliRehberi.Models
+
+@{
+    ViewData["Title"] = "Son İşlemler";
+    ViewData["ActivePage"] = "RecentActions";
+    var records = ViewBag.Records as List<ServiceStatement>;
+}
+
+<section class="dashboard-page">
+    @await Html.PartialAsync("_CitizenSidebar")
+
+    <main class="dashboard-content">
+        <div class="page-title">
+            <h1>Son İşlemler</h1>
+            <p>Sistemde gerçekleştirdiğiniz son belge yükleme ve işlem kayıtlarını görüntüleyebilirsiniz.</p>
+        </div>
+
+        <div class="uploaded-documents">
+            <h2>İşlem Kayıtları</h2>
+
+            @if (records != null && records.Any())
+            {
+                <div class="document-list">
+                    @foreach (var item in records)
+                    {
+                        <div class="document-item">
+                            <div>
+                                <strong>Hizmet dökümü yüklendi</strong>
+                                <span>
+                                    @item.OriginalFileName - @item.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                                </span>
+                            </div>
+
+                            <div class="document-status">@item.Status</div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <p>Henüz işlem kaydı bulunmamaktadır.</p>
+                    <span>İlk işleminizi başlatmak için hizmet dökümünüzü yükleyebilirsiniz.</span>
+                </div>
+            }
+        </div>
+    </main>
+</section>

@@ -1,0 +1,486 @@
+@model EmekliRehberi.ViewModels.ServiceMergeInputViewModel
+@using EmekliRehberi.Models
+@using EmekliRehberi.Services
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Hizmet Birleştirme";
+    ViewData["ActivePage"] = "ServiceMerge";
+
+    var premium = ViewBag.LatestPremium as PremiumDocument;
+    var socialSec = ViewBag.LatestSocialSecurity as SocialSecurityRecordDocument;
+    var result = ViewBag.Result as ServiceMergeResult;
+
+    string BadgeColor(DataSufficiencyLevel level) => level switch
+    {
+        DataSufficiencyLevel.Yeterli => "#15803d",
+        DataSufficiencyLevel.Sinirli => "#b45309",
+        _ => "#b91c1c"
+    };
+
+    string BadgeBg(DataSufficiencyLevel level) => level switch
+    {
+        DataSufficiencyLevel.Yeterli => "#f0fdf4",
+        DataSufficiencyLevel.Sinirli => "#fffbeb",
+        _ => "#fef2f2"
+    };
+
+    string TypeColor(ServiceMergeCommentType type) => type switch
+    {
+        ServiceMergeCommentType.Success => "#15803d",
+        ServiceMergeCommentType.Warning => "#b45309",
+        _ => "#004B93"
+    };
+}
+
+<section class="dashboard-page">
+    @await Html.PartialAsync("_CitizenSidebar")
+
+    <main class="dashboard-content">
+
+        <div class="page-title">
+            <h1>Hizmet Birleştirme</h1>
+            <p>
+                Farklı sigorta statülerinde (4A, 4B, 4C) hizmetiniz olup olmadığını ve bunun
+                emeklilik sürecinize olası etkisini, mevcut belgeleriniz üzerinden ön
+                değerlendirme olarak gösterir. Bu sayfa resmi bir hizmet birleştirme veya
+                statü kararı vermez.
+            </p>
+        </div>
+
+        @* ── Veri kaynakları kartı ─────────────────────────────────── *@
+        <div class="premium-detail-card" style="margin-bottom:18px;">
+            <h2>Kullanılan Veri Kaynakları</h2>
+            <div class="veri-kaynak-grid">
+                <div class="veri-kaynak-item @(premium != null ? "kaynak-var" : "kaynak-yok")">
+                    <div class="kaynak-baslik">SGK Tescil ve Hizmet Dökümü</div>
+                    <div class="kaynak-durum">
+                        @if (premium != null)
+                        {
+                            <span style="color:#15803d;">&#10003; Yüklendi — @premium.CreatedAt.ToString("dd.MM.yyyy")</span>
+                        }
+                        else
+                        {
+                            <span style="color:#b45309;">&#9888; Yüklenmedi</span>
+                            <a href="/Citizen/PremiumInfo" style="display:block;margin-top:6px;color:#005BAC;font-weight:700;font-size:13px;">
+                                Prim Bilgilerim sayfasından yükleyin
+                            </a>
+                        }
+                    </div>
+                </div>
+                <div class="veri-kaynak-item @(socialSec != null ? "kaynak-var" : "kaynak-yok")">
+                    <div class="kaynak-baslik">Sosyal Güvenlik Kayıt Belgesi</div>
+                    <div class="kaynak-durum">
+                        @if (socialSec != null)
+                        {
+                            <span style="color:#15803d;">&#10003; Yüklendi — @socialSec.CreatedAt.ToString("dd.MM.yyyy")</span>
+                        }
+                        else
+                        {
+                            <span style="color:#b45309;">&#9888; Henüz yüklenmedi</span>
+                            <a href="/Citizen/RetirementStatus" style="display:block;margin-top:6px;color:#005BAC;font-weight:700;font-size:13px;">
+                                Emeklilik Durumu sayfasından yükleyin
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (result != null)
+        {
+            @* ── Sizin Durumunuz (ana kart) ───────────────────────── *@
+            <div class="premium-detail-card sizin-durumunuz-card">
+                <div class="sufficiency-badge" style="background:@(BadgeBg(result.DataSufficiency));color:@(BadgeColor(result.DataSufficiency));">
+                    @result.DataSufficiencyLabel
+                </div>
+                <h2 style="margin-top:10px;">Sizin Durumunuz</h2>
+                <p class="sizin-durumunuz-text">@result.YourSituationSummary</p>
+
+                @if (result.HasSocialSecurityDocument)
+                {
+                    <div class="mini-stat-grid">
+                        <div class="mini-stat">
+                            <span>4A</span>
+                            <strong>@(result.Days4A?.ToString() ?? "—")</strong>
+                        </div>
+                        <div class="mini-stat">
+                            <span>4B</span>
+                            <strong>@(result.Days4B?.ToString() ?? "—")</strong>
+                        </div>
+                        <div class="mini-stat">
+                            <span>4C</span>
+                            <strong>@(result.Days4C?.ToString() ?? "—")</strong>
+                        </div>
+                        <div class="mini-stat">
+                            <span>GM20</span>
+                            <strong>@(result.DaysGM20?.ToString() ?? "—")</strong>
+                        </div>
+                        <div class="mini-stat">
+                            <span>Toplam</span>
+                            <strong>@(result.EffectiveTotalDays > 0 ? result.EffectiveTotalDays.ToString() : "—")</strong>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @* ── Statü bazında gün dağılımı (sadece gerçek dağılım varsa bar göster) ─ *@
+            @if (result.HasSocialSecurityDocument)
+            {
+                <div class="premium-detail-card" style="margin-top:18px;">
+                    <h2>Statü Bazında Gün Dağılımı</h2>
+
+                    @if (result.ActiveBranches.Count == 0)
+                    {
+                        <p style="color:#6b7280;font-size:14px;margin:0;">
+                            Belirgin bir statü dağılımı tespit edilemedi. Sosyal Güvenlik Kayıt
+                            Belgenizin güncel olduğundan emin olun.
+                        </p>
+                    }
+                    else
+                    {
+                        var maxDay = new[] { result.Days4A ?? 0, result.Days4B ?? 0, result.Days4C ?? 0 }.Max();
+
+                        <div class="hizmet-bar-grid">
+                            @if ((result.Days4A ?? 0) > 0)
+                            {
+                                var w = maxDay > 0 ? (int)((double)result.Days4A!.Value * 100 / maxDay) : 0;
+                                <div class="hizmet-bar-row">
+                                    <span class="hizmet-bar-label">4A</span>
+                                    <div class="hizmet-bar-track">
+                                        <div class="hizmet-bar-fill bar-4a" style="width:@(w)%;"></div>
+                                    </div>
+                                    <span class="hizmet-bar-value">@result.Days4A gün</span>
+                                </div>
+                            }
+                            @if ((result.Days4B ?? 0) > 0)
+                            {
+                                var w = maxDay > 0 ? (int)((double)result.Days4B!.Value * 100 / maxDay) : 0;
+                                <div class="hizmet-bar-row">
+                                    <span class="hizmet-bar-label">4B</span>
+                                    <div class="hizmet-bar-track">
+                                        <div class="hizmet-bar-fill bar-4b" style="width:@(w)%;"></div>
+                                    </div>
+                                    <span class="hizmet-bar-value">@result.Days4B gün</span>
+                                </div>
+                            }
+                            @if ((result.Days4C ?? 0) > 0)
+                            {
+                                var w = maxDay > 0 ? (int)((double)result.Days4C!.Value * 100 / maxDay) : 0;
+                                <div class="hizmet-bar-row">
+                                    <span class="hizmet-bar-label">4C</span>
+                                    <div class="hizmet-bar-track">
+                                        <div class="hizmet-bar-fill bar-4c" style="width:@(w)%;"></div>
+                                    </div>
+                                    <span class="hizmet-bar-value">@result.Days4C gün</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+
+            @* ── Ön Değerlendirme (5 soru-cevap) ──────────────────── *@
+            <div class="premium-detail-card" style="margin-top:18px;">
+                <h2>Ön Değerlendirme</h2>
+                <div class="qa-list">
+                    @foreach (var item in result.AnalysisItems)
+                    {
+                        <div class="qa-row">
+                            <div class="qa-question">@item.Question</div>
+                            <div class="qa-answer" style="color:@(TypeColor(item.Type));">@item.Answer</div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* ── Diğer gözlemler ───────────────────────────────────── *@
+            @if (result.AdditionalNotes.Any())
+            {
+                <div class="premium-detail-card" style="margin-top:18px;">
+                    <h2>Diğer Gözlemler</h2>
+                    <div class="qa-list">
+                        @foreach (var note in result.AdditionalNotes)
+                        {
+                            <div class="qa-row">
+                                <div class="qa-question" style="color:@(TypeColor(note.Type));">@note.Title</div>
+                                <div class="qa-answer">@note.Text</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @* ── Tamamlanması önerilen bilgiler ───────────────────── *@
+            @if (result.MissingDataNotices.Any())
+            {
+                <div class="premium-detail-card" style="margin-top:18px;">
+                    <h2>Tamamlanması Önerilen Bilgiler</h2>
+                    <div class="checklist">
+                        @foreach (var notice in result.MissingDataNotices)
+                        {
+                            <div class="checklist-item check-missing">
+                                <span class="check-icon">○</span>
+                                <span>@notice</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+
+        @* ── Hedef statü formu (küçük, en aşağıda) ────────────────── *@
+        <div class="premium-detail-card target-status-card" style="margin-top:18px;">
+            <h3 style="margin:0 0 6px;font-size:14px;color:#374151;">Hedef Sigorta Statüsü (İsteğe Bağlı)</h3>
+            <p style="color:#9ca3af;margin:0 0 12px;font-size:12px;">
+                Hangi statüden emekli olmayı hedeflediğinizi belirtirseniz, ağırlıklı statü ile karşılaştırma yapılır.
+            </p>
+            <form method="post" style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;">
+                @Html.AntiForgeryToken()
+                <div class="form-group" style="max-width:220px;">
+                    <select asp-for="TargetStatus" class="form-input form-input-sm">
+                        <option value="Bilmiyorum">Bilmiyorum</option>
+                        <option value="4A">4A — SSK</option>
+                        <option value="4B">4B — Bağ-Kur</option>
+                        <option value="4C">4C — Emekli Sandığı</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-sm-primary">Karşılaştır</button>
+            </form>
+        </div>
+
+        @* ── Bilgilendirme notu (küçük, en altta) ─────────────────── *@
+        <div class="info-note-small">
+            <strong>Bilgilendirme Notu:</strong>
+            Bu sayfa resmi bir hizmet birleştirme veya statü kararı değildir; yüklenen belgeler
+            üzerinden otomatik üretilen ön bilgilendirmedir. Hangi statüden emeklilik işlemi
+            yapılacağı, hizmet sürelerinin dağılımı ve ilgili mevzuat hükümlerine göre belirlenir.
+            Borçlanma işlemleri statü dağılımını etkileyebilir
+            (<a href="/Citizen/DebtOptions">Borçlanma İşlemleri</a>). Kesin bilgi için SGK'ya
+            veya yetkili bir danışmana başvurmanız önerilir.
+        </div>
+
+    </main>
+</section>
+
+<style>
+    .veri-kaynak-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .veri-kaynak-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 16px 18px;
+        background: #f9fafb;
+    }
+
+    .kaynak-var { border-left: 4px solid #15803d; }
+    .kaynak-yok { border-left: 4px solid #b45309; }
+
+    .kaynak-baslik {
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .kaynak-durum { font-size: 13px; }
+
+    .sizin-durumunuz-card {
+        border-left: 5px solid #005BAC;
+    }
+
+    .sufficiency-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .sizin-durumunuz-text {
+        color: #374151;
+        line-height: 1.8;
+        font-size: 15px;
+        margin: 8px 0 18px;
+    }
+
+    .mini-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+
+    .mini-stat {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .mini-stat span {
+        display: block;
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 4px;
+    }
+
+    .mini-stat strong {
+        font-size: 16px;
+        color: #111827;
+    }
+
+    .hizmet-bar-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .hizmet-bar-row {
+        display: grid;
+        grid-template-columns: 40px 1fr 80px;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .hizmet-bar-label {
+        font-weight: 700;
+        color: #374151;
+        font-size: 13px;
+    }
+
+    .hizmet-bar-track {
+        background: #f3f4f6;
+        border-radius: 6px;
+        height: 14px;
+        overflow: hidden;
+    }
+
+    .hizmet-bar-fill {
+        height: 100%;
+        border-radius: 6px;
+    }
+
+    .bar-4a { background: #005BAC; }
+    .bar-4b { background: #b45309; }
+    .bar-4c { background: #6d28d9; }
+
+    .hizmet-bar-value {
+        font-size: 12px;
+        color: #6b7280;
+        text-align: right;
+    }
+
+    .qa-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .qa-row {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: 20px;
+        padding: 14px 0;
+        border-bottom: 1px solid #e5e7eb;
+        align-items: start;
+    }
+
+    .qa-row:last-child {
+        border-bottom: none;
+    }
+
+    .qa-question {
+        font-weight: 700;
+        color: #004B93;
+        font-size: 13px;
+        padding-top: 2px;
+    }
+
+    .qa-answer {
+        color: #4b5563;
+        line-height: 1.7;
+        font-size: 14px;
+    }
+
+    .checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .check-missing { background: #fffbeb; color: #92400e; }
+
+    .check-icon {
+        font-weight: 700;
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .target-status-card {
+        background: #fafafa;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-input-sm {
+        height: 34px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 0 8px;
+        font-size: 13px;
+        background: white;
+    }
+
+    .btn-sm-primary {
+        height: 34px;
+        padding: 0 18px;
+        background: #005BAC;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .info-note-small {
+        margin-top: 18px;
+        padding: 12px 16px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 12px;
+        color: #6b7280;
+        line-height: 1.7;
+    }
+
+    .info-note-small a {
+        color: #005BAC;
+        font-weight: 600;
+    }
+
+    @@media (max-width: 800px) {
+        .veri-kaynak-grid { grid-template-columns: 1fr; }
+        .qa-row { grid-template-columns: 1fr; gap: 4px; }
+        .hizmet-bar-row { grid-template-columns: 32px 1fr 60px; }
+        .mini-stat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+</style>

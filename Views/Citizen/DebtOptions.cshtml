@@ -1,0 +1,84 @@
+@using EmekliRehberi.Models
+
+@{
+    ViewData["Title"] = "Borçlanma İşlemleri";
+    ViewData["ActivePage"] = "DebtOptions";
+    var latestStatement = ViewBag.LatestStatement as ServiceStatement;
+}
+<section class="dashboard-page">
+    @await Html.PartialAsync("_CitizenSidebar")
+
+    <main class="dashboard-content">
+        <div class="page-title">
+            <h1>Borçlanma İşlemleri</h1>
+            <p>
+                Doğum, askerlik ve diğer borçlanma türleri hakkında temel bilgilere ulaşabilirsiniz.
+            </p>
+        </div>
+
+        @if (latestStatement == null)
+        {
+            <div class="empty-service-warning">
+                <h2>Borçlanma değerlendirmesi için hizmet dökümü önerilir</h2>
+                <p>
+                    Borçlanma seçeneklerinin daha doğru yorumlanabilmesi için önce hizmet dökümü belgenizi yüklemeniz önerilir.
+                </p>
+                <a href="/Citizen/ServiceStatement">Hizmet Dökümü Yükle</a>
+            </div>
+        }
+        else
+        {
+            <div class="uploaded-main-card">
+                <div>
+                    <h2>Hizmet dökümünüz bulundu</h2>
+                    <p>
+                        <strong>@latestStatement.OriginalFileName</strong> adlı belge
+                        @latestStatement.CreatedAt.ToString("dd.MM.yyyy HH:mm") tarihinde yüklenmiştir.
+                        Borçlanma bilgilendirmelerinde bu kayıt dikkate alınacaktır.
+                    </p>
+                </div>
+
+                <span class="document-status">@latestStatement.Status</span>
+            </div>
+        }
+
+        <div class="service-dashboard-grid">
+            <div class="service-tile">
+                <h3>Doğum Borçlanması</h3>
+                <p>
+                    Kadın sigortalıların doğum nedeniyle çalışamadıkları bazı süreleri borçlanabilmesine ilişkin bilgilendirme.
+                </p>
+            </div>
+
+            <div class="service-tile">
+                <h3>Askerlik Borçlanması</h3>
+                <p>
+                    Askerlikte geçen sürelerin belirli şartlarla borçlanılmasına ilişkin başvuru ve süreç bilgileri.
+                </p>
+            </div>
+
+            <div class="service-tile">
+                <h3>Yurtdışı Borçlanması</h3>
+                <p>
+                    Yurtdışında geçen çalışma veya ikamet sürelerine ilişkin genel bilgilendirme.
+                </p>
+            </div>
+
+            <div class="service-tile">
+                <h3>Borçlanma Başvurusu Öncesi</h3>
+                <p>
+                    Başvuru öncesinde hizmet dökümü, sigorta başlangıcı ve eksik prim günlerinin kontrol edilmesi önerilir.
+                </p>
+            </div>
+        </div>
+
+        <div class="guidance-card">
+            <h2>Bu sayfada ileride neler olacak?</h2>
+            <ul>
+                <li>Kullanıcıdan çocuk sayısı, doğum tarihi veya askerlik bilgisi alınacak.</li>
+                <li>Sistem, girilen bilgilere göre hangi borçlanma türünün incelenebileceğini gösterecek.</li>
+                <li>Sonuçlar kesin karar değil, ön bilgilendirme olarak sunulacak.</li>
+            </ul>
+        </div>
+    </main>
+</section>
