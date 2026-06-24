@@ -89,7 +89,6 @@
         @* ─── Sayfa başlığı ve bölüm navigasyonu ──────────────────────── *@
         <div class="page-title" style="margin-bottom:12px;">
             <h1>Emeklilik Durumu</h1>
-            <p>Belgelerinize göre kısa ön değerlendirme. Kesin sonuç için SGK/e-Devlet araçlarına yönlendirilirsiniz.</p>
         </div>
 
         <nav class="section-nav" aria-label="Sayfa bölümleri">
@@ -105,11 +104,6 @@
                 <span class="rs-section-icon">📖</span>
                 <h2>Genel Bilgi</h2>
             </div>
-
-            <p style="color:#6b7280;font-size:14px;line-height:1.7;margin:0 0 18px;">
-                Emeklilik sürecinde sık karşılaşılan temel kavramları sade biçimde inceleyebilirsiniz.
-                Bu bölüm bilgilendirme amaçlıdır; kişiye özel kesin hesaplamalar için SGK'nın resmi araçları kullanılmalıdır.
-            </p>
 
             @{
                 const string sgkGenelLink = "https://www.sgk.gov.tr/Content/Post/24a62093-24ca-4a18-81e1-f79300b94a49/Emekli-Kavrami-2022-05-15-05-12-26";
@@ -342,10 +336,10 @@
             @* Belge yükleme *@
             <div class="upload-card" style="margin-bottom:20px;">
                 <div>
-                    <h2>Sosyal Güvenlik Kayıt Belgesi @(hasSocialSecDoc ? "— Güncelle" : "Yükle")</h2>
+                    <h2>Sosyal Güvenlik Kayıt Belgesi Yükle</h2>
                     <p style="color:#6b7280;margin:4px 0 0;font-size:13px;">
                         @(hasSocialSecDoc
-                            ? "Güncel belgeniz varsa yeni yükleyebilirsiniz; sistem son yüklenen belgeyi kullanır."
+                            ? "Yeni bir belge yüklemek isterseniz dosya seçerek işlemi tekrarlayabilirsiniz; sistem son yüklenen belgeyi kullanır."
                             : "e-Devlet'teki \"Sosyal Güvenlik Kayıt Belgesi Sorgulama\" sayfasından indirdiğiniz PDF'i yükleyin.")
                     </p>
                 </div>
@@ -475,7 +469,7 @@
                         </div>
                     </details>
 
-                    <button type="submit" class="btn-primary">Değerlendirmeyi Güncelle</button>
+                    <button type="submit" class="btn-primary">Analizi Başlat</button>
                 </form>
             </div>
 
@@ -663,10 +657,9 @@
                     <div class="analysis-card">
                         <div class="ac-icon">💰</div>
                         <div class="ac-title">Emekli Aylığı Tahmini</div>
-                        <div class="ac-value" style="font-size:14px;font-weight:600;color:#6b7280;">Net maaş hesaplanamaz</div>
+                        <div class="ac-value" style="font-size:15px;font-weight:700;color:#6b7280;">Aylık hesaplanamamıştır</div>
                         <div class="ac-note">
-                            Bu belgeler emekli aylığını kesin hesaplamak için yeterli değildir.
-                            Resmi hesaplama için aşağıdaki SGK araçlarını kullanın.
+                            Toplam hizmet gününüz 3600'den az olduğu için aylık hesaplanamamıştır.
                         </div>
                     </div>
 
@@ -706,24 +699,6 @@
                         </div>
                     }
 
-                    @if (premium != null && !string.IsNullOrWhiteSpace(premium.LastPeriod))
-                    {
-                        <div class="premium-detail-card" style="margin-bottom:18px;">
-                            <h2>Son Bildirim Durumu</h2>
-                            <p style="color:#4b5563;font-size:14px;line-height:1.7;margin:0;">
-                                Son bildirilen dönem: <strong>@premium.LastPeriod</strong>.
-                                SGK bildirimleri geriden yansıyabileceğinden içinde bulunulan ayın kaydı henüz sisteme düşmemiş olabilir.
-                                @if (premium.HasMissingDays)
-                                {
-                                    <span>
-                                        Bazı dönemlerde 30 günden az bildirim var — nedeni işe giriş/çıkış veya kısmi çalışma olabilir.
-                                        <a href="/Citizen/PremiumInfo" style="color:#005BAC;font-weight:700;">Prim Bilgilerim →</a>
-                                    </span>
-                                }
-                            </p>
-                        </div>
-                    }
-
                     @if (avgPek.HasValue)
                     {
                         <div class="premium-detail-card" style="margin-bottom:18px;">
@@ -757,7 +732,7 @@
                                         <span>Son bildirilen kazanç ortalamanıza yakın görünüyor.</span>
                                     }
                                 }
-                                Bildirilen kazanç düzeyi emekli aylığını etkileyen unsurlardan biridir; ancak kesin hesaplama için SGK araçlarını kullanın.
+                                Bildirilen kazanç düzeyi emekli aylığını etkileyen unsurlardan biridir.
                             </p>
                         </div>
                     }
@@ -795,11 +770,7 @@
             @* ── RESMİ SGK HESAPLAMA ARAÇLARI ─────────────────────────── *@
             <h3 class="rs-subsection-title" style="margin-top:32px;">Resmi SGK Hesaplama Araçları</h3>
             <p style="color:#6b7280;font-size:13px;margin:0 0 18px;">
-                Kesin emeklilik tarihi ve aylık hesabı için SGK'nın resmi araçlarını kullanın.
-                @if (statusGroup != "Belirsiz")
-                {
-                    <span>Statünüze uygun araçlar <span class="sgk-badge-recommended">Önerilen</span> etiketi ile gösterilmektedir.</span>
-                }
+                İlgili hesaplama araçları aşağıda listelenmiştir.
             </p>
 
             <div class="sgk-tools-grid">
@@ -888,15 +859,6 @@
                     <div class="sgk-tool-btn">e-Devlet'te Aç →</div>
                 </a>
 
-            </div>
-
-            @* Bilgilendirme notu *@
-            <div class="premium-detail-card" style="border-left:4px solid #005BAC;margin-top:12px;margin-bottom:20px;">
-                <p style="color:#4b5563;font-size:13px;line-height:1.7;margin:0;">
-                    Bu ekran yüklenen belgeler üzerinden ön değerlendirme sunar; kesin emeklilik kararı vermez.
-                    Farklı statü, eksik kayıt veya hatalı prim bildirimi durumlarında SGK ile görüşmeniz gerekir.
-                    <strong>Resmi başvuru ve kesin sonuç için SGK kayıtları esas alınır.</strong>
-                </p>
             </div>
 
         </section>

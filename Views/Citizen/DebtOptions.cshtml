@@ -12,19 +12,9 @@
 
         <div class="page-title" style="margin-bottom:16px;">
             <h1>Borçlanma İşlemleri</h1>
-            <p>Doğum, askerlik, yurt dışı ve diğer borçlanma türleri hakkında sade bilgilendirme ve resmi SGK/e-Devlet yönlendirmesi.</p>
         </div>
 
-        @* ── 1. Uyarı / Bilgilendirme Bannerı ─────────────────────────── *@
-        <div class="debt-banner">
-            <span class="debt-banner-icon">ℹ️</span>
-            <span>
-                Bu ekran yalnızca ön bilgilendirme ve yönlendirme amaçlıdır. Borçlanma hakkı, kesin borç tutarı
-                ve başvuru sonucu SGK/e-Devlet kayıtlarına göre belirlenir.
-            </span>
-        </div>
-
-        @* ── 2. Borçlanma Nedir? ──────────────────────────────────────── *@
+        @* ── 1. Borçlanma Nedir? ──────────────────────────────────────── *@
         <section class="debt-section">
             <div class="debt-section-header">
                 <span class="debt-section-icon">📘</span>
@@ -36,7 +26,7 @@
             </p>
         </section>
 
-        @* ── 3. Borçlanma Türleri ─────────────────────────────────────── *@
+        @* ── 2. Borçlanma Türleri ─────────────────────────────────────── *@
         <section class="debt-section">
             <div class="debt-section-header">
                 <span class="debt-section-icon">🗂️</span>
@@ -55,7 +45,7 @@
                         <span class="debt-info-chevron">▾</span>
                     </summary>
                     <div class="debt-info-detail">
-                        <p>Doğum borçlanması, sigortalı kadının doğumdan sonraki belirli süreleri için borçlanma yapabilmesine imkan tanır. Değerlendirmede doğum tarihi, sigorta başlangıcı, doğum sonrası prim bildirimi ve çocuğun yaşaması gibi bilgiler önemlidir. Bu ekran yalnızca genel bilgi verir; kesin değerlendirme SGK kayıtlarına göre yapılır.</p>
+                        <p>Doğum borçlanması, sigortalı kadının doğumdan sonraki belirli süreleri için borçlanma yapabilmesine imkan tanır. Değerlendirmede doğum tarihi, sigorta başlangıcı, doğum sonrası prim bildirimi ve çocuğun yaşaması gibi bilgiler önemlidir.</p>
                         <a href="https://www.sgk.gov.tr/Content/Post/4aa4cd49-4af5-43f2-8ecc-ec00326153ff/Dogum-Borclanmasi-2026-05-11-10-54-53"
                            target="_blank" rel="noopener noreferrer" class="debt-info-btn">SGK'da İncele →</a>
                     </div>
@@ -71,7 +61,7 @@
                         <span class="debt-info-chevron">▾</span>
                     </summary>
                     <div class="debt-info-detail">
-                        <p>Askerlik borçlanması, er, erbaş veya yedek subay okulunda geçen sürelerin borçlanılarak prim gününe eklenebilmesini sağlayabilir. Askerlik sigorta başlangıcından önce yapılmışsa sigorta başlangıç tarihine etkisi ayrıca değerlendirilebilir. Kesin sonuç SGK tarafından belirlenir.</p>
+                        <p>Askerlik borçlanması, er, erbaş veya yedek subay okulunda geçen sürelerin borçlanılarak prim gününe eklenebilmesini sağlayabilir. Askerlik sigorta başlangıcından önce yapılmışsa sigorta başlangıç tarihine etkisi ayrıca değerlendirilebilir.</p>
                         <a href="@sgkGenelBorclanmaLink"
                            target="_blank" rel="noopener noreferrer" class="debt-info-btn">SGK Borçlanmalar Sayfası →</a>
                     </div>
@@ -119,7 +109,7 @@
                         <span class="debt-info-chevron">▾</span>
                     </summary>
                     <div class="debt-info-detail">
-                        <p>SGK mevzuatında sigortalı olmaksızın geçirilen bazı doktora, tıpta uzmanlık veya avukatlık stajı süreleri için borçlanma yapılabilen durumlar bulunabilir. Bu tür borçlanmalar kişiye ve belgelere göre değiştiği için sistem kesin uygunluk sonucu vermez.</p>
+                        <p>SGK mevzuatında sigortalı olmaksızın geçirilen bazı doktora, tıpta uzmanlık veya avukatlık stajı süreleri için borçlanma yapılabilen durumlar bulunabilir. Bu tür borçlanmalar kişiye ve belgelere göre değişebilir.</p>
                         <a href="@sgkGenelBorclanmaLink"
                            target="_blank" rel="noopener noreferrer" class="debt-info-btn">SGK'da İncele →</a>
                     </div>
@@ -167,7 +157,7 @@
                         <span class="debt-info-chevron">▾</span>
                     </summary>
                     <div class="debt-info-detail">
-                        <p>Borçlanma tutarı başvuru tarihindeki resmi değerlere göre hesaplanır. Doğum borçlanması ve diğer borçlanma türlerinde uygulanacak oranlar farklı olabilir. Bu nedenle bu sayfa yalnızca genel bilgi verir; kesin tutar için SGK/e-Devlet borçlanma tutarı hesaplama hizmeti kullanılmalıdır.</p>
+                        <p>Borçlanma tutarı başvuru tarihindeki resmi değerlere göre hesaplanır. Doğum borçlanması ve diğer borçlanma türlerinde uygulanacak oranlar farklı olabilir. Borçlanma tutarı hesaplama hizmeti e-Devlet üzerinden de kontrol edilebilir.</p>
                         <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-borclanma-tutari-hesaplama"
                            target="_blank" rel="noopener noreferrer" class="debt-info-btn">e-Devlet'te Tutar Hesapla →</a>
                     </div>
@@ -176,15 +166,14 @@
             </div>
         </section>
 
-        @* ── 4. Borçlanma Sihirbazı ────────────────────────────────────── *@
+        @* ── 3. Borçlanma Tutarı Hesaplama ─────────────────────────────── *@
         <section class="debt-section">
             <div class="debt-section-header">
                 <span class="debt-section-icon">🧮</span>
-                <h2>Borçlanma Sihirbazı</h2>
+                <h2>Borçlanma Tutarı Hesaplama</h2>
             </div>
             <p style="color:#6b7280;font-size:14px;line-height:1.7;margin:0 0 18px;">
-                Borçlanmak istediğiniz süre türünü seçerek yaklaşık gün ve tutar hesabı yapabilirsiniz.
-                Bu hesaplama yalnızca ön bilgilendirme amaçlıdır; kesin tutar ve hak sahipliği SGK tarafından belirlenir.
+                Borçlanmak istediğiniz süre türünü seçerek gün ve tutar hesabı yapabilirsiniz.
             </p>
 
             @* Tür seçimi *@
@@ -231,12 +220,8 @@
                         <input type="date" id="dogum-ilk-sigorta" class="debt-form-input" />
                     </div>
                 </div>
-                <p class="debt-form-note">
-                    Günlük kazanç tutarı başvuru tarihindeki prime esas kazanç sınırlarına göre belirlenir.
-                    Buradaki değer tahmini hesap içindir.
-                </p>
                 <div class="debt-form-warning" id="dogum-uyari"></div>
-                <button type="button" class="debt-calc-btn" onclick="calculateDogum()">Tahmini Hesapla</button>
+                <button type="button" class="debt-calc-btn" onclick="calculateDogum()">Hesapla</button>
             </div>
 
             @* ── Askerlik Borçlanması formu ──────────────────────────────── *@
@@ -264,12 +249,8 @@
                     </div>
                 </div>
                 <p class="debt-form-note" id="ask-sure-bilgi"></p>
-                <p class="debt-form-note">
-                    Günlük kazanç tutarı başvuru tarihindeki prime esas kazanç sınırlarına göre belirlenir.
-                    Buradaki değer tahmini hesap içindir.
-                </p>
                 <div class="debt-form-warning" id="askerlik-uyari"></div>
-                <button type="button" class="debt-calc-btn" onclick="calculateAskerlik()">Tahmini Hesapla</button>
+                <button type="button" class="debt-calc-btn" onclick="calculateAskerlik()">Hesapla</button>
             </div>
 
             @* ── Yurt Dışı Borçlanması formu ─────────────────────────────── *@
@@ -285,15 +266,11 @@
                     </div>
                 </div>
                 <p class="debt-form-note">
-                    Günlük kazanç tutarı başvuru tarihindeki prime esas kazanç sınırlarına göre belirlenir.
-                    Buradaki değer tahmini hesap içindir.
-                </p>
-                <p class="debt-form-note">
                     2026 yılı için yurt dışı borçlanmasında bir gün için ödenmesi gereken tutarın alt sınırı
                     495,45 TL, üst sınırı 4.459,05 TL olarak açıklanmıştır. Bu değerler başvuru tarihine göre değişebilir.
                 </p>
                 <div class="debt-form-warning" id="yurtdisi-uyari"></div>
-                <button type="button" class="debt-calc-btn" onclick="calculateYurtdisi()">Tahmini Hesapla</button>
+                <button type="button" class="debt-calc-btn" onclick="calculateYurtdisi()">Hesapla</button>
             </div>
 
             @* ── Diğer Borçlanmalar ──────────────────────────────────────── *@
@@ -331,27 +308,16 @@
                         <div class="ac-title">Emekliliğe Olası Etki</div>
                         <div class="ac-value" style="font-size:13px;font-weight:600;color:#374151;" id="result-etki">—</div>
                     </div>
-                    <div class="analysis-card analysis-card--warn">
-                        <div class="ac-icon">⚠️</div>
-                        <div class="ac-title">Dikkat / Resmi Sonuç Uyarısı</div>
-                        <div class="ac-note">
-                            Bu hesaplama resmi borç çıkarmaz. Kesin borç tutarı, başvuru tarihindeki SGK/e-Devlet
-                            kayıtlarına ve seçilen günlük kazanç tutarına göre belirlenir.
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
 
-        @* ── 5. Resmi SGK / e-Devlet Araçları ─────────────────────────── *@
+        @* ── 4. Resmi SGK / e-Devlet Araçları ─────────────────────────── *@
         <section class="debt-section">
             <div class="debt-section-header">
                 <span class="debt-section-icon">🌐</span>
                 <h2>Resmi SGK / e-Devlet Araçları</h2>
             </div>
-            <p style="color:#6b7280;font-size:13px;margin:0 0 16px;">
-                Başvuru ve kesin hesaplama için resmi SGK/e-Devlet ekranlarını kullanın.
-            </p>
 
             <div class="debt-tools-grid">
 
@@ -406,28 +372,10 @@
 
             </div>
         </section>
-
-        @* Bilgilendirme notu *@
-        <div class="premium-detail-card" style="border-left:4px solid #005BAC;margin-top:8px;">
-            <p style="color:#4b5563;font-size:13px;line-height:1.7;margin:0;">
-                Bu sayfa yalnızca genel bilgilendirme ve resmi kaynaklara yönlendirme amaçlıdır; borçlanma türü seçimi,
-                tahmini tutar ve emekliliğe etki hesaplaması ileride bu sayfaya eklenecektir.
-                <strong>Kesin borçlanma hakkı ve tutarı için SGK/e-Devlet kayıtları esas alınır.</strong>
-            </p>
-        </div>
-
-    </main>
+</main>
 </section>
 
 <style>
-    /* Uyarı bannerı */
-    .debt-banner {
-        display:flex; align-items:flex-start; gap:10px;
-        background:#eff6ff; border:1px solid #bfdbfe; border-left:4px solid #2563eb;
-        border-radius:10px; padding:14px 16px; margin-bottom:24px;
-        font-size:13px; color:#1e3a5f; line-height:1.6;
-    }
-    .debt-banner-icon { font-size:16px; flex-shrink:0; }
 
     /* Bölüm başlıkları */
     .debt-section { margin-bottom:30px; }
@@ -505,7 +453,7 @@
     details > summary { list-style:none; }
     details > summary::-webkit-details-marker { display:none; }
 
-    /* ── Borçlanma Sihirbazı ────────────────────────────────────────── */
+    /* ── Borçlanma Tutarı Hesaplama ────────────────────────────────────────── */
     .debt-type-selector {
         display:grid;
         grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
@@ -659,7 +607,7 @@
             kullanilanGun.toLocaleString('tr-TR') + ' gün',
             gunNot,
             tutar,
-            'Prim gününü artırabilir. Kesin uygunluk doğum tarihi, primsiz süre ve SGK kayıtlarına göre belirlenir.'
+            'Prim gününü artırabilir.'
         );
     };
 
@@ -720,7 +668,7 @@
             gun.toLocaleString('tr-TR') + ' gün',
             '',
             tutar,
-            'Yurt dışında geçen bazı sürelerin Türkiye\'deki sosyal güvenlik hesabına dahil edilmesine yardımcı olabilir. Kesin değerlendirme SGK tarafından yapılır.'
+            'Yurt dışında geçen bazı sürelerin Türkiye\'deki sosyal güvenlik hesabına dahil edilmesine yardımcı olabilir.'
         );
     };
 })();

@@ -42,20 +42,8 @@
             <h1>Hizmet Birleştirme</h1>
             <p>
                 Farklı sigorta statülerinde (4A, 4B, 4C) hizmetiniz olup olmadığını ve bunun
-                emeklilik sürecinize olası etkisini, mevcut belgeleriniz üzerinden ön
-                değerlendirme olarak gösterir. Bu sayfa resmi bir hizmet birleştirme veya
-                statü kararı vermez.
+                emeklilik sürecinize olası etkisini mevcut belgeleriniz üzerinden gösterir.
             </p>
-        </div>
-
-        @* ── Üst bilgilendirme bannerı ─────────────────────────────── *@
-        <div class="sm-banner">
-            <span class="sm-banner-icon">ℹ️</span>
-            <span>
-                Bu ekran, farklı sigorta statülerindeki hizmetlerinizi anlamanıza yardımcı olan bir
-                ön rehberdir. Hizmet birleştirme başvurusu ve kesin statü kararı SGK/e-Devlet
-                kayıtlarına göre yapılır.
-            </span>
         </div>
 
         @* ── Hizmet Birleştirme Nedir? bilgi kartları ─────────────────── *@
@@ -108,19 +96,6 @@
                     </div>
                 </details>
 
-                <details class="sm-info-card">
-                    <summary class="sm-info-summary">
-                        <span class="sm-info-icon">🚫</span>
-                        <span class="sm-info-text">
-                            <span class="sm-info-title">Hizmet Birleştirme Ne Değildir?</span>
-                            <span class="sm-info-short">Bu işlem doğrudan emekli maaşı hesaplama veya kesin statü kararı değildir.</span>
-                        </span>
-                        <span class="sm-info-chevron">▾</span>
-                    </summary>
-                    <div class="sm-info-detail">
-                        <p>Hizmet birleştirme, farklı kayıtlardaki hizmetlerin emeklilik sürecinde birlikte değerlendirilmesine yönelik idari bir süreçtir. Bu sayfa yalnızca ön bilgilendirme sunar; resmi karar SGK kayıtlarına göre verilir.</p>
-                    </div>
-                </details>
             </div>
         </section>
 
@@ -256,9 +231,9 @@
                 </div>
             }
 
-            @* ── Ön Değerlendirme (5 soru-cevap) ──────────────────── *@
+            @* ── Değerlendirme (soru-cevap ve diğer gözlemler) ──────────────────── *@
             <div class="premium-detail-card" style="margin-top:18px;">
-                <h2>Ön Değerlendirme</h2>
+                <h2>Değerlendirme</h2>
                 <div class="qa-list">
                     @foreach (var item in result.AnalysisItems)
                     {
@@ -266,6 +241,25 @@
                             <div class="qa-question">@item.Question</div>
                             <div class="qa-answer" style="color:@(TypeColor(item.Type));">@item.Answer</div>
                         </div>
+                    }
+
+                    @{
+                        var visibleNotes = result.AdditionalNotes
+                            .Where(n => n.Title != "Hedef Statü Karşılaştırması")
+                            .ToList();
+                    }
+
+                    @if (visibleNotes.Any())
+                    {
+                        <div class="qa-section-title">Diğer Gözlemler</div>
+
+                        @foreach (var note in visibleNotes)
+                        {
+                            <div class="qa-row">
+                                <div class="qa-question" style="color:@(TypeColor(note.Type));">@note.Title</div>
+                                <div class="qa-answer">@note.Text</div>
+                            </div>
+                        }
                     }
                 </div>
             </div>
@@ -331,8 +325,7 @@
 
             <p style="color:#6b7280;font-size:14px;line-height:1.7;margin:0 0 6px;">
                 Son 7 yıllık fiili hizmet süresindeki statü dağılımınızı biliyorsanız, aşağıdaki alanlara
-                manuel girerek hangi statünün ağırlıklı göründüğünü ön kontrol edebilirsiniz. Bu hesaplama
-                resmi statü kararı değildir.
+                manuel girerek hangi statünün ağırlıklı göründüğünü kontrol edebilirsiniz.
             </p>
             <p style="color:#9ca3af;font-size:12px;line-height:1.6;margin:0 0 16px;">
                 Bu alanı doldurmak zorunlu değildir. Son 7 yıldaki statü günlerinizi bilmiyorsanız resmi
@@ -447,28 +440,7 @@
         </section>
 
         @if (result != null)
-{
-    @* ── Diğer gözlemler ───────────────────────────────────── *@
-    var visibleNotes = result.AdditionalNotes
-        .Where(n => n.Title != "Hedef Statü Karşılaştırması")
-        .ToList();
-
-    if (visibleNotes.Any())
-    {
-                <div class="premium-detail-card" style="margin-top:18px;">
-                    <h2>Diğer Gözlemler</h2>
-                    <div class="qa-list">
-                        @foreach (var note in visibleNotes)
-                        {
-                            <div class="qa-row">
-                                <div class="qa-question" style="color:@(TypeColor(note.Type));">@note.Title</div>
-                                <div class="qa-answer">@note.Text</div>
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-
+        {
             @* ── Tamamlanması önerilen bilgiler ───────────────────── *@
             @if (result.MissingDataNotices.Any())
             {
@@ -486,15 +458,6 @@
                 </div>
             }
         }
-
-        @* ── Bilgilendirme notu (küçük, en altta) ─────────────────── *@
-        <div class="info-note-small">
-            <strong>Bilgilendirme Notu:</strong>
-            Bu sayfa resmi bir hizmet birleştirme veya statü kararı değildir; yüklenen belgeler
-            üzerinden otomatik üretilen ön bilgilendirmedir. Hangi statüden emeklilik işlemi
-            yapılacağı, hizmet sürelerinin dağılımı ve ilgili mevzuat hükümlerine göre SGK
-            tarafından belirlenir. Kesin bilgi için SGK/e-Devlet kayıtları esas alınır.
-        </div>
 
     </main>
 </section>
@@ -642,6 +605,15 @@
         font-size: 14px;
     }
 
+    .qa-section-title {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid #e5e7eb;
+        font-weight: 800;
+        color: #111827;
+        font-size: 14px;
+    }
+
     .checklist {
         display: flex;
         flex-direction: column;
@@ -697,22 +669,6 @@
         cursor: pointer;
     }
 
-    .info-note-small {
-        margin-top: 18px;
-        padding: 12px 16px;
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        font-size: 12px;
-        color: #6b7280;
-        line-height: 1.7;
-    }
-
-    .info-note-small a {
-        color: #005BAC;
-        font-weight: 600;
-    }
-
     @@media (max-width: 800px) {
         .veri-kaynak-grid { grid-template-columns: 1fr; }
         .qa-row { grid-template-columns: 1fr; gap: 4px; }
@@ -721,15 +677,6 @@
         .sm-info-grid, .sm-tools-grid { grid-template-columns: 1fr; }
         .sm-info-detail { padding-left: 16px; }
     }
-
-    /* ── Üst bilgilendirme bannerı ─────────────────────────────────── */
-    .sm-banner {
-        display: flex; align-items: flex-start; gap: 10px;
-        background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb;
-        border-radius: 10px; padding: 14px 16px; margin: 16px 0 22px;
-        font-size: 13px; color: #1e3a5f; line-height: 1.6;
-    }
-    .sm-banner-icon { font-size: 16px; flex-shrink: 0; }
 
     /* ── Bölüm başlıkları (Hizmet Birleştirme Nedir? / Resmi Başvuru) ── */
     .sm-section { margin-bottom: 22px; }
