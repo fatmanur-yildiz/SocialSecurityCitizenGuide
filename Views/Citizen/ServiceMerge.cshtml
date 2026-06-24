@@ -48,6 +48,82 @@
             </p>
         </div>
 
+        @* ── Üst bilgilendirme bannerı ─────────────────────────────── *@
+        <div class="sm-banner">
+            <span class="sm-banner-icon">ℹ️</span>
+            <span>
+                Bu ekran, farklı sigorta statülerindeki hizmetlerinizi anlamanıza yardımcı olan bir
+                ön rehberdir. Hizmet birleştirme başvurusu ve kesin statü kararı SGK/e-Devlet
+                kayıtlarına göre yapılır.
+            </span>
+        </div>
+
+        @* ── Hizmet Birleştirme Nedir? bilgi kartları ─────────────────── *@
+        <section class="sm-section">
+            <div class="sm-section-header">
+                <span class="sm-section-icon">📘</span>
+                <h2>Hizmet Birleştirme Nedir?</h2>
+            </div>
+
+            <div class="sm-info-grid">
+                <details class="sm-info-card">
+                    <summary class="sm-info-summary">
+                        <span class="sm-info-icon">🔗</span>
+                        <span class="sm-info-text">
+                            <span class="sm-info-title">Hizmet Birleştirme Nedir?</span>
+                            <span class="sm-info-short">Farklı sigorta statülerinde geçen hizmetlerin emeklilik işlemleri öncesinde birlikte değerlendirilmesi sürecidir.</span>
+                        </span>
+                        <span class="sm-info-chevron">▾</span>
+                    </summary>
+                    <div class="sm-info-detail">
+                        <p>Çalışma hayatı boyunca 4A, 4B, 4C veya geçici 20. madde sandığı kapsamında hizmeti olan kişilerde, bu sürelerin emeklilik hesabında doğru görünmesi önemlidir. Bu ekran, yüklenen belgelerde farklı statü olup olmadığını ön değerlendirme olarak gösterir.</p>
+                    </div>
+                </details>
+
+                <details class="sm-info-card">
+                    <summary class="sm-info-summary">
+                        <span class="sm-info-icon">👥</span>
+                        <span class="sm-info-text">
+                            <span class="sm-info-title">Kimler İçin Gerekli Olabilir?</span>
+                            <span class="sm-info-short">Hem işçi, hem Bağ-Kur'lu, hem de kamu görevlisi olarak çalışmış kişiler için önemli olabilir.</span>
+                        </span>
+                        <span class="sm-info-chevron">▾</span>
+                    </summary>
+                    <div class="sm-info-detail">
+                        <p>Çalışma hayatında yalnızca tek statü varsa hizmet birleştirme ihtiyacı görünmeyebilir. Ancak 4A, 4B, 4C veya sandık hizmetleri birlikte bulunuyorsa, emeklilik öncesinde resmi başvuru ve kayıt kontrolü gerekebilir.</p>
+                    </div>
+                </details>
+
+                <details class="sm-info-card">
+                    <summary class="sm-info-summary">
+                        <span class="sm-info-icon">⏰</span>
+                        <span class="sm-info-text">
+                            <span class="sm-info-title">Ne Zaman Başvurulmalı?</span>
+                            <span class="sm-info-short">Emeklilik başvurusundan önce hizmetlerin kontrol edilmesi süreci hızlandırabilir.</span>
+                        </span>
+                        <span class="sm-info-chevron">▾</span>
+                    </summary>
+                    <div class="sm-info-detail">
+                        <p>Hizmet birleştirme ve kurumlar arası yazışmalar zaman alabilir. Bu nedenle emekliliğe yaklaşmadan önce hizmet dökümü ve sosyal güvenlik kayıt belgesinin kontrol edilmesi faydalıdır. Kesin süre ve işlem gerekliliği SGK tarafından belirlenir.</p>
+                    </div>
+                </details>
+
+                <details class="sm-info-card">
+                    <summary class="sm-info-summary">
+                        <span class="sm-info-icon">🚫</span>
+                        <span class="sm-info-text">
+                            <span class="sm-info-title">Hizmet Birleştirme Ne Değildir?</span>
+                            <span class="sm-info-short">Bu işlem doğrudan emekli maaşı hesaplama veya kesin statü kararı değildir.</span>
+                        </span>
+                        <span class="sm-info-chevron">▾</span>
+                    </summary>
+                    <div class="sm-info-detail">
+                        <p>Hizmet birleştirme, farklı kayıtlardaki hizmetlerin emeklilik sürecinde birlikte değerlendirilmesine yönelik idari bir süreçtir. Bu sayfa yalnızca ön bilgilendirme sunar; resmi karar SGK kayıtlarına göre verilir.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
         @* ── Veri kaynakları kartı ─────────────────────────────────── *@
         <div class="premium-detail-card" style="margin-bottom:18px;">
             <h2>Kullanılan Veri Kaynakları</h2>
@@ -194,13 +270,195 @@
                 </div>
             </div>
 
-            @* ── Diğer gözlemler ───────────────────────────────────── *@
-            @if (result.AdditionalNotes.Any())
+            @* ── 1261 Gün / Son 7 Yıl Bilgi Kutusu ────────────────── *@
+            <div class="premium-detail-card sm-rule-box" style="margin-top:18px;">
+                <h2>1261 Gün / Son 7 Yıl Kuralı Hakkında</h2>
+                <p style="color:#374151;font-size:14px;line-height:1.8;margin:8px 0;">
+                    Birden fazla statüde hizmeti olan kişilerde, özellikle 01.10.2008 öncesi sigortalılık
+                    geçmişi bulunanlarda, emeklilik statüsünün belirlenmesinde son 7 yıllık fiili hizmet
+                    süresi içindeki ağırlıklı statü önem taşıyabilir. Halk arasında bu durum
+                    <strong>1261 gün kuralı</strong> olarak bilinir.
+                </p>
+                <p style="color:#9ca3af;font-size:12px;line-height:1.7;margin:0 0 14px;">
+                    Bu ekran son 2520 günlük dönemi dönemsel olarak kesin hesaplamaz. Yüklenen belgeler
+                    üzerinden yalnızca statü dağılımı ve farklı statü riski hakkında ön bilgi verir.
+                    Kesin statü değerlendirmesi SGK tarafından yapılır.
+                </p>
+
+                @if (result.IsMixedService)
+                {
+                    <div class="sm-rule-note sm-rule-note--warn">
+                        ⚠️ Farklı statülerde hizmet göründüğü için son 7 yıl / 1261 gün kuralı açısından
+                        SGK resmi kayıtlarıyla ayrıca kontrol yapılması önerilir.
+                    </div>
+                }
+                else
+                {
+                    <div class="sm-rule-note sm-rule-note--ok">
+                        ✅ Mevcut belgelerde farklı statü görünmediği için 1261 gün açısından özel bir
+                        risk bu aşamada görünmemektedir.
+                    </div>
+                }
+            </div>
+        }
+
+        @* ── Son 7 Yıl / 1261 Gün Ön Kontrol Asistanı ──────────────── *@
+        <section class="sm-section" style="margin-top:18px;">
+            <div class="sm-section-header">
+                <span class="sm-section-icon">🧮</span>
+                <h2>Son 7 Yıl / 1261 Gün Ön Kontrol Asistanı</h2>
+            </div>
+
+            @if (result != null)
             {
+                int positiveStatusCount = new[] { result.Days4A ?? 0, result.Days4B ?? 0, result.Days4C ?? 0, result.DaysGM20 ?? 0 }.Count(d => d > 0);
+
+                if (positiveStatusCount == 1)
+                {
+                    <div class="sm-rule-note sm-rule-note--ok" style="margin-bottom:14px;">
+                        Mevcut belgelerinizde tek statü görünüyor. Bu asistan daha çok birden fazla statüde
+                        hizmeti olan kullanıcılar için faydalıdır.
+                    </div>
+                }
+                else if (positiveStatusCount >= 2)
+                {
+                    <div class="sm-rule-note sm-rule-note--warn" style="margin-bottom:14px;">
+                        Belgelerinizde birden fazla statü göründüğü için son 7 yıl / 1261 gün ön kontrolü
+                        faydalı olabilir.
+                    </div>
+                }
+            }
+
+            <p style="color:#6b7280;font-size:14px;line-height:1.7;margin:0 0 6px;">
+                Son 7 yıllık fiili hizmet süresindeki statü dağılımınızı biliyorsanız, aşağıdaki alanlara
+                manuel girerek hangi statünün ağırlıklı göründüğünü ön kontrol edebilirsiniz. Bu hesaplama
+                resmi statü kararı değildir.
+            </p>
+            <p style="color:#9ca3af;font-size:12px;line-height:1.6;margin:0 0 16px;">
+                Bu alanı doldurmak zorunlu değildir. Son 7 yıldaki statü günlerinizi bilmiyorsanız resmi
+                hizmet dökümünüzü ve SGK kayıtlarınızı kontrol edebilirsiniz.
+            </p>
+
+            <div class="sm-assistant-form">
+                <div class="sm-assistant-grid">
+                    <div class="form-group">
+                        <label for="sm7-4a">Son 7 Yıldaki 4A Gün Sayısı</label>
+                        <input type="number" id="sm7-4a" class="form-input form-input-sm" min="0" placeholder="0" />
+                    </div>
+                    <div class="form-group">
+                        <label for="sm7-4b">Son 7 Yıldaki 4B Gün Sayısı</label>
+                        <input type="number" id="sm7-4b" class="form-input form-input-sm" min="0" placeholder="0" />
+                    </div>
+                    <div class="form-group">
+                        <label for="sm7-4c">Son 7 Yıldaki 4C Gün Sayısı</label>
+                        <input type="number" id="sm7-4c" class="form-input form-input-sm" min="0" placeholder="0" />
+                    </div>
+                    <div class="form-group">
+                        <label for="sm7-gm20">Son 7 Yıldaki GM20 / Sandık Gün Sayısı</label>
+                        <input type="number" id="sm7-gm20" class="form-input form-input-sm" min="0" placeholder="0" />
+                    </div>
+                </div>
+                <div class="sm-assistant-bottom-row">
+                    <div class="form-group" style="max-width:200px;">
+                        <label for="sm7-son-statu">Son Çalışılan Statü</label>
+                        <select id="sm7-son-statu" class="form-input form-input-sm">
+                            <option value="">Bilmiyorum</option>
+                            <option value="4A">4A</option>
+                            <option value="4B">4B</option>
+                            <option value="4C">4C</option>
+                            <option value="GM20">GM20</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn-sm-primary" onclick="runServiceMergeAssistant()">Ön Kontrol Yap</button>
+                </div>
+                <div class="sm-form-warning" id="sm7-uyari"></div>
+            </div>
+
+            <div class="sm-assistant-result" id="sm7-result" style="display:none;">
+                <div class="sm-tools-grid" style="grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));">
+                    <div class="analysis-card">
+                        <div class="ac-icon">📊</div>
+                        <div class="ac-title">Girilen Toplam Gün</div>
+                        <div class="ac-value" id="sm7-toplam">—</div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="ac-icon">🏷️</div>
+                        <div class="ac-title">En Yüksek Statü</div>
+                        <div class="ac-value" id="sm7-enyuksek" style="font-size:17px;">—</div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="ac-icon">🧭</div>
+                        <div class="ac-title">1261 Gün Ön Kontrolü</div>
+                        <div class="ac-value" id="sm7-sonuc" style="font-size:13px;font-weight:600;line-height:1.4;">—</div>
+                        <div class="ac-note" id="sm7-sonuc-not"></div>
+                    </div>
+                    <div class="analysis-card analysis-card--warn">
+                        <div class="ac-icon">⚠️</div>
+                        <div class="ac-title">Dikkat / Resmi Uyarı</div>
+                        <div class="ac-note">
+                            Bu asistan yalnızca manuel girilen bilgilere göre ön kontrol yapar. Son 2520
+                            günlük dönem, hizmet türleri ve resmi statü kararı SGK kayıtlarına göre belirlenir.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        @* ── Resmi Başvuru ve Takip Adımları ───────────────────────── *@
+        <section class="sm-section" style="margin-top:18px;">
+            <div class="sm-section-header">
+                <span class="sm-section-icon">🧭</span>
+                <h2>Resmi Başvuru ve Takip Adımları</h2>
+            </div>
+            <p style="color:#6b7280;font-size:13px;margin:0 0 16px;">
+                Hizmetlerinizi kontrol ettikten sonra resmi başvuru ve takip işlemleri için
+                e-Devlet/SGK ekranlarını kullanabilirsiniz.
+            </p>
+
+            <div class="sm-tools-grid">
+                <a href="https://www.turkiye.gov.tr/sgk-tescil-ve-hizmet-dokumu" target="_blank" rel="noopener noreferrer" class="sm-tool-card">
+                    <div class="sm-tool-icon">📄</div>
+                    <div class="sm-tool-title">Hizmetlerinizi Kontrol Edin</div>
+                    <div class="sm-tool-desc">Emekliliğe esas uzun vade hizmetlerinizi ve işyeri ünvan listesini e-Devlet üzerinden görüntüleyebilirsiniz.</div>
+                    <div class="sm-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
+                <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-kayit-belgesi-sorgulama" target="_blank" rel="noopener noreferrer" class="sm-tool-card">
+                    <div class="sm-tool-icon">🪪</div>
+                    <div class="sm-tool-title">Sigorta Kayıt Belgenizi Alın</div>
+                    <div class="sm-tool-desc">4A, 4B ve 4C sigorta kayıt bilgilerinizi içeren barkodlu belgeyi e-Devlet üzerinden alabilirsiniz.</div>
+                    <div class="sm-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
+                <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-41-a-b-ve-506-sk-gm-20-nci-madde-sandigi-calisanlarin-hizmet-birlestirme-basvurusu" target="_blank" rel="noopener noreferrer" class="sm-tool-card">
+                    <div class="sm-tool-icon">📝</div>
+                    <div class="sm-tool-title">Hizmet Birleştirme Başvurusu Yapın</div>
+                    <div class="sm-tool-desc">4/1-a, 4/1-b ve 506 SK geçici 20. madde sandığı kapsamındaki hizmetler için resmi başvuru ekranıdır.</div>
+                    <div class="sm-tool-btn">Başvuruya Git →</div>
+                </a>
+
+                <a href="https://www.turkiye.gov.tr/sgk-sso-evrak-takip" target="_blank" rel="noopener noreferrer" class="sm-tool-card">
+                    <div class="sm-tool-icon">📬</div>
+                    <div class="sm-tool-title">Başvurunuzu Takip Edin</div>
+                    <div class="sm-tool-desc">SGK'ya iletilen başvuru ve evrak süreçlerini DYS Evrak Takip üzerinden kontrol edebilirsiniz.</div>
+                    <div class="sm-tool-btn">Evrak Takip →</div>
+                </a>
+            </div>
+        </section>
+
+        @if (result != null)
+{
+    @* ── Diğer gözlemler ───────────────────────────────────── *@
+    var visibleNotes = result.AdditionalNotes
+        .Where(n => n.Title != "Hedef Statü Karşılaştırması")
+        .ToList();
+
+    if (visibleNotes.Any())
+    {
                 <div class="premium-detail-card" style="margin-top:18px;">
                     <h2>Diğer Gözlemler</h2>
                     <div class="qa-list">
-                        @foreach (var note in result.AdditionalNotes)
+                        @foreach (var note in visibleNotes)
                         {
                             <div class="qa-row">
                                 <div class="qa-question" style="color:@(TypeColor(note.Type));">@note.Title</div>
@@ -229,35 +487,13 @@
             }
         }
 
-        @* ── Hedef statü formu (küçük, en aşağıda) ────────────────── *@
-        <div class="premium-detail-card target-status-card" style="margin-top:18px;">
-            <h3 style="margin:0 0 6px;font-size:14px;color:#374151;">Hedef Sigorta Statüsü (İsteğe Bağlı)</h3>
-            <p style="color:#9ca3af;margin:0 0 12px;font-size:12px;">
-                Hangi statüden emekli olmayı hedeflediğinizi belirtirseniz, ağırlıklı statü ile karşılaştırma yapılır.
-            </p>
-            <form method="post" style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;">
-                @Html.AntiForgeryToken()
-                <div class="form-group" style="max-width:220px;">
-                    <select asp-for="TargetStatus" class="form-input form-input-sm">
-                        <option value="Bilmiyorum">Bilmiyorum</option>
-                        <option value="4A">4A — SSK</option>
-                        <option value="4B">4B — Bağ-Kur</option>
-                        <option value="4C">4C — Emekli Sandığı</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-sm-primary">Karşılaştır</button>
-            </form>
-        </div>
-
         @* ── Bilgilendirme notu (küçük, en altta) ─────────────────── *@
         <div class="info-note-small">
             <strong>Bilgilendirme Notu:</strong>
             Bu sayfa resmi bir hizmet birleştirme veya statü kararı değildir; yüklenen belgeler
             üzerinden otomatik üretilen ön bilgilendirmedir. Hangi statüden emeklilik işlemi
-            yapılacağı, hizmet sürelerinin dağılımı ve ilgili mevzuat hükümlerine göre belirlenir.
-            Borçlanma işlemleri statü dağılımını etkileyebilir
-            (<a href="/Citizen/DebtOptions">Borçlanma İşlemleri</a>). Kesin bilgi için SGK'ya
-            veya yetkili bir danışmana başvurmanız önerilir.
+            yapılacağı, hizmet sürelerinin dağılımı ve ilgili mevzuat hükümlerine göre SGK
+            tarafından belirlenir. Kesin bilgi için SGK/e-Devlet kayıtları esas alınır.
         </div>
 
     </main>
@@ -482,5 +718,215 @@
         .qa-row { grid-template-columns: 1fr; gap: 4px; }
         .hizmet-bar-row { grid-template-columns: 32px 1fr 60px; }
         .mini-stat-grid { grid-template-columns: repeat(2, 1fr); }
+        .sm-info-grid, .sm-tools-grid { grid-template-columns: 1fr; }
+        .sm-info-detail { padding-left: 16px; }
+    }
+
+    /* ── Üst bilgilendirme bannerı ─────────────────────────────────── */
+    .sm-banner {
+        display: flex; align-items: flex-start; gap: 10px;
+        background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #2563eb;
+        border-radius: 10px; padding: 14px 16px; margin: 16px 0 22px;
+        font-size: 13px; color: #1e3a5f; line-height: 1.6;
+    }
+    .sm-banner-icon { font-size: 16px; flex-shrink: 0; }
+
+    /* ── Bölüm başlıkları (Hizmet Birleştirme Nedir? / Resmi Başvuru) ── */
+    .sm-section { margin-bottom: 22px; }
+    .sm-section-header {
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 14px; padding-bottom: 8px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .sm-section-header h2 { margin: 0; font-size: 17px; color: #111827; font-weight: 800; }
+    .sm-section-icon { font-size: 19px; }
+
+    /* ── Hizmet Birleştirme Nedir? bilgi kartları (accordion) ───────── */
+    .sm-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+        align-items: start;
+    }
+    .sm-info-card {
+        background: white; border: 1px solid #e5e7eb; border-radius: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.04);
+        overflow: hidden;
+    }
+    .sm-info-card[open] { border-color: #cbd5e1; }
+    .sm-info-summary {
+        display: flex; align-items: flex-start; gap: 12px;
+        padding: 16px; cursor: pointer; user-select: none;
+    }
+    .sm-info-summary:hover { background: #f9fafb; }
+    .sm-info-icon { font-size: 22px; line-height: 1.3; flex-shrink: 0; }
+    .sm-info-text { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+    .sm-info-title { font-weight: 700; color: #111827; font-size: 14px; }
+    .sm-info-short { font-size: 12px; color: #6b7280; line-height: 1.5; }
+    .sm-info-chevron {
+        font-size: 13px; color: #9ca3af; flex-shrink: 0;
+        transition: transform .2s; padding-top: 2px;
+    }
+    .sm-info-card[open] .sm-info-chevron { transform: rotate(180deg); }
+    .sm-info-detail { padding: 0 16px 16px 50px; }
+    .sm-info-detail p { margin: 0; font-size: 13px; color: #4b5563; line-height: 1.65; }
+
+    details > summary { list-style: none; }
+    details > summary::-webkit-details-marker { display: none; }
+
+    /* ── 1261 Gün / Son 7 Yıl bilgi kutusu ───────────────────────────── */
+    .sm-rule-box { border-left: 5px solid #6d28d9; }
+    .sm-rule-note {
+        font-size: 13px; font-weight: 600; border-radius: 8px;
+        padding: 12px 14px; line-height: 1.6;
+    }
+    .sm-rule-note--ok   { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .sm-rule-note--warn { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
+    /* ── Resmi Başvuru ve Takip Adımları kartları ────────────────────── */
+    .sm-tools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 14px;
+    }
+    .sm-tool-card {
+        background: white; border: 1px solid #e5e7eb; border-radius: 12px;
+        padding: 18px; display: flex; flex-direction: column; gap: 6px;
+        text-decoration: none; color: inherit;
+        box-shadow: 0 1px 4px rgba(0,0,0,.04);
+        transition: box-shadow .15s, transform .15s, border-color .15s;
+    }
+    .sm-tool-card:hover {
+        box-shadow: 0 4px 16px rgba(0,91,172,.12);
+        transform: translateY(-2px);
+        border-color: #005BAC;
+        text-decoration: none;
+    }
+    .sm-tool-icon  { font-size: 24px; }
+    .sm-tool-title { font-weight: 700; color: #111827; font-size: 14px; line-height: 1.3; }
+    .sm-tool-desc  { font-size: 12px; color: #6b7280; line-height: 1.5; flex: 1; }
+    .sm-tool-btn   { font-size: 12px; font-weight: 700; color: #005BAC; margin-top: 4px; }
+
+    /* ── Son 7 Yıl / 1261 Gün Ön Kontrol Asistanı ────────────────────── */
+    .sm-assistant-form {
+        background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px;
+        padding: 18px; margin-bottom: 18px;
+    }
+    .sm-assistant-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 14px; margin-bottom: 14px;
+    }
+    .sm-assistant-bottom-row {
+        display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap;
+    }
+    .sm-form-warning {
+        font-size: 12px; color: #b45309; font-weight: 600; margin-top: 10px;
+    }
+    .sm-form-warning:empty { display: none; }
+    .sm-assistant-result { margin-top: 6px; }
+
+    /* Sonuç kartları — Emeklilik Durumu / Borçlanma sayfalarıyla aynı dil */
+    .analysis-card {
+        background: white; border: 1px solid #e5e7eb; border-radius: 12px;
+        padding: 18px 16px; display: flex; flex-direction: column; gap: 4px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.04);
+        border-left: 4px solid #e5e7eb;
+    }
+    .analysis-card--warn { border-left-color: #f59e0b; background: #fffdf5; }
+    .ac-icon  { font-size: 22px; margin-bottom: 4px; }
+    .ac-title { font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: .04em; }
+    .ac-value { font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.2; margin: 4px 0; }
+    .ac-note  { font-size: 12px; color: #6b7280; line-height: 1.5; }
+
+    @@media (max-width: 700px) {
+        .sm-assistant-grid { grid-template-columns: 1fr 1fr; }
     }
 </style>
+
+<script>
+(function () {
+    window.runServiceMergeAssistant = function () {
+        var a = parseFloat(document.getElementById('sm7-4a').value);
+        var b = parseFloat(document.getElementById('sm7-4b').value);
+        var c = parseFloat(document.getElementById('sm7-4c').value);
+        var g = parseFloat(document.getElementById('sm7-gm20').value);
+        a = isNaN(a) ? 0 : a;
+        b = isNaN(b) ? 0 : b;
+        c = isNaN(c) ? 0 : c;
+        g = isNaN(g) ? 0 : g;
+
+        var sonStatu  = document.getElementById('sm7-son-statu').value;
+        var warnEl    = document.getElementById('sm7-uyari');
+        var resultBox = document.getElementById('sm7-result');
+
+        warnEl.textContent = '';
+
+        if (a < 0 || b < 0 || c < 0 || g < 0) {
+            warnEl.textContent = 'Gün sayıları negatif olamaz. Lütfen 0 veya üzeri bir değer girin.';
+            resultBox.style.display = 'none';
+            return;
+        }
+
+        var toplam = a + b + c + g;
+
+        if (toplam === 0) {
+            warnEl.textContent = 'Son 7 yıl gün bilgisi girilmediği için ön kontrol yapılamadı.';
+            resultBox.style.display = 'none';
+            return;
+        }
+
+        if (toplam > 2520) {
+            warnEl.textContent = 'Girilen toplam gün 2520 günü aşıyor. Son 7 yıllık fiili hizmet süresi için toplam gün 2520\'yi geçmemelidir.';
+            resultBox.style.display = 'none';
+            return;
+        }
+
+        var statuses = [
+            { key: '4A',   value: a },
+            { key: '4B',   value: b },
+            { key: '4C',   value: c },
+            { key: 'GM20', value: g }
+        ];
+
+        var maxValue = Math.max(a, b, c, g);
+        var topStatuses = statuses.filter(function (s) { return s.value === maxValue && maxValue > 0; });
+
+        var sonucText, sonucNot;
+
+        if (topStatuses.length > 1) {
+            // Eşitlik durumu
+            sonucText = 'Girilen günlerde eşitlik görünüyor.';
+            sonucNot  = 'Bu durumda son çalışılan statü bilgisi önem kazanabilir. Kesin değerlendirme SGK tarafından yapılır.';
+            if (sonStatu) {
+                sonucNot += ' Son çalışılan statü olarak ' + sonStatu + ' seçildiği için bu bilgi değerlendirmede dikkate alınabilir; ancak bu resmi sonuç değildir.';
+            }
+        } else if (maxValue >= 1261) {
+            sonucText = 'Girilen bilgilere göre son 7 yıllık fiili hizmet süresinde ağırlıklı statü ' + topStatuses[0].key + ' görünüyor.';
+            sonucNot  = 'Bu durum halk arasında 1261 gün kuralı olarak bilinen ön değerlendirme mantığıyla yorumlanmıştır. Kesin statü kararı SGK tarafından verilir.';
+        } else {
+            sonucText = 'Girilen bilgiler son 7 yıllık dönemi tam karşılamıyor olabilir.';
+            sonucNot  = 'Bu nedenle 1261 gün açısından kesin bir ağırlıklı statü yorumu yapılamaz.';
+        }
+
+        document.getElementById('sm7-toplam').textContent = toplam.toLocaleString('tr-TR') + ' gün';
+
+        if (topStatuses.length === 1) {
+            document.getElementById('sm7-enyuksek').textContent =
+                topStatuses[0].key + ' — ' + maxValue.toLocaleString('tr-TR') + ' gün';
+        } else if (topStatuses.length > 1) {
+            document.getElementById('sm7-enyuksek').textContent =
+                topStatuses.map(function (s) { return s.key; }).join(' / ') +
+                ' — ' + maxValue.toLocaleString('tr-TR') + ' gün (eşit)';
+        } else {
+            document.getElementById('sm7-enyuksek').textContent = '—';
+        }
+
+        document.getElementById('sm7-sonuc').textContent = sonucText;
+        document.getElementById('sm7-sonuc-not').textContent = sonucNot;
+
+        resultBox.style.display = '';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+})();
+</script>

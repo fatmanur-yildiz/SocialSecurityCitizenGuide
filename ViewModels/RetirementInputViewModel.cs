@@ -18,7 +18,7 @@ namespace EmekliRehberi.ViewModels
         [Display(Name = "Cinsiyet")]
         public string? Gender { get; set; }  // "Erkek" | "Kadın"
 
-        [Display(Name = "İlk Sigorta Başlangıç Tarihi")]
+        [Display(Name = "İlk Sigorta Tarihini Biliyorsanız Girin (opsiyonel)")]
         [DataType(DataType.Date)]
         public DateTime? FirstInsuranceDate { get; set; }
 

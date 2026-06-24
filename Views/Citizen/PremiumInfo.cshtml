@@ -18,19 +18,33 @@
         .ToList();
 
     var pekRecords = monthlyRecords.Where(r => r.PekAmount.HasValue).ToList();
-    decimal? avgPek  = pekRecords.Any() ? pekRecords.Average(r => r.PekAmount!.Value) : null;
-    decimal? minPek  = pekRecords.Any() ? pekRecords.Min(r => r.PekAmount!.Value) : null;
-    decimal? maxPek  = pekRecords.Any() ? pekRecords.Max(r => r.PekAmount!.Value) : null;
+    decimal? avgPek = pekRecords.Any() ? pekRecords.Average(r => r.PekAmount!.Value) : null;
+    decimal? minPek = pekRecords.Any() ? pekRecords.Min(r => r.PekAmount!.Value) : null;
+    decimal? maxPek = pekRecords.Any() ? pekRecords.Max(r => r.PekAmount!.Value) : null;
     decimal? lastPek = monthlyRecords.FirstOrDefault()?.PekAmount;
 
     bool lastPeriodFull = monthlyRecords.FirstOrDefault()?.Days == 30;
-
     int totalDays = doc?.TotalPremiumDays ?? 0;
-    string totalDayComment =
-        totalDays == 0    ? "" :
-        totalDays < 3600  ? "Emeklilik için gereken asgari prim günü koşulunu henüz karşılamıyor olabilirsiniz." :
-        totalDays < 5400  ? "Prim gün sayınız belirli emeklilik koşulları için yeterli olabilir." :
-                            "Prim gün sayınız emeklilik değerlendirmesinde önemli bir eşiğe ulaşmış görünmektedir.";
+    int eksikGunSayisi = missingDayRecords.Count;
+
+    DateTime? firstEntryDate = monthlyRecords
+        .Where(r => r.EntryDate.HasValue)
+        .OrderBy(r => r.EntryDate)
+        .Select(r => r.EntryDate)
+        .FirstOrDefault();
+
+    string belgeTuruFallback =
+        (doc?.DocumentType != null && doc.DocumentType.IndexOf("Hizmet Dökümü", StringComparison.OrdinalIgnoreCase) >= 0)
+            ? "4A / Hizmet Dökümü" : "—";
+
+    // PEK bar grafiği: PEK'i olan en güncel 6 dönem, azalan dönem sırasıyla
+    var pekChartRecords = pekRecords.Take(6).ToList();
+    decimal pekChartMax = pekChartRecords.Any() ? pekChartRecords.Max(r => r.PekAmount!.Value) : 0m;
+
+    // Tablo filtresi için indexli liste (foreach içinde @{} açmamak için)
+    var indexedMonthlyRecords = monthlyRecords
+        .Select((r, idx) => new { Record = r, Index = idx })
+        .ToList();
 }
 
 <section class="dashboard-page">
@@ -40,35 +54,124 @@
 
         <div class="page-title">
             <h1>Prim Bilgilerim</h1>
-            <p>
-                SGK Tescil ve Hizmet Dökümü belgenizi yükleyin; sistem verilerinizi okuyarak
-                prim günlerinizi, dönemsel bildirimlerinizi ve prime esas kazanç bilgilerinizi
-                sade ve anlaşılır biçimde özetlesin.
-            </p>
         </div>
 
+        @* ── Sekme butonları ───────────────────────────────────────────── *@
+        <div class="pi-tabs" role="tablist" aria-label="Prim Bilgilerim sekmeleri">
+            <button type="button" class="pi-tab pi-tab--active" data-tab="rehber" onclick="piSwitchTab('rehber')">
+                Prim Rehberi
+            </button>
+            <button type="button" class="pi-tab" data-tab="analiz" onclick="piSwitchTab('analiz')">
+                PDF Analizi
+            </button>
+        </div>
+
+        @* ════════════════════════════════════════════════════════════════
+           SEKME 1 — PRİM REHBERİ
+        ════════════════════════════════════════════════════════════════ *@
+        <div class="pi-tab-panel pi-tab-panel--active" id="pi-panel-rehber">
+            <p class="pi-guide-intro">
+                Bu bölüm, hizmet dökümü ve prim bilgilerinde sık karşılaşılan temel kavramları açıklar.
+                PDF Analizi sekmesinde ise yüklenen belgeye ait dönemsel kayıtlar, PEK bilgileri ve eksik gün durumu ayrıca gösterilir.
+            </p>
+
+            <div class="pi-info-grid">
+                <div class="pi-info-card">
+                    <span class="pi-info-icon">📅</span>
+                    <div>
+                        <h3>Prim Günü</h3>
+                        <p>
+                            Sigortalı olarak çalışılan ve SGK’ya bildirilen gün sayısını ifade eder.
+                            Emeklilik koşullarında prim günü önemli bir kriterdir; ancak tek başına yeterli değildir.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pi-info-card">
+                    <span class="pi-info-icon">📌</span>
+                    <div>
+                        <h3>Uzun Vade Prim Günü</h3>
+                        <p>
+                            Yaşlılık, malullük ve ölüm sigortası gibi uzun vadeli sigorta kollarına bildirilen prim günüdür.
+                            Emeklilik değerlendirmelerinde genellikle uzun vade prim gün sayısı esas alınır.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pi-info-card">
+                    <span class="pi-info-icon">💰</span>
+                    <div>
+                        <h3>P.E.K. Bilgisi</h3>
+                        <p>
+                            Prime Esas Kazanç, çalışanın SGK’ya bildirilen kazanç matrahıdır.
+                            Emekli aylığı hesabını etkileyebilen unsurlardan biridir ve dönemsel olarak değişiklik gösterebilir.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pi-info-card">
+                    <span class="pi-info-icon">⏳</span>
+                    <div>
+                        <h3>Son Bildirilen Dönem</h3>
+                        <p>
+                            Hizmet dökümünde görünen en güncel sigortalılık dönemini gösterir.
+                            SGK bildirimleri bazı durumlarda sisteme gecikmeli yansıyabileceği için güncel kayıt e-Devlet üzerinden kontrol edilmelidir.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pi-info-card">
+                    <span class="pi-info-icon">⚠️</span>
+                    <div>
+                        <h3>Eksik Gün</h3>
+                        <p>
+                            Bir ayda 30 günden az prim bildirimi bulunması durumudur.
+                            İşe giriş veya çıkış, raporlu süre, ücretsiz izin ya da kısmi süreli çalışma gibi nedenlerden kaynaklanabilir.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pi-info-card">
+                    <span class="pi-info-icon">🏷️</span>
+                    <div>
+                        <h3>4A / 4B / 4C Statüsü</h3>
+                        <p>
+                            4A, 4B ve 4C farklı sigorta statülerini ifade eder.
+                            Farklı statülerde hizmet bulunması halinde emeklilik statüsü ve hizmet birleştirme açısından ayrıca değerlendirme gerekebilir.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* ════════════════════════════════════════════════════════════════
+           SEKME 2 — PDF ANALİZİ
+        ════════════════════════════════════════════════════════════════ *@
+        <div class="pi-tab-panel" id="pi-panel-analiz" style="display:none;">
+
+
+        @* ── 1. Belge Yükleme ─────────────────────────────────────────── *@
         <div class="upload-card">
             <div>
                 <h2>SGK Tescil ve Hizmet Dökümü Yükle</h2>
-                @if (doc == null)
-                {
-                    <p>Prim bilgilerinizin analiz edilebilmesi için PDF belgenizi yükleyin.</p>
-                }
-                else
+                @if (doc != null)
                 {
                     <p>
                         <strong>@doc.OriginalFileName</strong> adlı belge
-                        @doc.CreatedAt.ToString("dd.MM.yyyy HH:mm") tarihinde yüklenmiştir.
-                        Yeni belge yüklerseniz sistem en son yüklenen belgeyi esas alır.
+                        @doc.CreatedAt.ToString("dd.MM.yyyy HH:mm") tarihinde sisteme yüklenmiştir.
+                        Güncel bir belge yüklemek isterseniz yeni dosyayı seçerek işlemi tekrarlayabilirsiniz;
+                        sistem en son yüklenen belgeyi esas alır.
                     </p>
+                }
+                else
+                {
+                    <p>Prim bilgilerinizin analiz edilebilmesi için SGK Tescil ve Hizmet Dökümü PDF belgenizi yükleyiniz.</p>
                 }
             </div>
             <form method="post" enctype="multipart/form-data" class="upload-form">
                 <input asp-for="PdfFile" type="file" accept="application/pdf" />
                 <span asp-validation-for="PdfFile" class="text-danger"></span>
-                <button type="submit">
-                    @(doc == null ? "Belgeyi Yükle" : "Yeni Belge Yükle")
-                </button>
+                <button type="submit">@(doc == null ? "Belgeyi Yükle" : "Yeni Belge Yükle")</button>
             </form>
         </div>
 
@@ -77,203 +180,172 @@
             <div class="empty-service-warning">
                 <h2>Henüz prim belgesi yüklenmemiştir</h2>
                 <p>
-                    Belge yüklendikten sonra sistem PDF içindeki prim bilgilerini otomatik
-                    okuyacak ve size özel bir değerlendirme sunacaktır.
+                    Belge yüklendikten sonra dönemsel prim kayıtlarınız, prime esas kazanç bilgileriniz
+                    ve eksik gün durumunuz otomatik olarak analiz edilecektir.
                 </p>
-            </div>
-
-            <div class="premium-detail-card">
-                <h2>Ne Tür Bilgiler Analiz Edilir?</h2>
-                <p style="color:#4b5563;line-height:1.7;margin:0 0 12px;">
-                    Yüklediğiniz SGK Tescil ve Hizmet Dökümü belgesinden şu bilgiler
-                    otomatik olarak okunacaktır:
-                </p>
-                <ul style="color:#4b5563;line-height:2;margin:0;padding-left:20px;">
-                    <li>Toplam uzun vade prim gün sayısı</li>
-                    <li>Son bildirilen sigortalılık dönemi</li>
-                    <li>Eksik gün bildirimi olan dönemler</li>
-                    <li>Dönemsel prime esas kazanç (P.E.K.) değerleri</li>
-                </ul>
             </div>
         }
         else
         {
-            <div class="uploaded-main-card">
-                <div>
-                    <h2>Yüklenen Belge</h2>
-                    <p>
-                        <strong>@doc.OriginalFileName</strong> —
-                        @doc.CreatedAt.ToString("dd.MM.yyyy HH:mm")
-                    </p>
-                </div>
-                <span class="document-status">@doc.Status</span>
-            </div>
-
-            <div class="premium-summary-grid">
-                <div class="premium-box">
-                    <span>Toplam Prim Günü</span>
-                    <strong>
-                        @(doc.TotalPremiumDays.HasValue
-                            ? doc.TotalPremiumDays.Value + " gün"
-                            : "Bulunamadı")
-                    </strong>
-                </div>
-                <div class="premium-box">
-                    <span>Son Bildirilen Dönem</span>
-                    <strong>
-                        @(string.IsNullOrWhiteSpace(doc.LastPeriod)
-                            ? "Bulunamadı"
-                            : doc.LastPeriod)
-                    </strong>
-                </div>
-                <div class="premium-box">
-                    <span>Eksik Gün Durumu</span>
-                    <strong style="@(doc.HasMissingDays ? "color:#b45309;" : "color:#15803d;")">
-                        @(doc.HasMissingDays ? "Eksik gün var" : "Eksik gün görünmüyor")
-                    </strong>
-                </div>
-                <div class="premium-box">
-                    <span>Belge Türü</span>
-                    <strong>@doc.DocumentType</strong>
-                </div>
-            </div>
-
+            @* ── 2. Dönemsel Prim Kayıtları ────────────────────────────── *@
             <div class="premium-detail-card">
-                <h2>Prim Bilgileriniz Ne Anlama Geliyor?</h2>
-                <div class="prim-yorum-listesi">
-
-                    @if (doc.TotalPremiumDays.HasValue)
-                    {
-                        <div class="yorum-satiri">
-                            <div class="yorum-baslik">Toplam Prim Gününüz</div>
-                            <div class="yorum-metin">
-                                SGK kayıtlarında toplam <strong>@doc.TotalPremiumDays.Value gün</strong>
-                                uzun vade prim bildiriminiz görünmektedir.
-                                @if (!string.IsNullOrEmpty(totalDayComment))
-                                {
-                                    <span> @totalDayComment</span>
-                                }
-                                Prim günü emeklilik değerlendirmesinde önemli bir kriterdir; ancak
-                                yaş, ilk sigorta başlangıcı, sigorta statüsü ve borçlanma gibi
-                                ek bilgiler olmadan kesin bir yorum yapılamamaktadır.
-                            </div>
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrWhiteSpace(doc.LastPeriod))
-                    {
-                        <div class="yorum-satiri">
-                            <div class="yorum-baslik">Son Bildirilen Dönem</div>
-                            <div class="yorum-metin">
-                                Belgede en güncel kayıt <strong>@doc.LastPeriod</strong> dönemine aittir.
-                                @if (lastPeriodFull)
-                                {
-                                    <span>
-                                        Bu dönemde <strong>tam ay (30 gün)</strong> bildirimi
-                                        görünmektedir; sigortalılığınızın aktif olduğuna işaret eder.
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span>
-                                        Bu dönemde eksik gün bildirimi görünmektedir.
-                                        İşe giriş/çıkış, rapor veya kısmi çalışma gibi nedenler olabilir.
-                                    </span>
-                                }
-                                SGK bildirimleri zaman zaman geriden yansıyabilir; bu nedenle
-                                en güncel dönemin kaydı henüz sisteme işlenmemiş olabilir.
-                            </div>
-                        </div>
-                    }
-
-                    @if (doc.HasMissingDays)
-                    {
-                        <div class="yorum-satiri">
-                            <div class="yorum-baslik">Eksik Gün Bildirimi</div>
-                            <div class="yorum-metin">
-                                Bazı dönemlerde 30 günden az bildirim görünmektedir.
-                                Bu durum; işe giriş veya çıkış tarihleri, raporlu süre,
-                                ücretsiz izin, kısmi süreli çalışma ya da işyeri değişikliği
-                                gibi nedenlerden kaynaklanabilir.
-                                Bilginiz dışında bir eksiklik olduğunu düşünüyorsanız
-                                işvereniniz veya SGK ile görüşmeniz önerilir.
-                            </div>
-                        </div>
-                    }
-
-                    <div class="yorum-satiri" style="border-bottom:none;">
-                        <div class="yorum-baslik">Prim Günü Tek Başına Yeterli Mi?</div>
-                        <div class="yorum-metin">
-                            Hayır. Emeklilik hakkı; prim günü sayısının yanı sıra
-                            <strong>yaş koşulu</strong>, <strong>sigortalılık süresi</strong>,
-                            <strong>sigorta başlangıç tarihi</strong> ve
-                            <strong>sigorta statüsü (4A/4B/4C)</strong> gibi kriterlerin
-                            birlikte sağlanmasını gerektirir. Bu sayfa yalnızca prim günü
-                            ve P.E.K. bilgilerinizi özetlemektedir; kesin emeklilik
-                            değerlendirmesi için lütfen <strong>Emeklilik Durumu</strong>
-                            sayfasını inceleyin.
-                        </div>
+                <h2>Dönemsel Prim Kayıtları</h2>
+                @if (monthlyRecords.Any())
+                {
+                    <div class="pi-filter-row">
+                        <button type="button" class="pi-filter-btn pi-filter-btn--active" data-filter="all"     onclick="piFilterRecords('all')">Tüm Kayıtlar</button>
+                        <button type="button" class="pi-filter-btn"                        data-filter="last12" onclick="piFilterRecords('last12')">Son 12 Dönem</button>
+                        <button type="button" class="pi-filter-btn"                        data-filter="missing" onclick="piFilterRecords('missing')">Eksik Günler</button>
                     </div>
+                    <table class="data-table" id="pi-records-table">
+                        <thead>
+                            <tr>
+                                <th>Dönem</th>
+                                <th>Gün</th>
+                                <th>P.E.K.</th>
+                                <th>Statü</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var entry in indexedMonthlyRecords)
+                            {
+                                <tr data-index="@entry.Index" data-days="@entry.Record.Days">
+                                    <td>@entry.Record.Period</td>
+                                    <td>@entry.Record.Days</td>
+                                    <td>@(entry.Record.PekAmount.HasValue ? entry.Record.PekAmount.Value.ToString("N2") + " TL" : "—")</td>
+                                    <td>@(entry.Record.InsuranceStatus ?? entry.Record.DocumentType ?? belgeTuruFallback)</td>
+                                    <td>
+                                        @if (entry.Record.Days == 30)
+                                        {
+                                            <span style="color:#15803d;font-weight:600;">Tam ay</span>
+                                        }
+                                        else if (entry.Record.Days > 0 && entry.Record.Days < 30)
+                                        {
+                                            <span style="color:#b45309;font-weight:600;">30 günden az</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color:#9ca3af;">—</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <p id="pi-filter-empty" style="display:none;color:#9ca3af;font-size:13px;margin:10px 0 0;">Bu filtreye uygun kayıt bulunamadı.</p>
+                }
+                else
+                {
+                    <p style="color:#6b7280;">Dönemsel kayıtlar otomatik olarak ayrıştırılamadı.</p>
+                }
+            </div>
 
+            @* ── 3. Prim Özeti ──────────────────────────────────────────── *@
+            <div class="premium-detail-card">
+                <h2>Prim Özeti</h2>
+                <div class="premium-summary-grid">
+                    <div class="premium-box">
+                        <span>Toplam Prim Günü</span>
+                        <strong>@(doc.TotalPremiumDays.HasValue ? doc.TotalPremiumDays.Value.ToString("N0") + " gün" : "Okunamadı")</strong>
+                    </div>
+                    <div class="premium-box">
+                        <span>İlk Giriş Tarihi</span>
+                        <strong>@(firstEntryDate.HasValue ? firstEntryDate.Value.ToString("dd.MM.yyyy") : "Okunamadı")</strong>
+                    </div>
+                    <div class="premium-box">
+                        <span>Son Bildirilen Dönem</span>
+                        <strong>@(!string.IsNullOrWhiteSpace(doc.LastPeriod) ? doc.LastPeriod : "Okunamadı")</strong>
+                    </div>
+                    <div class="premium-box">
+                        <span>Eksik Gün Durumu</span>
+                        <strong style="@(doc.HasMissingDays ? "color:#b45309;" : "color:#15803d;")">
+                            @(doc.HasMissingDays ? "Eksik gün var" : "Görünmüyor")
+                        </strong>
+                    </div>
+                    <div class="premium-box">
+                        <span>Belge Türü</span>
+                        <strong>@doc.DocumentType</strong>
+                    </div>
                 </div>
             </div>
 
-            @if (pekRecords.Any())
+            @* ── 4. PEK Özeti ───────────────────────────────────────────── *@
+            <div class="premium-detail-card">
+                <h2>PEK Özeti (Prime Esas Kazanç)</h2>
+                <div class="premium-summary-grid">
+                    <div class="premium-box">
+                        <span>Son Dönem PEK</span>
+                        <strong>@(lastPek.HasValue ? lastPek.Value.ToString("N2") + " TL" : "Okunamadı")</strong>
+                    </div>
+                    <div class="premium-box">
+                        <span>Ortalama PEK</span>
+                        <strong>@(avgPek.HasValue ? avgPek.Value.ToString("N2") + " TL" : "Okunamadı")</strong>
+                    </div>
+                    <div class="premium-box">
+                        <span>En Yüksek PEK</span>
+                        <strong>@(maxPek.HasValue ? maxPek.Value.ToString("N2") + " TL" : "Okunamadı")</strong>
+                    </div>
+                    <div class="premium-box">
+                        <span>En Düşük PEK</span>
+                        <strong>@(minPek.HasValue ? minPek.Value.ToString("N2") + " TL" : "Okunamadı")</strong>
+                    </div>
+                </div>
+                <p class="pi-pek-yorum">
+                    @if (!lastPek.HasValue || !avgPek.HasValue)
+                    {
+                        <span>PEK bilgisi bu belgede okunamadı veya belge formatı uygun değil.</span>
+                    }
+                    else if (lastPek.Value > avgPek.Value * 1.02m)
+                    {
+                        <span>Son dönem PEK, dönemsel ortalamanızın üzerindedir. Bildirilen kazanç düzeyi emekli aylığını etkileyen unsurlardan biridir; kesin hesaplama için SGK araçları kullanılmalıdır.</span>
+                    }
+                    else if (lastPek.Value < avgPek.Value * 0.98m)
+                    {
+                        <span>Son dönem PEK, dönemsel ortalamanızın altındadır. Ön bilgilendirme amaçlıdır; kesin sonuç için SGK kayıtları esas alınır.</span>
+                    }
+                    else
+                    {
+                        <span>Son dönem PEK, dönemsel ortalamanıza yakındır. Ön bilgilendirme amaçlıdır; kesin sonuç için SGK kayıtları esas alınır.</span>
+                    }
+                </p>
+            </div>
+
+            @* ── 5. Son Dönem PEK Görseli ───────────────────────────────── *@
+            @if (pekChartRecords.Any())
             {
                 <div class="premium-detail-card">
-                    <h2>Prime Esas Kazanç (P.E.K.) Özeti</h2>
-                    <p style="color:#6b7280;margin:0 0 20px;line-height:1.7;">
-                        P.E.K., SGK'ya bildirilen kazanç matrahıdır. Emekli aylığı hesabında
-                        kullanılan önemli bir değerdir; bildirilen kazanç arttıkça emekli
-                        aylığı üzerindeki olumlu etkisi de artar. Aşağıdaki özet, belgedeki
-                        kayıtlardan otomatik hesaplanmıştır.
-                    </p>
-                    <div class="premium-summary-grid">
-                        @if (lastPek.HasValue)
+                    <h2>Son Dönem PEK Görseli</h2>
+                    <div class="pi-pek-chart">
+                        @foreach (var rec in pekChartRecords)
                         {
-                            <div class="premium-box">
-                                <span>Son Dönem P.E.K.</span>
-                                <strong>@lastPek.Value.ToString("N2") TL</strong>
-                            </div>
-                        }
-                        @if (avgPek.HasValue)
-                        {
-                            <div class="premium-box">
-                                <span>Ortalama P.E.K.</span>
-                                <strong>@avgPek.Value.ToString("N2") TL</strong>
-                            </div>
-                        }
-                        @if (minPek.HasValue)
-                        {
-                            <div class="premium-box">
-                                <span>En Düşük P.E.K.</span>
-                                <strong>@minPek.Value.ToString("N2") TL</strong>
-                            </div>
-                        }
-                        @if (maxPek.HasValue)
-                        {
-                            <div class="premium-box">
-                                <span>En Yüksek P.E.K.</span>
-                                <strong>@maxPek.Value.ToString("N2") TL</strong>
+                            decimal barPct = pekChartMax > 0
+                                ? Math.Round(rec.PekAmount!.Value / pekChartMax * 100, 1)
+                                : 0m;
+                            <div class="pi-pek-bar-row">
+                                <div class="pi-pek-bar-label">@rec.Period</div>
+                                <div class="pi-pek-bar-track">
+                                    <div class="pi-pek-bar-fill" style="width:@barPct%;"></div>
+                                </div>
+                                <div class="pi-pek-bar-value">@rec.PekAmount!.Value.ToString("N2") TL</div>
                             </div>
                         }
                     </div>
-                    <p style="color:#9ca3af;margin:14px 0 0;font-size:13px;">
-                        * Asgari ücret veya tavan karşılaştırması için dönemsel resmi limitler
-                        gerektiğinden bu sayfada kesin bir kıyaslama yapılmamaktadır.
+                    <p style="color:#9ca3af;font-size:12px;margin:10px 0 0;">
+                        En güncel @pekChartRecords.Count dönem gösterilmektedir. En uzun çubuk en yüksek PEK değerini temsil eder.
                     </p>
                 </div>
             }
 
+            @* ── 6. Eksik Gün Analizi ────────────────────────────────────── *@
             @if (missingDayRecords.Any())
             {
                 <div class="premium-detail-card">
                     <h2>Eksik Gün Analizi</h2>
-                    <p style="color:#6b7280;margin:0 0 16px;line-height:1.7;">
-                        Aşağıdaki dönemlerde 30 günden az bildirim görünmektedir.
-                        Bu durum tek başına hata anlamına gelmez; ancak bilginiz
-                        dışındaki bir eksiklik varsa işvereniniz veya SGK ile
-                        kontrol etmeniz önerilir.
+                    <p style="color:#6b7280;margin:0 0 14px;line-height:1.7;">
+                        Aşağıdaki dönemlerde 30 günden az prim bildirimi görünmektedir.
+                        Bu durum; işe giriş/çıkış, kısmi çalışma, ücretsiz izin veya raporlu süre gibi nedenlerden kaynaklanabilir.
+                        Bilginiz dışında bir eksiklik olduğunu düşünüyorsanız işvereniniz veya SGK ile kontrol etmeniz önerilir.
                     </p>
                     <table class="data-table">
                         <thead>
@@ -282,7 +354,6 @@
                                 <th>Bildirilen Gün</th>
                                 <th>Eksik Gün</th>
                                 <th>P.E.K.</th>
-                                <th>Olası Durum</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -292,14 +363,7 @@
                                     <td>@item.Period</td>
                                     <td><strong>@item.Days gün</strong></td>
                                     <td style="color:#b45309;font-weight:600;">@(30 - item.Days) gün eksik</td>
-                                    <td>
-                                        @(item.PekAmount.HasValue
-                                            ? item.PekAmount.Value.ToString("N2") + " TL"
-                                            : "-")
-                                    </td>
-                                    <td style="color:#6b7280;font-size:13px;">
-                                        İşe giriş/çıkış, rapor veya kısmi çalışma olabilir
-                                    </td>
+                                    <td>@(item.PekAmount.HasValue ? item.PekAmount.Value.ToString("N2") + " TL" : "—")</td>
                                 </tr>
                             }
                         </tbody>
@@ -307,183 +371,338 @@
                 </div>
             }
 
+            @* ── 7. Prim Bilgileriniz Ne Anlama Geliyor? ────────────────── *@
             <div class="premium-detail-card">
-                <h2>Dönemsel Prim Kayıtları</h2>
-                @if (monthlyRecords.Any())
-                {
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Dönem</th>
-                                <th>Gün</th>
-                                <th>P.E.K.</th>
-                                <th>Durum</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in monthlyRecords)
-                            {
-                                <tr>
-                                    <td>@item.Period</td>
-                                    <td>@item.Days</td>
-                                    <td>
-                                        @(item.PekAmount.HasValue
-                                            ? item.PekAmount.Value.ToString("N2") + " TL"
-                                            : "-")
-                                    </td>
-                                    <td>
-                                        @if (item.Days == 30)
-                                        {
-                                            <span style="color:#15803d;font-weight:600;">Tam ay bildirimi</span>
-                                        }
-                                        else if (item.Days > 0 && item.Days < 30)
-                                        {
-                                            <span style="color:#b45309;font-weight:600;">Eksik gün olabilir</span>
-                                        }
-                                        else
-                                        {
-                                            <span style="color:#6b7280;">Gün bilgisi okunamadı</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <p style="color:#6b7280;">Dönemsel kayıtlar otomatik olarak ayrıştırılamadı.</p>
-                }
-            </div>
+                <h2>Prim Bilgileriniz Ne Anlama Geliyor?</h2>
+                <div class="prim-yorum-listesi">
 
-            <div class="premium-detail-card" style="border-left:5px solid #005BAC;">
-                <h2>Dikkat Edilmesi Gerekenler</h2>
-                <ul style="margin:0;padding-left:20px;color:#4b5563;line-height:2.1;">
-                    <li>
-                        Bu analiz <strong>resmi bir emeklilik kararı değildir</strong>;
-                        yüklenen belgedeki okunabilir verilerden otomatik üretilmiştir.
-                    </li>
-                    <li>
-                        Emeklilik değerlendirmesi için <strong>yaş, ilk sigorta başlangıcı,
-                        sigorta statüsü, borçlanma ve güncel mevzuat</strong> bilgileri
-                        ayrıca gereklidir.
-                    </li>
-                    <li>
-                        Eksik veya hatalı görünen kayıtlar için
-                        <strong>işvereniniz ya da SGK</strong> ile iletişime geçmeniz önerilir.
-                    </li>
-                    <li>
-                        SGK bildirimleri zaman zaman geriden sisteme yansıyabilir;
-                        en güncel bilgi için e-Devlet üzerinden kontrol ediniz.
-                    </li>
-                </ul>
+                    <div class="yorum-satiri">
+                        <div class="yorum-baslik">Toplam Prim Günü</div>
+                        <div class="yorum-metin">
+                            @if (doc.TotalPremiumDays.HasValue)
+                            {
+                                <span>Belgede toplam <strong>@doc.TotalPremiumDays.Value gün</strong> uzun vade prim bildirimi görünmektedir.</span>
+                                if (totalDays < 3600)
+                                {
+                                    <span> Emeklilik için gereken asgari prim günü koşulunu henüz karşılamıyor olabilirsiniz.</span>
+                                }
+                                else if (totalDays < 5400)
+                                {
+                                    <span> Belirli emeklilik koşulları için yeterli olabilir; yaş ve sigortalılık süresi birlikte değerlendirilmelidir.</span>
+                                }
+                                else
+                                {
+                                    <span> Prim gün sayınız emeklilik değerlendirmesinde önemli bir eşiğe ulaşmış görünmektedir.</span>
+                                }
+                            }
+                            else
+                            {
+                                <span>Toplam prim günü belgeden okunamadı.</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="yorum-satiri">
+                        <div class="yorum-baslik">Son Bildirilen Dönem</div>
+                        <div class="yorum-metin">
+                            @if (!string.IsNullOrWhiteSpace(doc.LastPeriod))
+                            {
+                                <span>Belgede en güncel kayıt <strong>@doc.LastPeriod</strong> dönemine aittir.</span>
+                                if (lastPeriodFull)
+                                {
+                                    <span> Bu dönemde tam ay (30 gün) bildirimi görünmektedir.</span>
+                                }
+                                else
+                                {
+                                    <span> Bu dönemde eksik gün bildirimi görünmektedir.</span>
+                                }
+                                <span> SGK bildirimleri zaman zaman geriden yansıyabileceğinden güncel dönem belgede henüz görünmeyebilir.</span>
+                            }
+                            else
+                            {
+                                <span>Son dönem bilgisi belgeden okunamadı.</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="yorum-satiri">
+                        <div class="yorum-baslik">PEK Bilgileri</div>
+                        <div class="yorum-metin">
+                            @if (lastPek.HasValue && avgPek.HasValue)
+                            {
+                                <span>Son dönem PEK <strong>@lastPek.Value.ToString("N2") TL</strong>, dönemsel ortalama <strong>@avgPek.Value.ToString("N2") TL</strong> olarak görünmektedir.</span>
+                                if (lastPek.Value > avgPek.Value * 1.02m)
+                                {
+                                    <span> Son dönem PEK ortalamanın üzerindedir.</span>
+                                }
+                                else if (lastPek.Value < avgPek.Value * 0.98m)
+                                {
+                                    <span> Son dönem PEK ortalamanın altındadır.</span>
+                                }
+                                else
+                                {
+                                    <span> Son dönem PEK ortalamayla uyumludur.</span>
+                                }
+                                <span> PEK, emekli aylığını etkileyen unsurlardan biridir; kesin hesaplama için SGK araçları kullanılmalıdır.</span>
+                            }
+                            else
+                            {
+                                <span>PEK bilgisi bu belgeden okunamadı.</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="yorum-satiri">
+                        <div class="yorum-baslik">Eksik Gün Durumu</div>
+                        <div class="yorum-metin">
+                            @if (eksikGunSayisi > 0)
+                            {
+                                <span><strong>@eksikGunSayisi dönemde</strong> 30 günden az bildirim görünmektedir.</span>
+                                <span> Bu durum işe giriş/çıkış, kısmi çalışma veya ücretsiz izin gibi nedenlerden kaynaklanıyor olabilir. Beklenmediği hâllerde resmi kayıtlar kontrol edilmelidir.</span>
+                            }
+                            else
+                            {
+                                <span>Yüklenen belgede 30 günden az bildirim içeren dönem görünmemektedir.</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="yorum-satiri" style="border-bottom:none;">
+                        <div class="yorum-baslik">Genel Değerlendirme</div>
+                        <div class="yorum-metin">
+                            Bu analiz, yüklenen belgedeki okunabilir verilerden otomatik üretilmiştir.
+                            Emeklilik değerlendirmesi için <strong>yaş, ilk sigorta başlangıcı, sigorta statüsü ve borçlanma</strong>
+                            bilgileri ayrıca gereklidir. Kesin bilgi için SGK/e-Devlet kayıtları esas alınır.
+                        </div>
+                    </div>
+
+                </div>
             </div>
         }
 
-        <div class="premium-detail-card">
-            <h2>Sık Sorulan Sorular</h2>
-
-            <div class="sss-item">
-                <div class="sss-soru">Prim günü nedir?</div>
-                <div class="sss-cevap">
-                    Sigortalı olarak çalışıldığı ve SGK'ya bildirildiği gün sayısıdır.
-                    Emeklilik hakkının doğması için belirli bir prim günü koşulunun
-                    sağlanması zorunludur; ancak prim günü tek başına yeterli değildir.
-                </div>
+        @* ── 8. İlgili Resmi SGK/e-Devlet Hizmetleri ───────────────────── *@
+        <section class="pi-tools-section">
+            <div class="pi-tools-header">
+                <span class="pi-tools-icon">🌐</span>
+                <h2>İlgili Resmi SGK/e-Devlet Hizmetleri</h2>
             </div>
+            <p style="color:#6b7280;font-size:13px;margin:0 0 16px;">
+                Güncel ve resmi prim/hizmet bilgileriniz için aşağıdaki e-Devlet ekranlarını kullanabilirsiniz.
+            </p>
 
-            <div class="sss-item">
-                <div class="sss-soru">Uzun vade prim gün sayısı ne anlama gelir?</div>
-                <div class="sss-cevap">
-                    SGK sigortaları kısa vade (iş kazası, hastalık) ve uzun vade
-                    (yaşlılık, malullük, ölüm) olarak ikiye ayrılır. Emeklilik
-                    değerlendirmesinde esas alınan, uzun vade prim günüdür.
-                </div>
+            <div class="pi-tools-grid">
+                <a href="https://www.turkiye.gov.tr/sgk-tescil-ve-hizmet-dokumu" target="_blank" rel="noopener noreferrer" class="pi-tool-card">
+                    <div class="pi-tool-icon">📄</div>
+                    <div class="pi-tool-title">SGK Tescil ve Hizmet Dökümü</div>
+                    <div class="pi-tool-desc">Emekliliğe esas uzun vade hizmetlerinizi ve işyeri ünvan listenizi görüntüleyebilirsiniz.</div>
+                    <div class="pi-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+                <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-kayit-belgesi-sorgulama" target="_blank" rel="noopener noreferrer" class="pi-tool-card">
+                    <div class="pi-tool-icon">🪪</div>
+                    <div class="pi-tool-title">Sosyal Güvenlik Kayıt Belgesi</div>
+                    <div class="pi-tool-desc">4A, 4B ve 4C sigorta kayıt bilgilerinizi içeren barkodlu belgeyi alabilirsiniz.</div>
+                    <div class="pi-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+                <a href="https://www.turkiye.gov.tr/4a-hizmet-dokumu" target="_blank" rel="noopener noreferrer" class="pi-tool-card">
+                    <div class="pi-tool-icon">🧾</div>
+                    <div class="pi-tool-title">4A Hizmet Bilgileri (Son 6 Ay)</div>
+                    <div class="pi-tool-desc">4A kapsamındaki yakın dönem hizmet bilgilerinizi görüntüleyebilirsiniz.</div>
+                    <div class="pi-tool-btn">e-Devlet'te Aç →</div>
+                </a>
             </div>
+        </section>
 
-            <div class="sss-item">
-                <div class="sss-soru">P.E.K. nedir ve neden önemlidir?</div>
-                <div class="sss-cevap">
-                    Prime Esas Kazanç; SGK'ya bildirilen kazanç matrahıdır. Emekli aylığı
-                    hesabında kullanılır. Daha yüksek P.E.K. bildirimi emekli aylığını
-                    olumlu yönde etkiler.
-                </div>
-            </div>
-
-            <div class="sss-item">
-                <div class="sss-soru">Son bildirilen dönem neden önemlidir?</div>
-                <div class="sss-cevap">
-                    Sigortalılığın hâlâ devam edip etmediğini ve işvereninizin bildirimlerini
-                    düzenli yapıp yapmadığını anlamak için son bildirilen dönem bir gösterge
-                    niteliği taşır. Belge tarihinden önceki döneme ait kayıt bulunmaması
-                    halinde işvereninizle veya SGK ile kontrol etmeniz önerilir.
-                </div>
-            </div>
-
-            <div class="sss-item" style="border-bottom:none;padding-bottom:0;">
-                <div class="sss-soru">Eksik gün ne anlama gelebilir?</div>
-                <div class="sss-cevap">
-                    Bir ayda 30 günden az bildirim yapılması; ayın ortasında işe başlama
-                    veya ayrılma, raporlu süre, ücretsiz izin ya da kısmi süreli çalışma
-                    gibi durumlardan kaynaklanabilir. Bu durum her zaman bir hata anlamına
-                    gelmez; bağlamına göre değerlendirilmelidir.
-                </div>
-            </div>
         </div>
 
     </main>
 </section>
 
 <style>
-    .prim-yorum-listesi {
-        display: flex;
-        flex-direction: column;
+
+    /* ── Sekme yapısı ve Prim Rehberi kartları ─────────────────────── */
+    .pi-tabs {
+        display:flex;
+        gap:8px;
+        margin-bottom:20px;
+        border-bottom:2px solid #e5e7eb;
+    }
+    .pi-tab {
+        padding:10px 22px;
+        border:none;
+        background:none;
+        cursor:pointer;
+        font-size:14px;
+        font-weight:700;
+        color:#6b7280;
+        border-bottom:3px solid transparent;
+        margin-bottom:-2px;
+        transition:color .15s, border-color .15s;
+        font-family:inherit;
+    }
+    .pi-tab:hover { color:#004B93; }
+    .pi-tab--active {
+        color:#005BAC;
+        border-bottom-color:#005BAC;
+    }
+    .pi-tab-panel { animation:pi-fade .15s ease; }
+    @@keyframes pi-fade { from { opacity:0; } to { opacity:1; } }
+
+    .pi-guide-intro {
+        color:#6b7280;
+        font-size:14px;
+        line-height:1.7;
+        margin:0 0 18px;
+    }
+    .pi-info-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+        gap:14px;
+    }
+    .pi-info-card {
+        background:white;
+        border:1px solid #e5e7eb;
+        border-radius:12px;
+        padding:16px;
+        display:flex;
+        gap:12px;
+        align-items:flex-start;
+        box-shadow:0 1px 4px rgba(0,0,0,.04);
+    }
+    .pi-info-icon {
+        font-size:22px;
+        line-height:1.2;
+        flex-shrink:0;
+    }
+    .pi-info-card h3 {
+        margin:0 0 6px;
+        font-size:15px;
+        color:#004B93;
+        font-weight:800;
+    }
+    .pi-info-card p {
+        margin:0;
+        color:#4b5563;
+        font-size:13px;
+        line-height:1.55;
     }
 
+    /* ── Prim Bilgileriniz Ne Anlama Geliyor? ───────────────────────── */
+    .prim-yorum-listesi { display:flex; flex-direction:column; }
     .yorum-satiri {
-        display: grid;
-        grid-template-columns: 220px 1fr;
-        gap: 20px;
-        padding: 18px 0;
-        border-bottom: 1px solid #e5e7eb;
-        align-items: start;
+        display:grid; grid-template-columns:200px 1fr; gap:20px;
+        padding:16px 0; border-bottom:1px solid #e5e7eb; align-items:start;
+    }
+    .yorum-baslik { font-weight:700; color:#004B93; font-size:13px; padding-top:2px; }
+    .yorum-metin  { color:#4b5563; line-height:1.7; font-size:14px; }
+
+    /* ── Dönemsel filtre butonları ──────────────────────────────────── */
+    .pi-filter-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+    .pi-filter-btn {
+        padding:7px 16px; border-radius:20px; font-size:12px; font-weight:700;
+        background:#f1f5f9; color:#374151; border:1px solid #e2e8f0; cursor:pointer;
+        font-family:inherit; transition:background .15s, color .15s;
+    }
+    .pi-filter-btn:hover { background:#e2e8f0; }
+    .pi-filter-btn--active { background:#005BAC; color:white; border-color:#005BAC; }
+
+    /* ── PEK yorum kutusu ───────────────────────────────────────────── */
+    .pi-pek-yorum {
+        background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px;
+        padding:12px 14px; margin:14px 0 0; font-size:13px;
+        color:#374151; line-height:1.6;
     }
 
-    .yorum-baslik {
-        font-weight: 700;
-        color: #004B93;
-        font-size: 14px;
-        padding-top: 2px;
+    /* ── PEK bar grafiği ────────────────────────────────────────────── */
+    .pi-pek-chart { display:flex; flex-direction:column; gap:10px; }
+    .pi-pek-bar-row {
+        display:grid; grid-template-columns:80px 1fr 140px;
+        align-items:center; gap:12px;
     }
-
-    .yorum-metin {
-        color: #4b5563;
-        line-height: 1.7;
-        font-size: 14px;
+    .pi-pek-bar-label { font-size:12px; color:#6b7280; font-weight:600; }
+    .pi-pek-bar-track {
+        background:#f1f5f9; border-radius:6px; height:14px; overflow:hidden;
     }
-
-    .sss-item {
-        padding: 18px 0;
-        border-bottom: 1px solid #e5e7eb;
+    .pi-pek-bar-fill {
+        background:linear-gradient(90deg,#005BAC,#2563eb);
+        height:100%; border-radius:6px; transition:width .3s;
     }
+    .pi-pek-bar-value { font-size:12px; color:#111827; font-weight:700; text-align:right; }
 
-    .sss-soru {
-        font-weight: 700;
-        color: #004B93;
-        margin-bottom: 8px;
-        font-size: 15px;
+    /* ── Resmi SGK araçları ─────────────────────────────────────────── */
+    .pi-tools-section { margin-top:22px; }
+    .pi-tools-header {
+        display:flex; align-items:center; gap:10px;
+        margin-bottom:14px; padding-bottom:8px; border-bottom:2px solid #e5e7eb;
     }
-
-    .sss-cevap {
-        color: #4b5563;
-        line-height: 1.7;
-        font-size: 14px;
+    .pi-tools-header h2 { margin:0; font-size:17px; color:#111827; font-weight:800; }
+    .pi-tools-icon { font-size:19px; }
+    .pi-tools-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(230px,1fr));
+        gap:14px;
     }
+    .pi-tool-card {
+        background:white; border:1px solid #e5e7eb; border-radius:12px;
+        padding:18px; display:flex; flex-direction:column; gap:6px;
+        text-decoration:none; color:inherit;
+        box-shadow:0 1px 4px rgba(0,0,0,.04);
+        transition:box-shadow .15s, transform .15s, border-color .15s;
+    }
+    .pi-tool-card:hover {
+        box-shadow:0 4px 16px rgba(0,91,172,.12); transform:translateY(-2px);
+        border-color:#005BAC; text-decoration:none;
+    }
+    .pi-tool-icon  { font-size:24px; }
+    .pi-tool-title { font-weight:700; color:#111827; font-size:14px; line-height:1.3; }
+    .pi-tool-desc  { font-size:12px; color:#6b7280; line-height:1.5; flex:1; }
+    .pi-tool-btn   { font-size:12px; font-weight:700; color:#005BAC; margin-top:4px; }
 
-    @@media (max-width: 700px) {
-        .yorum-satiri {
-            grid-template-columns: 1fr;
-            gap: 6px;
-        }
+    @@media (max-width:700px) {
+        .yorum-satiri { grid-template-columns:1fr; gap:6px; }
+        .pi-tools-grid { grid-template-columns:1fr; }
+        .pi-pek-bar-row { grid-template-columns:60px 1fr 100px; gap:8px; }
     }
 </style>
+
+<script>
+(function () {
+
+    window.piSwitchTab = function (tab) {
+        var guidePanel = document.getElementById('pi-panel-rehber');
+        var analysisPanel = document.getElementById('pi-panel-analiz');
+        var buttons = document.querySelectorAll('.pi-tab');
+
+        if (!guidePanel || !analysisPanel) return;
+
+        var showGuide = tab === 'rehber';
+
+        guidePanel.style.display = showGuide ? '' : 'none';
+        analysisPanel.style.display = showGuide ? 'none' : '';
+
+        guidePanel.classList.toggle('pi-tab-panel--active', showGuide);
+        analysisPanel.classList.toggle('pi-tab-panel--active', !showGuide);
+
+        buttons.forEach(function (button) {
+            button.classList.toggle('pi-tab--active', button.getAttribute('data-tab') === tab);
+        });
+    };
+
+    window.piFilterRecords = function (filter) {
+        var table = document.getElementById('pi-records-table');
+        if (!table) return;
+        var btns = document.querySelectorAll('.pi-filter-btn');
+        btns.forEach(function (b) { b.classList.toggle('pi-filter-btn--active', b.getAttribute('data-filter') === filter); });
+        var rows = table.querySelectorAll('tbody tr');
+        var visible = 0;
+        rows.forEach(function (row) {
+            var idx  = parseInt(row.getAttribute('data-index'), 10);
+            var days = parseInt(row.getAttribute('data-days'), 10);
+            var show = filter === 'all' || (filter === 'last12' && idx < 12) || (filter === 'missing' && days > 0 && days < 30);
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        var empty = document.getElementById('pi-filter-empty');
+        if (empty) empty.style.display = visible === 0 ? '' : 'none';
+    };
+})();
+</script>

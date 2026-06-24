@@ -2,19 +2,18 @@
     var activePage = ViewData["ActivePage"] as string ?? "";
 
     string Active(string pageName)
-    {
-        return activePage == pageName ? "active" : "";
-    }
+        => activePage == pageName ? "active" : "";
 }
 
 <aside class="sidebar">
     <div class="sidebar-title">Hizmetler</div>
 
-    <a class="@Active("Home")" href="/Citizen">Ana Sayfa</a>
-    <a class="@Active("PremiumInfo")" href="/Citizen/PremiumInfo">Prim Bilgilerim</a>
+    <a class="@Active("PremiumInfo")"      href="/Citizen/PremiumInfo">Prim Bilgilerim</a>
     <a class="@Active("RetirementStatus")" href="/Citizen/RetirementStatus">Emeklilik Durumu</a>
-    <a class="@Active("DebtOptions")" href="/Citizen/DebtOptions">Borçlanma İşlemleri</a>
-    <a class="@Active("ServiceMerge")" href="/Citizen/ServiceMerge">Hizmet Birleştirme</a>
-    <a class="@Active("RecentActions")" href="/Citizen/RecentActions">Son İşlemler</a>
+    <a class="@Active("DebtOptions")"      href="/Citizen/DebtOptions">Borçlanma İşlemleri</a>
+    <a class="@Active("ServiceMerge")"     href="/Citizen/ServiceMerge">Hizmet Birleştirme</a>
+
+    <div class="sidebar-title" style="margin-top:18px;">Hesap</div>
+
     <a class="@Active("Profile")" href="/Citizen/Profile">Profilim</a>
 </aside>

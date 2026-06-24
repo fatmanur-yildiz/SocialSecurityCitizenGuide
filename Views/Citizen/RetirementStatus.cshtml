@@ -1,115 +1,84 @@
 @model EmekliRehberi.ViewModels.RetirementInputViewModel
 @using EmekliRehberi.Models
+@using EmekliRehberi.Services
 @using System.Linq
 @using System.Globalization
 
 @{
-    ViewData["Title"] = "Emeklilik Durumu";
+    ViewData["Title"]      = "Emeklilik Durumu";
     ViewData["ActivePage"] = "RetirementStatus";
 
-    var premium     = ViewBag.LatestPremium as PremiumDocument;
-    var socialSec   = ViewBag.LatestSocialSecurity as SocialSecurityRecordDocument;
-    var manual      = ViewBag.ManualInput as EmekliRehberi.ViewModels.RetirementInputViewModel;
+    var premium   = ViewBag.LatestPremium as PremiumDocument;
+    var socialSec = ViewBag.LatestSocialSecurity as SocialSecurityRecordDocument;
+    var manual    = ViewBag.ManualInput as EmekliRehberi.ViewModels.RetirementInputViewModel;
 
-    // Aylık kayıtlar
     var monthlyRecords = premium?.Records?
         .Where(r => !r.IsYearTotal)
         .OrderBy(r => r.Period)
         .ToList() ?? new List<PremiumRecord>();
 
-    // PEK
     var pekRecords = monthlyRecords.Where(r => r.PekAmount.HasValue).ToList();
-    decimal? avgPek = pekRecords.Any() ? pekRecords.Average(r => r.PekAmount!.Value) : null;
+    decimal? avgPek  = pekRecords.Any() ? pekRecords.Average(r => r.PekAmount!.Value) : null;
+    decimal? lastPek = pekRecords.Any() ? pekRecords.OrderByDescending(r => r.Period).First().PekAmount : null;
 
-    // ── İlk sigorta tarihi: öncelik sırası ───────────────────────────────────
-    // 1. Kullanıcı manuel girdiyse
-    // 2. Sosyal Güvenlik belgesinden
-    // 3. Prim kayıtlarından tahmin
-    DateTime? firstDateManual = manual?.FirstInsuranceDate;
-    DateTime? firstDateDoc    = socialSec?.FirstRegistrationDate;
-    DateTime? firstDatePremium = null;
+    // İlk sigorta tarihi — InsuranceDateResolver (Aşama 1)
+    var resolved        = ViewBag.ResolvedInsuranceDate as InsuranceDateResolver.ResolvedInsuranceDate;
+    DateTime? firstDate = resolved?.Date;
+    string firstDateSource = resolved?.Source ?? "";
 
-    if (monthlyRecords.Any())
-    {
-        var fp = monthlyRecords.FirstOrDefault(r => r.EntryDate.HasValue);
-        if (fp?.EntryDate != null)
-            firstDatePremium = fp.EntryDate;
-        else
-        {
-            var firstPeriod = monthlyRecords
-                .Where(r => !string.IsNullOrWhiteSpace(r.Period))
-                .OrderBy(r => r.Period)
-                .FirstOrDefault();
-            if (firstPeriod != null &&
-                DateTime.TryParseExact(firstPeriod.Period + "/01", "yyyy/MM/dd",
-                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var pd))
-                firstDatePremium = pd;
-        }
-    }
-
-    DateTime? firstDate = firstDateManual ?? firstDateDoc ?? firstDatePremium;
-    string firstDateSource =
-        firstDateManual.HasValue   ? "kullanıcı girişi" :
-        firstDateDoc.HasValue      ? "Sosyal Güvenlik Kayıt Belgesi" :
-        firstDatePremium.HasValue  ? "prim kayıtlarından tahmin" : "";
-
-    // Sigortalılık süresi
     double? insuranceYears = firstDate.HasValue
         ? (DateTime.Now - firstDate.Value).TotalDays / 365.25
         : null;
 
-    // Toplam prim günü
     int totalDays = premium?.TotalPremiumDays ?? socialSec?.TotalDays ?? 0;
 
-    // Kullanıcı yaşı
     int? age = manual?.BirthDate.HasValue == true
         ? (int)((DateTime.Now - manual.BirthDate!.Value).TotalDays / 365.25)
         : null;
 
-    // ── Dominant statü ────────────────────────────────────────────────────────
-    string dominantStatus  = "Belirsiz";
-    bool   multipleStatuses = false;
+    int days4A = socialSec?.Days4A ?? 0;
+    int days4B = socialSec?.Days4B ?? 0;
+    int days4C = socialSec?.Days4C ?? 0;
+    int nonZeroStatuses = (days4A > 0 ? 1 : 0) + (days4B > 0 ? 1 : 0) + (days4C > 0 ? 1 : 0);
+    bool multipleStatuses = nonZeroStatuses > 1;
 
+    string dominantStatus = "Belirsiz";
     if (socialSec != null)
     {
-        int a = socialSec.Days4A ?? 0;
-        int b = socialSec.Days4B ?? 0;
-        int c = socialSec.Days4C ?? 0;
-
-        int nonZeroCount = (a > 0 ? 1 : 0) + (b > 0 ? 1 : 0) + (c > 0 ? 1 : 0);
-        multipleStatuses = nonZeroCount > 1;
-
-        if      (a > 0 && b == 0 && c == 0) dominantStatus = "4A (SSK)";
-        else if (b > 0 && a == 0 && c == 0) dominantStatus = "4B (Bağ-Kur)";
-        else if (c > 0 && a == 0 && b == 0) dominantStatus = "4C (Emekli Sandığı)";
+        if      (days4A > 0 && days4B == 0 && days4C == 0) dominantStatus = "4A (SSK)";
+        else if (days4B > 0 && days4A == 0 && days4C == 0) dominantStatus = "4B (Bağ-Kur)";
+        else if (days4C > 0 && days4A == 0 && days4B == 0) dominantStatus = "4C (Emekli Sandığı)";
         else if (multipleStatuses)
-        {
-            if      (a >= b && a >= c) dominantStatus = "4A ağırlıklı";
-            else if (b >= a && b >= c) dominantStatus = "4B ağırlıklı";
-            else                       dominantStatus = "4C ağırlıklı";
-        }
+            dominantStatus = days4A >= days4B && days4A >= days4C ? "4A ağırlıklı" :
+                             days4B >= days4A && days4B >= days4C ? "4B ağırlıklı" : "4C ağırlıklı";
     }
     else if (!string.IsNullOrWhiteSpace(manual?.TargetStatus) && manual?.TargetStatus != "Bilmiyorum")
     {
         dominantStatus = manual!.TargetStatus!;
     }
 
-    // ── Checklist ─────────────────────────────────────────────────────────────
     bool hasPremiumDoc   = premium != null;
-    bool hasTotalDays    = totalDays > 0;
     bool hasSocialSecDoc = socialSec != null;
     bool hasBirthDate    = manual?.BirthDate.HasValue == true;
     bool hasGender       = !string.IsNullOrWhiteSpace(manual?.Gender);
     bool hasFirstDate    = firstDate.HasValue;
-
-    // Statü: sosyal güvenlik belgesi yüklüyse ve günler okunabiliyorsa tamamlandı
-    bool hasStatusFromDoc    = socialSec != null && ((socialSec.Days4A ?? 0) + (socialSec.Days4B ?? 0) + (socialSec.Days4C ?? 0)) > 0;
-    bool hasStatusFromManual = !string.IsNullOrWhiteSpace(manual?.TargetStatus) && manual?.TargetStatus != "Bilmiyorum";
-    bool hasStatus = hasStatusFromDoc || hasStatusFromManual;
-
-    bool formSubmitted = manual != null;
+    bool hasStatusFromDoc = socialSec != null && (days4A + days4B + days4C) > 0;
+    bool hasStatusManual  = !string.IsNullOrWhiteSpace(manual?.TargetStatus) && manual?.TargetStatus != "Bilmiyorum";
+    bool hasStatus        = hasStatusFromDoc || hasStatusManual;
+    bool formSubmitted    = manual != null;
     bool isFemale = manual?.Gender == "Kadın";
     bool isMale   = manual?.Gender == "Erkek";
+    var trCulture = new CultureInfo("tr-TR");
+
+    // EYT sınır tarihi
+    var eytCutoff = new DateTime(1999, 9, 8);
+    bool? isEytScope = firstDate.HasValue ? firstDate.Value <= eytCutoff : (bool?)null;
+
+    // Hangi statü dominantsa ona göre önerilen araç grubu
+    string statusGroup = dominantStatus.StartsWith("4A") ? "4A"
+                       : dominantStatus.StartsWith("4B") ? "4B"
+                       : dominantStatus.StartsWith("4C") ? "4C"
+                       : "Belirsiz";
 }
 
 <section class="dashboard-page">
@@ -117,662 +86,1011 @@
 
     <main class="dashboard-content">
 
-        <div class="page-title">
+        @* ─── Sayfa başlığı ve bölüm navigasyonu ──────────────────────── *@
+        <div class="page-title" style="margin-bottom:12px;">
             <h1>Emeklilik Durumu</h1>
-            <p>
-                Mevcut prim ve kayıt bilgileriniz üzerinden emeklilik sürecinize ilişkin
-                anlaşılır bir ön değerlendirme alabilirsiniz.
-            </p>
+            <p>Belgelerinize göre kısa ön değerlendirme. Kesin sonuç için SGK/e-Devlet araçlarına yönlendirilirsiniz.</p>
         </div>
 
-        @* ── Veri kaynakları ──────────────────────────────────────── *@
-        <div class="premium-detail-card" style="margin-bottom:22px;">
-            <h2>Kullanılan Veri Kaynakları</h2>
-            <div class="veri-kaynak-grid">
-                <div class="veri-kaynak-item @(hasPremiumDoc ? "kaynak-var" : "kaynak-yok")">
-                    <div class="kaynak-baslik">SGK Tescil ve Hizmet Dökümü</div>
-                    <div class="kaynak-durum">
-                        @if (hasPremiumDoc)
-                        {
-                            <span style="color:#15803d;">&#10003; Yüklendi — @premium!.CreatedAt.ToString("dd.MM.yyyy")</span>
-                        }
-                        else
-                        {
-                            <span style="color:#b45309;">&#9888; Yüklenmedi</span>
-                            <a href="/Citizen/PremiumInfo" style="display:block;margin-top:6px;color:#005BAC;font-weight:700;font-size:13px;">
-                                Prim Bilgilerim sayfasından yükleyin →
-                            </a>
-                        }
+        <nav class="section-nav" aria-label="Sayfa bölümleri">
+            <a href="#genel-bilgi">Genel Bilgi</a>
+            <a href="#pdf-analiz">PDF Analizi ve SGK Yönlendirmesi</a>
+        </nav>
+
+        @* ════════════════════════════════════════════════════════════════
+           BÖLÜM 1 — GENEL BİLGİ
+        ════════════════════════════════════════════════════════════════ *@
+        <section id="genel-bilgi" class="rs-section">
+            <div class="rs-section-header">
+                <span class="rs-section-icon">📖</span>
+                <h2>Genel Bilgi</h2>
+            </div>
+
+            <p style="color:#6b7280;font-size:14px;line-height:1.7;margin:0 0 18px;">
+                Emeklilik sürecinde sık karşılaşılan temel kavramları sade biçimde inceleyebilirsiniz.
+                Bu bölüm bilgilendirme amaçlıdır; kişiye özel kesin hesaplamalar için SGK'nın resmi araçları kullanılmalıdır.
+            </p>
+
+            @{
+                const string sgkGenelLink = "https://www.sgk.gov.tr/Content/Post/24a62093-24ca-4a18-81e1-f79300b94a49/Emekli-Kavrami-2022-05-15-05-12-26";
+            }
+
+            <div class="info-cards-grid">
+
+                <details class="info-card">
+                    <summary class="info-card-summary">
+                        <span class="info-card-icon">🧓</span>
+                        <span class="info-card-text">
+                            <span class="info-card-title">Emeklilik Nedir?</span>
+                            <span class="info-card-short">Çalışma hayatından aylık alma dönemine geçişi ifade eder.</span>
+                        </span>
+                        <span class="info-card-chevron">▾</span>
+                    </summary>
+                    <div class="info-card-detail">
+                        <p>Emeklilik, kişinin çalışma hayatı boyunca bildirilen primleri ve sigortalılık bilgileri üzerinden belirli şartları sağlaması halinde aylık alabilmesidir.</p>
+                        <p>Bu süreç yalnızca "kaç gün primim var?" sorusuyla açıklanamaz. İlk sigorta başlangıcı, yaş, sigorta statüsü ve prim günü birlikte değerlendirilir.</p>
+                        <p>Bu kart temel bilgilendirme içindir; kişiye özel hesaplama PDF Analizi bölümünde yapılır.</p>
                     </div>
-                </div>
-                <div class="veri-kaynak-item @(hasSocialSecDoc ? "kaynak-var" : "kaynak-yok")">
-                    <div class="kaynak-baslik">Sosyal Güvenlik Kayıt Belgesi</div>
-                    <div class="kaynak-durum">
-                        @if (hasSocialSecDoc)
-                        {
-                            <span style="color:#15803d;">&#10003; Yüklendi — @socialSec!.CreatedAt.ToString("dd.MM.yyyy")</span>
-                        }
-                        else
-                        {
-                            <span style="color:#b45309;">&#9888; Henüz yüklenmedi</span>
-                            <div style="font-size:12px;color:#6b7280;margin-top:4px;">
-                                e-Devlet → "Sosyal Güvenlik Kayıt Belgesi Sorgulama" sayfasından PDF indirip aşağıdan yükleyin.
-                            </div>
-                        }
+                </details>
+
+                <details class="info-card">
+                    <summary class="info-card-summary">
+                        <span class="info-card-icon">🏦</span>
+                        <span class="info-card-text">
+                            <span class="info-card-title">Yaşlılık Aylığı</span>
+                            <span class="info-card-short">Emeklilik şartları sağlandığında bağlanan aylıktır.</span>
+                        </span>
+                        <span class="info-card-chevron">▾</span>
+                    </summary>
+                    <div class="info-card-detail">
+                        <p>Yaşlılık aylığı, sigortalının yaş, prim günü ve sigortalılık süresi gibi şartları sağlaması halinde bağlanabilen emeklilik aylığıdır.</p>
+                        <p>Hangi şartların aranacağı kişinin ilk sigorta başlangıcına ve 4A, 4B, 4C statüsüne göre değişebilir.</p>
+                        <p>Bu nedenle sistem kesin aylık bağlama kararı vermez; sadece belgeler üzerinden ön değerlendirme yapar.</p>
+                        <a href="@sgkGenelLink" target="_blank" rel="noopener noreferrer" class="info-card-btn">Detaylı Bilgi →</a>
+                    </div>
+                </details>
+
+                <details class="info-card">
+                    <summary class="info-card-summary">
+                        <span class="info-card-icon">⏳</span>
+                        <span class="info-card-text">
+                            <span class="info-card-title">Sigortalılık Süresi</span>
+                            <span class="info-card-short">İlk sigorta başlangıcından emeklilik talebine kadar geçen süredir.</span>
+                        </span>
+                        <span class="info-card-chevron">▾</span>
+                    </summary>
+                    <div class="info-card-detail">
+                        <p>Sigortalılık süresi, kişinin ilk defa uzun vadeli sigorta kapsamında çalışmaya başladığı tarihten emeklilik talebine kadar geçen süreyi ifade eder.</p>
+                        <p>Bu nedenle ilk sigorta başlangıcının doğru belirlenmesi önemlidir. Sosyal Güvenlik Kayıt Belgesi ile Hizmet Dökümü farklı tarih gösterebilir.</p>
+                        <p>Sistem, mümkünse hizmet dökümündeki en eski işe giriş tarihini dikkate alır.</p>
+                    </div>
+                </details>
+
+                <details class="info-card">
+                    <summary class="info-card-summary">
+                        <span class="info-card-icon">📋</span>
+                        <span class="info-card-text">
+                            <span class="info-card-title">Prim Ödeme Gün Sayısı</span>
+                            <span class="info-card-short">SGK'ya bildirilen emeklilik hesabına esas gün sayısıdır.</span>
+                        </span>
+                        <span class="info-card-chevron">▾</span>
+                    </summary>
+                    <div class="info-card-detail">
+                        <p>Prim ödeme gün sayısı, sigortalı adına SGK'ya bildirilen uzun vadeli sigorta günlerini ifade eder.</p>
+                        <p>Emeklilik değerlendirmesinde temel bilgilerden biridir; ancak tek başına yeterli değildir.</p>
+                        <p>Prim günü, yaş, sigorta başlangıcı ve statü bilgisiyle birlikte değerlendirilir.</p>
+                    </div>
+                </details>
+
+                <details class="info-card">
+                    <summary class="info-card-summary">
+                        <span class="info-card-icon">🎂</span>
+                        <span class="info-card-text">
+                            <span class="info-card-title">Yaş Koşulu</span>
+                            <span class="info-card-short">Emeklilik için gerekli yaş şartı kişiye göre değişebilir.</span>
+                        </span>
+                        <span class="info-card-chevron">▾</span>
+                    </summary>
+                    <div class="info-card-detail">
+                        <p>Yaş şartı; sigorta başlangıç tarihi, çalışma statüsü ve kişinin durumuna göre değişebilir.</p>
+                        <p>Aynı prim gününe sahip iki kişinin emeklilik şartları farklı olabilir.</p>
+                        <p>Bu nedenle sistem yaş için ön değerlendirme yapar, kesin hesaplama için SGK'nın resmi araçlarına yönlendirir.</p>
+                    </div>
+                </details>
+
+                <details class="info-card">
+                    <summary class="info-card-summary">
+                        <span class="info-card-icon">🏷️</span>
+                        <span class="info-card-text">
+                            <span class="info-card-title">4A, 4B ve 4C Nedir?</span>
+                            <span class="info-card-short">Çalışma şekline göre farklı sigorta statüleridir.</span>
+                        </span>
+                        <span class="info-card-chevron">▾</span>
+                    </summary>
+                    <div class="info-card-detail">
+                        <p>4A genellikle hizmet akdiyle çalışanları, 4B kendi adına bağımsız çalışanları, 4C ise kamu görevlilerini ifade eder.</p>
+                        <p>Kişinin farklı statülerde çalışması varsa, hangi statüden emekli olunacağı ayrıca önem kazanabilir.</p>
+                        <p>Bu durumda Hizmet Birleştirme sayfasında statü dağılımı ayrıca kontrol edilmelidir.</p>
+                        <a href="/Citizen/ServiceMerge" class="info-card-btn info-card-btn--internal">Hizmet Birleştirme'ye Git →</a>
+                    </div>
+                </details>
+
+                <details class="info-card">
+                    <summary class="info-card-summary">
+                        <span class="info-card-icon">📅</span>
+                        <span class="info-card-text">
+                            <span class="info-card-title">Ne Zaman Emekli Olabilirim?</span>
+                            <span class="info-card-short">Kesin hesaplama için SGK'nın resmi araçları kullanılmalıdır.</span>
+                        </span>
+                        <span class="info-card-chevron">▾</span>
+                    </summary>
+                    <div class="info-card-detail">
+                        <p>Bu sistem yüklenen belgelerden başlangıç tarihi, prim günü, statü ve bazı temel bilgileri okuyarak ön değerlendirme yapar.</p>
+                        <p>Ancak kesin emeklilik zamanı; kişinin tüm SGK kayıtları, özel durumları, borçlanmaları ve güncel mevzuatla birlikte değerlendirilir.</p>
+                        <p>Bu nedenle kesin sonuç için SGK'nın resmi "Ne Zaman Emekli Olabilirim?" araçlarına yönlendirme yapılır.</p>
+                        <a href="#pdf-analiz" class="info-card-btn info-card-btn--internal">Resmi Hesaplama Araçlarına Git →</a>
+                    </div>
+                </details>
+
+                <details class="info-card">
+                    <summary class="info-card-summary">
+                        <span class="info-card-icon">💰</span>
+                        <span class="info-card-text">
+                            <span class="info-card-title">Emekli Aylığı Hesaplanabilir mi?</span>
+                            <span class="info-card-short">Net emekli aylığı bu belgelerle kesin hesaplanamaz.</span>
+                        </span>
+                        <span class="info-card-chevron">▾</span>
+                    </summary>
+                    <div class="info-card-detail">
+                        <p>Emekli aylığı hesabında prime esas kazanç, çalışma dönemleri, aylık bağlama oranları ve SGK'nın hesaplama kuralları birlikte değerlendirilir.</p>
+                        <p>Hizmet dökümündeki PEK bilgisi bu konuda fikir verir; ancak tek başına net maaş sonucu üretmez.</p>
+                        <p>Bu nedenle sistem maaş tahmini yapmaz, resmi SGK/e-Devlet hesaplama araçlarına yönlendirir.</p>
+                        <a href="#pdf-analiz" class="info-card-btn info-card-btn--internal">SGK Hesaplama Araçlarına Git →</a>
+                    </div>
+                </details>
+
+                <details class="info-card">
+                    <summary class="info-card-summary">
+                        <span class="info-card-icon">💼</span>
+                        <span class="info-card-text">
+                            <span class="info-card-title">Emeklilikten Sonra Çalışma</span>
+                            <span class="info-card-short">Emeklilik sonrası çalışma kuralları başlangıç tarihi ve statüye göre değişebilir.</span>
+                        </span>
+                        <span class="info-card-chevron">▾</span>
+                    </summary>
+                    <div class="info-card-detail">
+                        <p>Emekli olduktan sonra çalışmaya devam edilmesi halinde aylığın kesilip kesilmeyeceği veya sosyal güvenlik destek primi uygulanıp uygulanmayacağı kişinin durumuna göre değişebilir.</p>
+                        <p>İlk sigorta başlangıcı, emekli olunan statü ve yeniden çalışılacak statü bu değerlendirmede önemlidir.</p>
+                        <p>Bu konu ayrıntılı mevzuat gerektirdiği için sistem yalnızca genel bilgilendirme yapar, kesin karar üretmez.</p>
+                        <a href="@sgkGenelLink" target="_blank" rel="noopener noreferrer" class="info-card-btn">Detaylı Bilgi →</a>
+                    </div>
+                </details>
+
+                <details class="info-card">
+                    <summary class="info-card-summary">
+                        <span class="info-card-icon">🔄</span>
+                        <span class="info-card-text">
+                            <span class="info-card-title">Toptan Ödeme ve İhya</span>
+                            <span class="info-card-short">Aylık bağlanamayan bazı durumlarda prim iadesi veya ihya gündeme gelebilir.</span>
+                        </span>
+                        <span class="info-card-chevron">▾</span>
+                    </summary>
+                    <div class="info-card-detail">
+                        <p>Bazı sigortalılar yaş şartını doldurduğu halde aylık bağlanması için gerekli prim veya süre şartlarını sağlayamayabilir.</p>
+                        <p>Bu tür durumlarda toptan ödeme veya daha önce tasfiye edilen hizmetlerin yeniden ihyası gibi işlemler gündeme gelebilir.</p>
+                        <p>Bu konu kişiye özel olduğu için yalnızca genel bilgi verilir; kesin değerlendirme için SGK kaynağına bakılmalıdır.</p>
+                        <a href="@sgkGenelLink" target="_blank" rel="noopener noreferrer" class="info-card-btn">Detaylı Bilgi →</a>
+                    </div>
+                </details>
+
+            </div>
+
+            <p style="color:#9ca3af;font-size:12px;margin:14px 0 0;">
+                Diğer temel kavramlar için SGK'nın genel emeklilik bilgi sayfasını da inceleyebilirsiniz:
+                <a href="@sgkGenelLink" target="_blank" rel="noopener noreferrer" style="color:#005BAC;font-weight:700;">SGK — Emekli Kavramı →</a>
+            </p>
+        </section>
+
+        @* ════════════════════════════════════════════════════════════════
+           BÖLÜM 2 — PDF ANALİZİ VE SGK YÖNLENDİRMESİ
+        ════════════════════════════════════════════════════════════════ *@
+        <section id="pdf-analiz" class="rs-section">
+            <div class="rs-section-header">
+                <span class="rs-section-icon">📊</span>
+                <h2>PDF Analizi ve SGK Yönlendirmesi</h2>
+            </div>
+
+            @* Veri kaynakları *@
+            <div class="premium-detail-card" style="margin-bottom:20px;">
+                <h2>Kullanılan Veri Kaynakları</h2>
+                <div class="veri-kaynak-grid">
+                    <div class="veri-kaynak-item @(hasPremiumDoc ? "kaynak-var" : "kaynak-yok")">
+                        <div class="kaynak-baslik">SGK Tescil ve Hizmet Dökümü</div>
+                        <div class="kaynak-durum">
+                            @if (hasPremiumDoc)
+                            {
+                                <span style="color:#15803d;">&#10003; Yüklendi — @premium!.CreatedAt.ToString("dd.MM.yyyy")</span>
+                            }
+                            else
+                            {
+                                <span style="color:#b45309;">&#9888; Yüklenmedi</span>
+                                <a href="/Citizen/PremiumInfo" style="display:block;margin-top:6px;color:#005BAC;font-weight:700;font-size:13px;">
+                                    Prim Bilgilerim sayfasından yükleyin →
+                                </a>
+                            }
+                        </div>
+                    </div>
+                    <div class="veri-kaynak-item @(hasSocialSecDoc ? "kaynak-var" : "kaynak-yok")">
+                        <div class="kaynak-baslik">Sosyal Güvenlik Kayıt Belgesi</div>
+                        <div class="kaynak-durum">
+                            @if (hasSocialSecDoc)
+                            {
+                                <span style="color:#15803d;">&#10003; Yüklendi — @socialSec!.CreatedAt.ToString("dd.MM.yyyy")</span>
+                            }
+                            else
+                            {
+                                <span style="color:#b45309;">&#9888; Henüz yüklenmedi</span>
+                                <div style="font-size:12px;color:#6b7280;margin-top:4px;">
+                                    Aşağıdaki belge yükleme alanından yükleyebilirsiniz.
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        @* ── Sosyal Güvenlik Belgesi yükleme ──────────────────────── *@
-        @if (!hasSocialSecDoc)
-        {
-            <div class="upload-card" style="margin-bottom:22px;">
+            @* Belge yükleme *@
+            <div class="upload-card" style="margin-bottom:20px;">
                 <div>
-                    <h2>Sosyal Güvenlik Kayıt Belgesi Yükle</h2>
-                    <p style="color:#6b7280;margin:4px 0 0;">
-                        4A/4B/4C gün sayıları ve tescil bilgileri otomatik okunacaktır.
+                    <h2>Sosyal Güvenlik Kayıt Belgesi @(hasSocialSecDoc ? "— Güncelle" : "Yükle")</h2>
+                    <p style="color:#6b7280;margin:4px 0 0;font-size:13px;">
+                        @(hasSocialSecDoc
+                            ? "Güncel belgeniz varsa yeni yükleyebilirsiniz; sistem son yüklenen belgeyi kullanır."
+                            : "e-Devlet'teki \"Sosyal Güvenlik Kayıt Belgesi Sorgulama\" sayfasından indirdiğiniz PDF'i yükleyin.")
                     </p>
                 </div>
                 <form method="post" enctype="multipart/form-data" class="upload-form">
                     @Html.AntiForgeryToken()
                     <input type="file" name="SocialSecurityPdf" accept="application/pdf" />
-                    <button type="submit">Belgeyi Yükle</button>
+                    <button type="submit">@(hasSocialSecDoc ? "Yeni Belge Yükle" : "Belgeyi Yükle")</button>
                 </form>
             </div>
-        }
-        else
-        {
-            <div class="upload-card" style="margin-bottom:22px;">
-                <div>
-                    <h2>Sosyal Güvenlik Kayıt Belgesi</h2>
-                    <p style="color:#6b7280;margin:4px 0 0;">
-                        Güncel bir belge varsa yeni belge yükleyebilirsiniz; sistem son yüklenen belgeyi kullanır.
-                    </p>
-                </div>
-                <form method="post" enctype="multipart/form-data" class="upload-form">
-                    @Html.AntiForgeryToken()
-                    <input type="file" name="SocialSecurityPdf" accept="application/pdf" />
-                    <button type="submit">Yeni Belge Yükle</button>
-                </form>
-            </div>
-        }
 
-        @* ── Manuel bilgi formu ────────────────────────────────────── *@
-        <div class="premium-detail-card" style="margin-bottom:22px;">
-            <h2>Kişisel Bilgilerinizi Girin</h2>
-            <p style="color:#6b7280;margin:0 0 20px;font-size:14px;line-height:1.6;">
-                Aşağıdaki bilgiler ön değerlendirmede kullanılacaktır. Eksik bilgi girişiyle
-                değerlendirme yapılabilir; ancak sonuç sınırlı kalır.
-            </p>
-            <form method="post" enctype="multipart/form-data">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="SocialSecurityPdf" value="" />
-
-                <div class="form-grid-2" style="margin-bottom:18px;">
-                    <div class="form-group">
-                        <label asp-for="BirthDate">Doğum Tarihi</label>
-                        <input asp-for="BirthDate" type="date" class="form-input" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Gender">Cinsiyet</label>
-                        <select asp-for="Gender" class="form-input">
-                            <option value="">Seçiniz</option>
-                            <option value="Erkek">Erkek</option>
-                            <option value="Kadın">Kadın</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="FirstInsuranceDate">İlk Sigorta Başlangıç Tarihi</label>
-                        <input asp-for="FirstInsuranceDate" type="date" class="form-input"
-                               value="@(firstDateManual?.ToString("yyyy-MM-dd") ?? "")" />
-                        @if (firstDate.HasValue && !firstDateManual.HasValue)
-                        {
-                            <span style="font-size:12px;color:#6b7280;margin-top:3px;">
-                                Otomatik tespit: <strong>@firstDate.Value.ToString("dd.MM.yyyy")</strong>
-                                (@firstDateSource) — Yanlışsa düzeltebilirsiniz.
-                            </span>
-                        }
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="TargetStatus">Sigorta Statüsü</label>
-                        <select asp-for="TargetStatus" class="form-input">
-                            <option value="Bilmiyorum">Bilmiyorum / Belirlenemedi</option>
-                            <option value="4A">4A — SSK (Ücretli/Sigortalı Çalışan)</option>
-                            <option value="4B">4B — Bağ-Kur (Bağımsız / Kendi Hesabına)</option>
-                            <option value="4C">4C — Emekli Sandığı (Kamu Görevlisi)</option>
-                        </select>
-                        @if (hasStatusFromDoc)
-                        {
-                            <span style="font-size:12px;color:#15803d;margin-top:3px;">
-                                Sosyal Güvenlik Kayıt Belgesinden okundu: <strong>@dominantStatus</strong>
-                            </span>
-                        }
-                    </div>
-                </div>
-
-                @* Borçlanma — ek bilgi olarak, zorunlu değil *@
-                <details style="margin-bottom:18px;">
-                    <summary style="font-weight:700;color:#004B93;font-size:14px;cursor:pointer;padding:10px 0;">
-                        Ek Bilgi: Borçlanma Durumu (İsteğe Bağlı)
-                    </summary>
-                    <div style="padding-top:14px;">
-                        <p style="color:#6b7280;font-size:13px;margin:0 0 14px;">
-                            Borçlanma emeklilik tarihini öne çekebilir.
-                            "Bilmiyorum" seçilirse değerlendirmede dikkate alınmaz.
-                        </p>
-                        <div class="form-grid-3">
-                            @if (!isFemale)
-                            {
-                                <div class="form-group">
-                                    <label asp-for="MilitaryDebt">Askerlik Borçlanması</label>
-                                    <select asp-for="MilitaryDebt" class="form-input">
-                                        <option value="Bilmiyorum">Bilmiyorum</option>
-                                        <option value="Yapıldı">Yapıldı</option>
-                                        <option value="Evet">Yapmayı düşünüyorum</option>
-                                        <option value="Hayır">Hayır / Geçerli değil</option>
-                                    </select>
-                                </div>
-                            }
-                            @if (!isMale)
-                            {
-                                <div class="form-group">
-                                    <label asp-for="MaternityDebt">Doğum Borçlanması</label>
-                                    <select asp-for="MaternityDebt" class="form-input">
-                                        <option value="Bilmiyorum">Bilmiyorum</option>
-                                        <option value="Yapıldı">Yapıldı</option>
-                                        <option value="Evet">Yapmayı düşünüyorum</option>
-                                        <option value="Hayır">Hayır / Geçerli değil</option>
-                                    </select>
-                                </div>
-                            }
-                            <div class="form-group">
-                                <label asp-for="AbroadDebt">Yurt Dışı Borçlanma</label>
-                                <select asp-for="AbroadDebt" class="form-input">
-                                    <option value="Bilmiyorum">Bilmiyorum</option>
-                                    <option value="Evet">Evet / Yapıldı</option>
-                                    <option value="Hayır">Hayır</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </details>
-
-                @* e-Devlet sonucu *@
-                <details style="margin-bottom:18px;">
-                    <summary style="font-weight:700;color:#004B93;font-size:14px;cursor:pointer;padding:10px 0;">
-                        e-Devlet "Ne Zaman Emekli Olabilirim?" Sonucunu Girin (İsteğe Bağlı)
-                    </summary>
-                    <div style="padding-top:14px;">
-                        <p style="color:#6b7280;font-size:13px;margin:0 0 14px;">
-                            e-Devlet üzerindeki sonucu girerseniz mevcut durumunuzla
-                            karşılaştırma yapılacaktır.
-                        </p>
-                        <div class="form-grid-3">
-                            <div class="form-group">
-                                <label asp-for="EstimatedRetirementDate">Tahmini Emeklilik Tarihi</label>
-                                <input asp-for="EstimatedRetirementDate" type="date" class="form-input" />
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="RequiredPremiumDays">Gereken Prim Günü</label>
-                                <input asp-for="RequiredPremiumDays" type="number" class="form-input" placeholder="Örn: 7200" />
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="RequiredAge">Gereken Yaş</label>
-                                <input asp-for="RequiredAge" type="number" class="form-input" placeholder="Örn: 58" />
-                            </div>
-                        </div>
-                    </div>
-                </details>
-
-                <button type="submit"
-                        style="padding:12px 28px;background:#005BAC;color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">
-                    Değerlendirmeyi Güncelle
-                </button>
-            </form>
-        </div>
-
-        @if (formSubmitted || hasPremiumDoc || hasSocialSecDoc)
-        {
-            @* ── Bilgi tamamlama checklist ─────────────────────────── *@
-            <div class="premium-detail-card" style="margin-bottom:22px;">
-                <h2>Bilgi Tamamlama Durumu</h2>
-                <p style="color:#6b7280;margin:0 0 16px;font-size:13px;">
-                    Tüm bilgiler tamamlandığında değerlendirme daha doğru sonuç verir.
-                    Eksik bilgilerle de devam edebilirsiniz.
+            @* Manuel bilgi formu *@
+            <div class="premium-detail-card" style="margin-bottom:20px;">
+                <h2>Kişisel Bilgilerinizi Girin</h2>
+                <p style="color:#6b7280;margin:0 0 18px;font-size:13px;">
+                    Eksik bilgiyle de devam edebilirsiniz; ancak analiz daha sınırlı kalır.
                 </p>
-                <div class="checklist">
-                    <div class="checklist-item @(hasPremiumDoc ? "check-ok" : "check-missing")">
-                        <span class="check-icon">@(hasPremiumDoc ? "✓" : "○")</span>
-                        <span>SGK Tescil ve Hizmet Dökümü</span>
-                        @if (!hasPremiumDoc)
-                        {
-                            <a href="/Citizen/PremiumInfo" class="check-link">Yükle →</a>
-                        }
+                <form method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="SocialSecurityPdf" value="" />
+
+                    <div class="form-grid-2" style="margin-bottom:18px;">
+                        <div class="form-group">
+                            <label asp-for="BirthDate">Doğum Tarihi</label>
+                            <input asp-for="BirthDate" type="date" class="form-input" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Gender">Cinsiyet</label>
+                            <select asp-for="Gender" class="form-input">
+                                <option value="">Seçiniz</option>
+                                <option value="Erkek">Erkek</option>
+                                <option value="Kadın">Kadın</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="FirstInsuranceDate">İlk Sigorta Tarihi (opsiyonel)</label>
+                            <input asp-for="FirstInsuranceDate" type="date" class="form-input"
+                                   value="@(Model.FirstInsuranceDate?.ToString("yyyy-MM-dd") ?? "")" />
+                            @if (firstDate.HasValue && !Model.FirstInsuranceDate.HasValue)
+                            {
+                                <span style="font-size:12px;color:#6b7280;margin-top:3px;">
+                                    Otomatik tespit: <strong>@firstDate.Value.ToString("dd.MM.yyyy")</strong>
+                                    (@firstDateSource). Yanlışsa düzeltebilirsiniz.
+                                </span>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="TargetStatus">Sigorta Statüsü</label>
+                            <select asp-for="TargetStatus" class="form-input">
+                                <option value="Bilmiyorum">Bilmiyorum / Belirlenemedi</option>
+                                <option value="4A">4A — SSK (Ücretli/Sigortalı Çalışan)</option>
+                                <option value="4B">4B — Bağ-Kur (Bağımsız / Kendi Hesabına)</option>
+                                <option value="4C">4C — Emekli Sandığı (Kamu Görevlisi)</option>
+                            </select>
+                            @if (hasStatusFromDoc)
+                            {
+                                <span style="font-size:12px;color:#15803d;margin-top:3px;">
+                                    Belgeden okundu: <strong>@dominantStatus</strong>
+                                </span>
+                            }
+                        </div>
                     </div>
-                    <div class="checklist-item @(hasSocialSecDoc ? "check-ok" : "check-missing")">
-                        <span class="check-icon">@(hasSocialSecDoc ? "✓" : "○")</span>
-                        <span>Sosyal Güvenlik Kayıt Belgesi</span>
-                        @if (!hasSocialSecDoc)
-                        {
-                            <span class="check-hint">Yukarıdan yükleyebilirsiniz</span>
-                        }
-                    </div>
-                    <div class="checklist-item @(hasBirthDate ? "check-ok" : "check-missing")">
-                        <span class="check-icon">@(hasBirthDate ? "✓" : "○")</span>
-                        <span>Doğum tarihi</span>
-                        @if (!hasBirthDate)
-                        {
-                            <span class="check-hint">Formu doldurun</span>
-                        }
-                    </div>
-                    <div class="checklist-item @(hasGender ? "check-ok" : "check-missing")">
-                        <span class="check-icon">@(hasGender ? "✓" : "○")</span>
-                        <span>Cinsiyet</span>
-                        @if (!hasGender)
-                        {
-                            <span class="check-hint">Formu doldurun</span>
-                        }
-                    </div>
-                    <div class="checklist-item @(hasFirstDate ? "check-ok" : "check-missing")">
-                        <span class="check-icon">@(hasFirstDate ? "✓" : "○")</span>
-                        <span>İlk sigorta başlangıç tarihi</span>
-                        @if (!hasFirstDate)
-                        {
-                            <span class="check-hint">Belgelerden okunamadı — formu doldurun</span>
-                        }
-                        @if (hasFirstDate)
-                        {
-                            <span class="check-hint" style="color:#15803d;">@firstDate!.Value.ToString("dd.MM.yyyy") (@firstDateSource)</span>
-                        }
-                    </div>
-                    <div class="checklist-item @(hasStatus ? "check-ok" : "check-missing")">
-                        <span class="check-icon">@(hasStatus ? "✓" : "○")</span>
-                        <span>Sigorta statüsü</span>
-                        @if (!hasStatus)
-                        {
-                            <span class="check-hint">Belge yükleyin veya formu doldurun</span>
-                        }
-                        @if (hasStatus)
-                        {
-                            <span class="check-hint" style="color:#15803d;">@dominantStatus</span>
-                        }
-                    </div>
-                </div>
+
+                    <details style="margin-bottom:18px;">
+                        <summary style="font-weight:700;color:#004B93;font-size:14px;cursor:pointer;padding:8px 0;user-select:none;">
+                            + e-Devlet "Ne Zaman Emekli Olabilirim?" Sonucu (İsteğe Bağlı)
+                        </summary>
+                        <div style="padding:12px 0;">
+                            <p style="color:#6b7280;font-size:13px;margin:0 0 12px;">
+                                e-Devlet sonucunu girerseniz eksik gün ve yaş karşılaştırması yapılır.
+                            </p>
+                            <div class="form-grid-3">
+                                <div class="form-group">
+                                    <label asp-for="EstimatedRetirementDate">Tahmini Emeklilik Tarihi</label>
+                                    <input asp-for="EstimatedRetirementDate" type="date" class="form-input" />
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="RequiredPremiumDays">Gereken Prim Günü</label>
+                                    <input asp-for="RequiredPremiumDays" type="number" class="form-input" placeholder="Örn: 7200" />
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="RequiredAge">Gereken Yaş</label>
+                                    <input asp-for="RequiredAge" type="number" class="form-input" placeholder="Örn: 58" />
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details style="margin-bottom:18px;">
+                        <summary style="font-weight:700;color:#004B93;font-size:14px;cursor:pointer;padding:8px 0;user-select:none;">
+                            + Borçlanma Durumu (İsteğe Bağlı)
+                        </summary>
+                        <div style="padding:12px 0;">
+                            <div class="form-grid-3">
+                                @if (!isFemale)
+                                {
+                                    <div class="form-group">
+                                        <label asp-for="MilitaryDebt">Askerlik Borçlanması</label>
+                                        <select asp-for="MilitaryDebt" class="form-input">
+                                            <option value="Bilmiyorum">Bilmiyorum</option>
+                                            <option value="Yapıldı">Yapıldı</option>
+                                            <option value="Evet">Yapmayı düşünüyorum</option>
+                                            <option value="Hayır">Hayır</option>
+                                        </select>
+                                    </div>
+                                }
+                                @if (!isMale)
+                                {
+                                    <div class="form-group">
+                                        <label asp-for="MaternityDebt">Doğum Borçlanması</label>
+                                        <select asp-for="MaternityDebt" class="form-input">
+                                            <option value="Bilmiyorum">Bilmiyorum</option>
+                                            <option value="Yapıldı">Yapıldı</option>
+                                            <option value="Evet">Yapmayı düşünüyorum</option>
+                                            <option value="Hayır">Hayır</option>
+                                        </select>
+                                    </div>
+                                }
+                                <div class="form-group">
+                                    <label asp-for="AbroadDebt">Yurt Dışı Borçlanma</label>
+                                    <select asp-for="AbroadDebt" class="form-input">
+                                        <option value="Bilmiyorum">Bilmiyorum</option>
+                                        <option value="Evet">Evet / Yapıldı</option>
+                                        <option value="Hayır">Hayır</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <button type="submit" class="btn-primary">Değerlendirmeyi Güncelle</button>
+                </form>
             </div>
 
-            @* ── Ön değerlendirme ─────────────────────────────────── *@
-            <div class="premium-detail-card" style="margin-bottom:22px;">
-                <h2>Ön Değerlendirme Özeti</h2>
-                <div class="prim-yorum-listesi">
+            @* Temel Bilgi Durumu — forma bağlı dinamik uyarı *@
+            @{
+                bool basicInfoComplete = hasBirthDate && hasGender && hasFirstDate && hasStatus;
+                var missingFields = new List<string>();
+                if (!hasBirthDate) missingFields.Add("Doğum tarihi");
+                if (!hasGender) missingFields.Add("Cinsiyet");
+                if (!hasFirstDate) missingFields.Add("İlk sigorta tarihi");
+                if (!hasStatus) missingFields.Add("Sigorta statüsü");
+            }
+            <div class="info-alert @(basicInfoComplete ? "info-alert--ok" : "info-alert--warn")" style="margin-bottom:20px;">
+                @if (basicInfoComplete)
+                {
+                    <div class="info-alert-icon">✅</div>
+                    <div>
+                        <div class="info-alert-title">Temel bilgiler tamamlandı</div>
+                        <div class="info-alert-text">Doğum tarihi, cinsiyet ve statü bilgisi mevcut olduğu için ön değerlendirme daha anlamlı yapılabilir.</div>
+                    </div>
+                }
+                else
+                {
+                    <div class="info-alert-icon">⚠️</div>
+                    <div>
+                        <div class="info-alert-title">Eksik bilgi var</div>
+                        <div class="info-alert-text">
+                            Doğum tarihi, cinsiyet veya statü bilgisi eksik olduğu için değerlendirme sınırlı yapılır.
+                        </div>
+                        <div class="info-alert-missing">Eksik alanlar: @string.Join(", ", missingFields)</div>
+                    </div>
+                }
+            </div>
 
-                    @* Prim günü *@
-                    @if (totalDays > 0)
-                    {
-                        <div class="yorum-satiri">
-                            <div class="yorum-baslik">Toplam Prim Günü</div>
-                            <div class="yorum-metin">
-                                Kayıtlarınızda toplam <strong>@totalDays gün</strong> uzun vade prim
-                                bildiriminiz bulunmaktadır.
-                                @if (manual?.RequiredPremiumDays.HasValue == true)
+            @* ── ANALİZ KARTLARI ──────────────────────────────────────────── *@
+            @if (hasPremiumDoc || hasSocialSecDoc)
+            {
+                <h3 class="rs-subsection-title">Ön Değerlendirme</h3>
+                <div class="analysis-cards-grid">
+
+                    @* Kart 1: İlk Başlangıç *@
+                    <div class="analysis-card @(resolved?.HasConflict == true ? "analysis-card--warn" : "")">
+                        <div class="ac-icon">📅</div>
+                        <div class="ac-title">İlk Sigorta Başlangıcı</div>
+                        @if (firstDate.HasValue)
+                        {
+                            <div class="ac-value">@firstDate.Value.ToString("dd.MM.yyyy")</div>
+                            <div class="ac-note">
+                                @if (resolved?.HasConflict == true)
                                 {
-                                    int req  = manual.RequiredPremiumDays.Value;
-                                    int diff = req - totalDays;
-                                    if (diff > 0)
-                                    {
-                                        <span>
-                                            e-Devlet sonucuna göre gereken prim günü
-                                            <strong>@req</strong>; mevcut gününüz
-                                            <strong>@totalDays</strong>. Bu bilgiye göre
-                                            <strong style="color:#b45309;">@diff gün eksik</strong>
-                                            görünmektedir.
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span style="color:#15803d;">
-                                            e-Devlet'te belirtilen <strong>@req günlük</strong>
-                                            prim koşulu karşılanmış görünmektedir.
-                                        </span>
-                                    }
+                                    <span>Hizmet dökümünde kayıt belgesinden eski bir kayıt bulundu. Bu tarih dikkate alındı.</span>
                                 }
                                 else
                                 {
-                                    <span>
-                                        Prim günü emeklilik değerlendirmesinde dikkate alınan
-                                        temel bilgilerden biridir; ancak tek başına yeterli değildir.
-                                        Yaş, sigorta başlangıç tarihi ve statü bilgileriyle
-                                        birlikte değerlendirilmelidir.
-                                    </span>
+                                    <span>Kaynak: @firstDateSource</span>
                                 }
                             </div>
-                        </div>
-                    }
+                        }
+                        else
+                        {
+                            <div class="ac-value ac-value--empty">Belirlenemedi</div>
+                            <div class="ac-note">Hizmet Dökümü veya Kayıt Belgesi yükleyin.</div>
+                        }
+                    </div>
 
-                    @* Sigortalılık süresi *@
-                    @if (insuranceYears.HasValue)
-                    {
-                        int iy = (int)insuranceYears.Value;
-                        int im = (int)((insuranceYears.Value - iy) * 12);
-                        <div class="yorum-satiri">
-                            <div class="yorum-baslik">Sigortalılık Süresi</div>
-                            <div class="yorum-metin">
-                                <strong>@firstDate!.Value.ToString("dd.MM.yyyy")</strong>
-                                tarihinden itibaren (@firstDateSource) yaklaşık
-                                <strong>@iy yıl @im ay</strong> sigortalılık süreniz bulunmaktadır.
-                                @if (manual?.RequiredInsuranceYears.HasValue == true)
+                    @* Kart 2: Prim Durumu *@
+                    <div class="analysis-card">
+                        <div class="ac-icon">📋</div>
+                        <div class="ac-title">Prim Durumu</div>
+                        @if (totalDays > 0)
+                        {
+                            <div class="ac-value">@totalDays.ToString("N0") gün</div>
+                            @if (manual?.RequiredPremiumDays.HasValue == true)
+                            {
+                                int req  = manual.RequiredPremiumDays.Value;
+                                int diff = req - totalDays;
+                                if (diff > 0)
                                 {
-                                    int req = manual.RequiredInsuranceYears.Value;
-                                    if (iy < req)
-                                    {
-                                        <span style="color:#b45309;">
-                                            Gereken <strong>@req yıl</strong> için
-                                            <strong>@(req - iy) yıl daha</strong> gerekiyor.
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span style="color:#15803d;">Sigortalılık süresi koşulu karşılanmış görünüyor.</span>
-                                    }
-                                }
-                            </div>
-                        </div>
-                    }
-
-                    @* Yaş *@
-                    @if (age.HasValue)
-                    {
-                        <div class="yorum-satiri">
-                            <div class="yorum-baslik">Yaş Durumu</div>
-                            <div class="yorum-metin">
-                                Şu an <strong>@age yaşındasınız</strong>.
-                                @if (manual?.RequiredAge.HasValue == true)
-                                {
-                                    int req = manual.RequiredAge.Value;
-                                    if (age < req)
-                                    {
-                                        <span style="color:#b45309;">
-                                            e-Devlet'te belirtilen yaş koşulu <strong>@req</strong>;
-                                            bu koşul için yaklaşık <strong>@(req - age.Value) yıl</strong>
-                                            daha gerekiyor.
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span style="color:#15803d;">Yaş koşulu karşılanmış görünüyor.</span>
-                                    }
+                                    <div class="ac-note ac-note--warn">
+                                        Gereken: @req.ToString("N0") gün — <strong>@diff.ToString("N0") gün eksik</strong>
+                                    </div>
                                 }
                                 else
                                 {
-                                    <span>
-                                        Yaş koşulu; sigortalılık başlangıcı, cinsiyet ve statüye
-                                        göre değişir. e-Devlet'ten "Ne Zaman Emekli Olabilirim?"
-                                        sonucunu kontrol edebilirsiniz.
-                                    </span>
+                                    <div class="ac-note ac-note--ok">Prim günü koşulu karşılanmış görünüyor.</div>
                                 }
+                            }
+                            else
+                            {
+                                <div class="ac-note">Gereken prim günü girilirse eksik gün hesabı yapılır.</div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="ac-value ac-value--empty">Belge yok</div>
+                            <div class="ac-note">SGK Hizmet Dökümü yükleyin.</div>
+                        }
+                    </div>
+
+                    @* Kart 3: Sigortalılık Süresi *@
+                    <div class="analysis-card">
+                        <div class="ac-icon">⏱️</div>
+                        <div class="ac-title">Sigortalılık Süresi</div>
+                        @if (insuranceYears.HasValue)
+                        {
+                            int iy = (int)insuranceYears.Value;
+                            int im = (int)((insuranceYears.Value - iy) * 12);
+                            <div class="ac-value">~@iy yıl @im ay</div>
+                            @if (manual?.RequiredInsuranceYears.HasValue == true)
+                            {
+                                int req = manual.RequiredInsuranceYears.Value;
+                                if (iy < req)
+                                {
+                                    <div class="ac-note ac-note--warn">Gereken @req yıl — @(req - iy) yıl daha gerekiyor.</div>
+                                }
+                                else
+                                {
+                                    <div class="ac-note ac-note--ok">Sigortalılık süresi koşulu karşılanmış görünüyor.</div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="ac-note">İlk başlangıç tarihine (@firstDateSource) göre hesaplandı.</div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="ac-value ac-value--empty">Belirlenemedi</div>
+                            <div class="ac-note">İlk sigorta tarihi gereklidir.</div>
+                        }
+                    </div>
+
+                    @* Kart 4: Statü Durumu *@
+                    <div class="analysis-card @(multipleStatuses ? "analysis-card--warn" : "")">
+                        <div class="ac-icon">🏷️</div>
+                        <div class="ac-title">Statü Durumu</div>
+                        @if (dominantStatus != "Belirsiz")
+                        {
+                            <div class="ac-value">@dominantStatus</div>
+                            @if (!multipleStatuses && days4B == 0 && days4C == 0 && socialSec != null)
+                            {
+                                <div class="ac-note ac-note--ok">4B ve 4C görünmediği için farklı statü riski tespit edilmedi.</div>
+                            }
+                            else if (multipleStatuses)
+                            {
+                                <div class="ac-note ac-note--warn">Farklı statüler var. <a href="/Citizen/ServiceMerge" style="color:#b45309;font-weight:700;">Hizmet Birleştirme →</a></div>
+                            }
+                            else if (!hasSocialSecDoc)
+                            {
+                                <div class="ac-note">Kayıt Belgesi yüklenirse statü doğrulanır.</div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="ac-value ac-value--empty">Belirlenemedi</div>
+                            <div class="ac-note">Kayıt Belgesi yükleyin veya statüyü seçin.</div>
+                        }
+                    </div>
+
+                    @* Kart 5: EYT Ön Kontrolü *@
+                    <div class="analysis-card @(isEytScope == true ? "analysis-card--warn" : "")">
+                        <div class="ac-icon">🔍</div>
+                        <div class="ac-title">EYT Ön Kontrolü</div>
+                        @if (isEytScope == true)
+                        {
+                            <div class="ac-value" style="font-size:15px;">Kontrol Edilmeli</div>
+                            <div class="ac-note ac-note--warn">
+                                Başlangıç tarihi @firstDate!.Value.ToString("dd.MM.yyyy") — EYT dönemi içinde görünüyor.
+                                Prim ve sigortalılık süresi ayrıca değerlendirilmelidir.
                             </div>
+                        }
+                        else if (isEytScope == false)
+                        {
+                            <div class="ac-value" style="font-size:15px;">Kapsamda Görünmüyor</div>
+                            <div class="ac-note">Başlangıç tarihi 08.09.1999 sonrası; mevcut belgelere göre EYT kapsamında görünmüyor.</div>
+                        }
+                        else
+                        {
+                            <div class="ac-value ac-value--empty">Belirlenemedi</div>
+                            <div class="ac-note">İlk sigorta tarihi bilinince kontrol yapılabilir.</div>
+                        }
+                    </div>
+
+                    @* Kart 6: Emekli Aylığı *@
+                    <div class="analysis-card">
+                        <div class="ac-icon">💰</div>
+                        <div class="ac-title">Emekli Aylığı Tahmini</div>
+                        <div class="ac-value" style="font-size:14px;font-weight:600;color:#6b7280;">Net maaş hesaplanamaz</div>
+                        <div class="ac-note">
+                            Bu belgeler emekli aylığını kesin hesaplamak için yeterli değildir.
+                            Resmi hesaplama için aşağıdaki SGK araçlarını kullanın.
+                        </div>
+                    </div>
+
+                </div>
+
+                @* ── Detaylı analiz — mevcut kartları koru ────────────────── *@
+                @if (formSubmitted || hasSocialSecDoc)
+                {
+                    @if (hasSocialSecDoc && socialSec != null)
+                    {
+                        <div class="premium-detail-card" style="margin-bottom:18px;">
+                            <h2>Statü Detayı</h2>
+                            <div class="premium-summary-grid" style="margin-bottom:14px;">
+                                <div class="premium-box">
+                                    <span>4A (SSK) Günü</span>
+                                    <strong>@(socialSec.Days4A?.ToString("N0") ?? "—")</strong>
+                                </div>
+                                <div class="premium-box">
+                                    <span>4B (Bağ-Kur) Günü</span>
+                                    <strong>@(socialSec.Days4B?.ToString("N0") ?? "—")</strong>
+                                </div>
+                                <div class="premium-box">
+                                    <span>4C (Em. Sandığı) Günü</span>
+                                    <strong>@(socialSec.Days4C?.ToString("N0") ?? "—")</strong>
+                                </div>
+                                <div class="premium-box">
+                                    <span>Toplam (Kayıt Belgesi)</span>
+                                    <strong>@(socialSec.TotalDays?.ToString("N0") ?? "—")</strong>
+                                </div>
+                            </div>
+                            @if (socialSec.FirstRegistrationDate.HasValue)
+                            {
+                                <p style="color:#6b7280;font-size:13px;margin:0;">
+                                    Kayıt Belgesindeki tescil tarihi: <strong>@socialSec.FirstRegistrationDate.Value.ToString("dd.MM.yyyy")</strong>
+                                </p>
+                            }
                         </div>
                     }
 
-                    @* Tahmini emeklilik tarihi *@
+                    @if (premium != null && !string.IsNullOrWhiteSpace(premium.LastPeriod))
+                    {
+                        <div class="premium-detail-card" style="margin-bottom:18px;">
+                            <h2>Son Bildirim Durumu</h2>
+                            <p style="color:#4b5563;font-size:14px;line-height:1.7;margin:0;">
+                                Son bildirilen dönem: <strong>@premium.LastPeriod</strong>.
+                                SGK bildirimleri geriden yansıyabileceğinden içinde bulunulan ayın kaydı henüz sisteme düşmemiş olabilir.
+                                @if (premium.HasMissingDays)
+                                {
+                                    <span>
+                                        Bazı dönemlerde 30 günden az bildirim var — nedeni işe giriş/çıkış veya kısmi çalışma olabilir.
+                                        <a href="/Citizen/PremiumInfo" style="color:#005BAC;font-weight:700;">Prim Bilgilerim →</a>
+                                    </span>
+                                }
+                            </p>
+                        </div>
+                    }
+
+                    @if (avgPek.HasValue)
+                    {
+                        <div class="premium-detail-card" style="margin-bottom:18px;">
+                            <h2>PEK (Prime Esas Kazanç)</h2>
+                            <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:10px;">
+                                <div>
+                                    <div style="font-size:12px;color:#6b7280;">Ortalama PEK</div>
+                                    <div style="font-size:20px;font-weight:800;color:#0f172a;">@avgPek.Value.ToString("N2", trCulture) TL</div>
+                                </div>
+                                @if (lastPek.HasValue)
+                                {
+                                    <div>
+                                        <div style="font-size:12px;color:#6b7280;">Son Dönem PEK</div>
+                                        <div style="font-size:20px;font-weight:800;color:#0f172a;">@lastPek.Value.ToString("N2", trCulture) TL</div>
+                                    </div>
+                                }
+                            </div>
+                            <p style="color:#6b7280;font-size:13px;margin:0;">
+                                @if (lastPek.HasValue && avgPek.HasValue)
+                                {
+                                    if (lastPek.Value > avgPek.Value * 1.05m)
+                                    {
+                                        <span>Son bildirilen kazanç ortalamanızın üzerinde görünüyor.</span>
+                                    }
+                                    else if (lastPek.Value < avgPek.Value * 0.95m)
+                                    {
+                                        <span>Son bildirilen kazanç ortalamanızın altında görünüyor.</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Son bildirilen kazanç ortalamanıza yakın görünüyor.</span>
+                                    }
+                                }
+                                Bildirilen kazanç düzeyi emekli aylığını etkileyen unsurlardan biridir; ancak kesin hesaplama için SGK araçlarını kullanın.
+                            </p>
+                        </div>
+                    }
+
                     @if (manual?.EstimatedRetirementDate.HasValue == true)
                     {
                         var retDate = manual.EstimatedRetirementDate.Value;
                         var diff    = retDate - DateTime.Now;
-                        var trCulture = new CultureInfo("tr-TR");
-                        <div class="yorum-satiri">
-                            <div class="yorum-baslik">Tahmini Emeklilik Tarihi</div>
-                            <div class="yorum-metin">
-                                e-Devlet'e göre tahmini emeklilik tarihiniz
-                                <strong>@retDate.ToString("MMMM yyyy", trCulture)</strong>.
+                        <div class="premium-detail-card" style="margin-bottom:18px;">
+                            <h2>e-Devlet Karşılaştırması</h2>
+                            <p style="color:#4b5563;font-size:14px;line-height:1.7;margin:0;">
+                                e-Devlet'e göre tahmini emeklilik tarihi <strong>@retDate.ToString("MMMM yyyy", trCulture)</strong>.
                                 @if (diff.TotalDays > 0)
                                 {
                                     int dy = (int)(diff.TotalDays / 365);
                                     int dm = (int)((diff.TotalDays % 365) / 30);
-                                    <span>
-                                        Bu tarihe yaklaşık
-                                        <strong>@(dy > 0 ? dy + " yıl " : "")@(dm > 0 ? dm + " ay" : "")</strong>
-                                        kalmaktadır.
-                                    </span>
+                                    <span>Bu tarihe yaklaşık <strong>@(dy > 0 ? dy + " yıl " : "")@(dm > 0 ? dm + " ay" : "az bir süre")</strong> kalmaktadır.</span>
                                 }
                                 else
                                 {
-                                    <span style="color:#15803d;">
-                                        Bu tarihe göre emeklilik koşulları karşılanmış olabilir.
-                                        SGK'ya başvurmanızı öneririz.
-                                    </span>
+                                    <span style="color:#15803d;font-weight:700;">Bu tarihe göre emeklilik koşulları karşılanmış olabilir. SGK'ya başvurunuz.</span>
                                 }
-                            </div>
+                            </p>
                         </div>
                     }
-                    else if (formSubmitted && manual?.RequiredPremiumDays == null && manual?.RequiredAge == null)
-                    {
-                        <div class="yorum-satiri" style="border-bottom:none;">
-                            <div class="yorum-baslik">e-Devlet Karşılaştırması</div>
-                            <div class="yorum-metin" style="color:#6b7280;">
-                                e-Devlet'ten "Ne Zaman Emekli Olabilirim?" sonucunu girmediğiniz
-                                için karşılaştırma yapılamamaktadır. Bilgileri girerseniz
-                                mevcut durumunuzla otomatik karşılaştırma yapılacaktır.
-                            </div>
-                        </div>
-                    }
-
-                    @* Borçlanma notu *@
-                    @{
-                        bool hasAnyDebt = manual?.MilitaryDebt == "Evet" || manual?.MilitaryDebt == "Yapıldı"
-                            || manual?.MaternityDebt == "Evet" || manual?.MaternityDebt == "Yapıldı"
-                            || manual?.AbroadDebt == "Evet";
-                    }
-                    @if (hasAnyDebt)
-                    {
-                        <div class="yorum-satiri" style="border-bottom:none;">
-                            <div class="yorum-baslik">Borçlanma</div>
-                            <div class="yorum-metin">
-                                Borçlanma yaptığınızı veya yapmayı düşündüğünüzü belirttiniz.
-                                Borçlanma, prim gününüzü artırarak emeklilik tarihini öne çekebilir.
-                                Kesin hesaplama için SGK ile iletişime geçmeniz veya e-Devlet
-                                simülasyonunu kullanmanız önerilir.
-                                @if (isFemale && (manual?.MaternityDebt == "Evet" || manual?.MaternityDebt == "Yapıldı"))
-                                {
-                                    <span>
-                                        Doğum borçlanması; her çocuk için belirli koşullarda
-                                        toplam prim gününüze ekleme yapılmasını sağlayabilir.
-                                    </span>
-                                }
-                                @if (isMale && (manual?.MilitaryDebt == "Evet" || manual?.MilitaryDebt == "Yapıldı"))
-                                {
-                                    <span>
-                                        Askerlik borçlanması; askerlik sürenizi prim günü
-                                        olarak değerlendirmenize imkân tanıyabilir.
-                                    </span>
-                                }
-                            </div>
-                        </div>
-                    }
-
+                }
+            }
+            else
+            {
+                <div class="premium-detail-card" style="color:#6b7280;font-size:14px;border-left:4px solid #e5e7eb;">
+                    Analiz kartları görüntülemek için SGK Hizmet Dökümü veya Sosyal Güvenlik Kayıt Belgesi yükleyin.
                 </div>
+            }
+
+            @* ── RESMİ SGK HESAPLAMA ARAÇLARI ─────────────────────────── *@
+            <h3 class="rs-subsection-title" style="margin-top:32px;">Resmi SGK Hesaplama Araçları</h3>
+            <p style="color:#6b7280;font-size:13px;margin:0 0 18px;">
+                Kesin emeklilik tarihi ve aylık hesabı için SGK'nın resmi araçlarını kullanın.
+                @if (statusGroup != "Belirsiz")
+                {
+                    <span>Statünüze uygun araçlar <span class="sgk-badge-recommended">Önerilen</span> etiketi ile gösterilmektedir.</span>
+                }
+            </p>
+
+            <div class="sgk-tools-grid">
+
+                @* 4A Araçları *@
+                <a href="https://uyg.sgk.gov.tr/nezaman/" target="_blank" rel="noopener noreferrer"
+                   class="sgk-tool-card @(statusGroup == "4A" ? "sgk-tool-card--recommended" : "")">
+                    @if (statusGroup == "4A")
+                    {
+                        <span class="sgk-badge-recommended">Önerilen</span>
+                    }
+                    <div class="sgk-tool-icon">🗓️</div>
+                    <div class="sgk-tool-title">4A — Ne Zaman Emekli Olabilirim?</div>
+                    <div class="sgk-tool-desc">4A çalışanları için SGK'nın resmi emeklilik zamanı sorgulama aracıdır.</div>
+                    <div class="sgk-tool-btn">SGK'da Aç →</div>
+                </a>
+
+                <a href="https://giris.turkiye.gov.tr/Giris/gir" target="_blank" rel="noopener noreferrer"
+                   class="sgk-tool-card @(statusGroup == "4A" ? "sgk-tool-card--recommended" : "")">
+                    @if (statusGroup == "4A")
+                    {
+                        <span class="sgk-badge-recommended">Önerilen</span>
+                    }
+                    <div class="sgk-tool-icon">💵</div>
+                    <div class="sgk-tool-title">4A — Aylık Hesaplama</div>
+                    <div class="sgk-tool-desc">4A çalışanları için e-Devlet üzerinden erişilen resmi aylık hesaplama aracıdır.</div>
+                    <div class="sgk-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
+                @* 4B Araçları *@
+                <a href="https://uyg.sgk.gov.tr/EMEKTARWEB/hakKazanma.do" target="_blank" rel="noopener noreferrer"
+                   class="sgk-tool-card @(statusGroup == "4B" ? "sgk-tool-card--recommended" : "")">
+                    @if (statusGroup == "4B")
+                    {
+                        <span class="sgk-badge-recommended">Önerilen</span>
+                    }
+                    <div class="sgk-tool-icon">🗓️</div>
+                    <div class="sgk-tool-title">4B — Ne Zaman Emekli Olabilirim?</div>
+                    <div class="sgk-tool-desc">4B / Bağ-Kur kapsamındaki kullanıcılar için SGK'nın emeklilik zamanı hesaplama aracıdır.</div>
+                    <div class="sgk-tool-btn">SGK'da Aç →</div>
+                </a>
+
+                <a href="https://giris.turkiye.gov.tr/Giris/gir" target="_blank" rel="noopener noreferrer"
+                   class="sgk-tool-card @(statusGroup == "4B" ? "sgk-tool-card--recommended" : "")">
+                    @if (statusGroup == "4B")
+                    {
+                        <span class="sgk-badge-recommended">Önerilen</span>
+                    }
+                    <div class="sgk-tool-icon">💵</div>
+                    <div class="sgk-tool-title">4B — Aylık Hesaplama</div>
+                    <div class="sgk-tool-desc">4B sigortalıları için e-Devlet üzerinden erişilen resmi aylık hesaplama aracıdır.</div>
+                    <div class="sgk-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
+                @* 4C Araçları *@
+                <a href="https://uyg.sgk.gov.tr/HizmetHesabi4c/" target="_blank" rel="noopener noreferrer"
+                   class="sgk-tool-card @(statusGroup == "4C" ? "sgk-tool-card--recommended" : "")">
+                    @if (statusGroup == "4C")
+                    {
+                        <span class="sgk-badge-recommended">Önerilen</span>
+                    }
+                    <div class="sgk-tool-icon">🗓️</div>
+                    <div class="sgk-tool-title">4C — Ne Zaman Emekli Olabilirim?</div>
+                    <div class="sgk-tool-desc">4C / kamu çalışanları için SGK'nın emeklilik hizmet süresi ve yaş hesabı aracıdır.</div>
+                    <div class="sgk-tool-btn">SGK'da Aç →</div>
+                </a>
+
+                <a href="https://giris.turkiye.gov.tr/Giris/gir" target="_blank" rel="noopener noreferrer"
+                   class="sgk-tool-card @(statusGroup == "4C" ? "sgk-tool-card--recommended" : "")">
+                    @if (statusGroup == "4C")
+                    {
+                        <span class="sgk-badge-recommended">Önerilen</span>
+                    }
+                    <div class="sgk-tool-icon">💵</div>
+                    <div class="sgk-tool-title">4C — İkramiye / Maaş Hesaplama</div>
+                    <div class="sgk-tool-desc">4C çalışanları için e-Devlet üzerinden erişilen ikramiye ve maaş hesaplama aracıdır.</div>
+                    <div class="sgk-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
+                @* Genel e-Devlet *@
+                <a href="https://giris.turkiye.gov.tr/Giris/gir" target="_blank" rel="noopener noreferrer"
+                   class="sgk-tool-card">
+                    <div class="sgk-tool-icon">🌐</div>
+                    <div class="sgk-tool-title">e-Devlet Girişi</div>
+                    <div class="sgk-tool-desc">SGK hizmetleri ve resmi sorgulama ekranlarına e-Devlet üzerinden erişebilirsiniz.</div>
+                    <div class="sgk-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
             </div>
 
-            @* ── Statü değerlendirmesi ────────────────────────────── *@
-            @if (hasSocialSecDoc && socialSec != null)
-            {
-                <div class="premium-detail-card" style="margin-bottom:22px;">
-                    <h2>Sigorta Statüsü Değerlendirmesi</h2>
-                    <div class="premium-summary-grid" style="margin-bottom:16px;">
-                        <div class="premium-box">
-                            <span>4A (SSK) Günü</span>
-                            <strong>@(socialSec.Days4A?.ToString("N0") ?? "—")</strong>
-                        </div>
-                        <div class="premium-box">
-                            <span>4B (Bağ-Kur) Günü</span>
-                            <strong>@(socialSec.Days4B?.ToString("N0") ?? "—")</strong>
-                        </div>
-                        <div class="premium-box">
-                            <span>4C (Em. Sandığı) Günü</span>
-                            <strong>@(socialSec.Days4C?.ToString("N0") ?? "—")</strong>
-                        </div>
-                        <div class="premium-box">
-                            <span>Toplam (Kayıt Belgesi)</span>
-                            <strong>@(socialSec.TotalDays?.ToString("N0") ?? "—")</strong>
-                        </div>
-                    </div>
-                    <p style="color:#4b5563;line-height:1.7;margin:0 0 10px;font-size:14px;">
-                        @if (!multipleStatuses)
-                        {
-                            <span>
-                                Kayıt belgenize göre hizmetleriniz
-                                <strong>@dominantStatus</strong> kapsamında görünmektedir.
-                                4B ve 4C gün sayıları sıfır olduğundan birden fazla statü uyarısı bulunmamaktadır.
-                            </span>
-                        }
-                        else
-                        {
-                            <span>
-                                Kayıt belgenizde birden fazla statüde hizmet bulunmaktadır.
-                                Ağırlıklı statünüz <strong>@dominantStatus</strong> olarak
-                                görünmektedir. Hangi statüden emekli olacağınız, son çalışma
-                                döneminiz ve hizmet dağılımına göre değişebilir.
-                                <a href="/Citizen/ServiceMerge" style="color:#005BAC;font-weight:700;">
-                                    Hizmet Birleştirme sayfasını inceleyin →
-                                </a>
-                            </span>
-                        }
-                    </p>
-                    @if (socialSec.FirstRegistrationDate.HasValue)
-                    {
-                        <p style="color:#6b7280;font-size:13px;margin:0;">
-                            İlk tescil tarihi (kayıt belgesinden):
-                            <strong>@socialSec.FirstRegistrationDate.Value.ToString("dd.MM.yyyy")</strong>
-                        </p>
-                    }
-                </div>
-            }
+            @* Bilgilendirme notu *@
+            <div class="premium-detail-card" style="border-left:4px solid #005BAC;margin-top:12px;margin-bottom:20px;">
+                <p style="color:#4b5563;font-size:13px;line-height:1.7;margin:0;">
+                    Bu ekran yüklenen belgeler üzerinden ön değerlendirme sunar; kesin emeklilik kararı vermez.
+                    Farklı statü, eksik kayıt veya hatalı prim bildirimi durumlarında SGK ile görüşmeniz gerekir.
+                    <strong>Resmi başvuru ve kesin sonuç için SGK kayıtları esas alınır.</strong>
+                </p>
+            </div>
 
-            @* ── Son bildirim ─────────────────────────────────────── *@
-            @if (premium != null)
-            {
-                <div class="premium-detail-card" style="margin-bottom:22px;">
-                    <h2>Son Bildirim Durumu</h2>
-                    <p style="color:#4b5563;line-height:1.7;margin:0;font-size:14px;">
-                        Prim belgenizde son bildirilen dönem
-                        <strong>@(premium.LastPeriod ?? "bilinmiyor")</strong>
-                        olarak görünmektedir.
-                        SGK bildirimleri zaman zaman geriden yansıyabileceğinden
-                        içinde bulunulan ayın kaydı henüz sisteme düşmemiş olabilir.
-                        @if (premium.HasMissingDays)
-                        {
-                            <span>
-                                Bazı dönemlerde eksik gün bildirimi tespit edilmiştir.
-                                Detaylar için
-                                <a href="/Citizen/PremiumInfo" style="color:#005BAC;font-weight:700;">
-                                    Prim Bilgilerim →
-                                </a>
-                                sayfasını inceleyin.
-                            </span>
-                        }
-                    </p>
-                </div>
-            }
-
-            @* ── PEK özeti ────────────────────────────────────────── *@
-            @if (avgPek.HasValue)
-            {
-                <div class="premium-detail-card" style="margin-bottom:22px;">
-                    <h2>P.E.K. ve Emekli Aylığına Etkisi</h2>
-                    <p style="color:#4b5563;line-height:1.7;margin:0 0 12px;font-size:14px;">
-                        Kayıtlarınızdaki ortalama prime esas kazancınız
-                        <strong>@avgPek.Value.ToString("N2") TL</strong>
-                        olarak hesaplanmıştır. P.E.K., emekli aylığı hesabında
-                        kullanılan kazanç matrahıdır; bildirilen kazanç düzeyi
-                        arttıkça emekli aylığına olumlu etkisi artar.
-                    </p>
-                    <p style="color:#9ca3af;font-size:13px;margin:0;">
-                        Prim gününüz dolduktan sonra çalışmaya devam etmenin
-                        emekli aylığına etkisi, bildirilen kazanç düzeyine ve
-                        aylık bağlama hesabına göre değişebilir. Bu konuda
-                        kesin bir yorum yapılmamaktadır.
-                    </p>
-                </div>
-            }
-        }
-
-        @* ── Bilgilendirme Notu ───────────────────────────────────── *@
-        <div class="premium-detail-card" style="border-left:5px solid #005BAC;margin-bottom:22px;">
-            <h2>Bilgilendirme Notu</h2>
-            <p style="color:#4b5563;line-height:1.7;margin:0 0 12px;font-size:14px;">
-                Bu ekran, yüklenen belgelerdeki okunabilir bilgiler ve kullanıcı
-                tarafından girilen veriler üzerinden hazırlanmış bir ön değerlendirme
-                sunar. Emeklilik koşulları; prim günü, sigortalılık süresi, yaş,
-                sigorta başlangıcı ve statü bilgileri birlikte değerlendirilerek belirlenir.
-            </p>
-            <ul style="margin:0;padding-left:20px;color:#4b5563;line-height:2;font-size:14px;">
-                <li>Farklı sigorta statülerinde hizmet varsa hangi statüden emekli olunacağı ayrıca değerlendirilmelidir.</li>
-                <li>Eksik veya hatalı görünen kayıtlar için işvereniniz ya da SGK ile iletişime geçmeniz önerilir.</li>
-                <li>SGK bildirimleri zaman zaman geriden yansıyabilir; en güncel bilgi için e-Devlet'i kontrol ediniz.</li>
-            </ul>
-            <p style="color:#9ca3af;font-size:12px;margin:14px 0 0;">
-                Resmi başvuru ve kesin sonuç için SGK kayıtları esas alınır.
-            </p>
-        </div>
+        </section>
 
     </main>
 </section>
 
 <style>
-    .veri-kaynak-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-    }
-    .veri-kaynak-item {
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 16px 18px;
-        background: #f9fafb;
-    }
-    .kaynak-var  { border-left: 4px solid #15803d; }
-    .kaynak-yok  { border-left: 4px solid #b45309; }
-    .kaynak-baslik { font-weight:700; color:#111827; margin-bottom:8px; font-size:14px; }
-    .kaynak-durum  { font-size:13px; }
+    /* Veri kaynakları */
+    .veri-kaynak-grid  { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .veri-kaynak-item  { border:1px solid #e5e7eb; border-radius:10px; padding:14px 16px; background:#f9fafb; }
+    .kaynak-var        { border-left:4px solid #15803d; }
+    .kaynak-yok        { border-left:4px solid #b45309; }
+    .kaynak-baslik     { font-weight:700; color:#111827; margin-bottom:6px; font-size:13px; }
+    .kaynak-durum      { font-size:13px; }
 
-    .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .form-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+    /* Temel Bilgi Durumu — form altı dinamik uyarı */
+    .info-alert {
+        display:flex; align-items:flex-start; gap:12px;
+        border-radius:10px; padding:14px 16px;
+        border:1px solid #e5e7eb;
+    }
+    .info-alert--ok   { background:#f0fdf4; border-color:#bbf7d0; }
+    .info-alert--warn { background:#fffbeb; border-color:#fde68a; }
+    .info-alert-icon  { font-size:18px; line-height:1.4; flex-shrink:0; }
+    .info-alert-title { font-weight:700; font-size:13px; color:#111827; margin-bottom:3px; }
+    .info-alert-text  { font-size:12px; color:#4b5563; line-height:1.6; }
+    .info-alert-missing { font-size:12px; color:#92400e; font-weight:600; margin-top:5px; }
 
-    .form-group { display:flex; flex-direction:column; gap:5px; }
+    /* Section nav tabs */
+    .section-nav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:22px; }
+    .section-nav a {
+        padding:7px 16px; border-radius:20px; font-size:13px; font-weight:600;
+        background:#f1f5f9; color:#374151; text-decoration:none;
+        border:1px solid #e2e8f0; transition:background .15s, color .15s;
+    }
+    .section-nav a:hover { background:#005BAC; color:white; border-color:#005BAC; }
+
+    /* Section headers */
+    .rs-section { margin-bottom:32px; }
+    .rs-section-header {
+        display:flex; align-items:center; gap:10px;
+        margin-bottom:18px; padding-bottom:10px;
+        border-bottom:2px solid #e5e7eb;
+    }
+    .rs-section-header h2 { margin:0; font-size:18px; color:#111827; font-weight:800; }
+    .rs-section-icon { font-size:20px; }
+    .rs-subsection-title { font-size:15px; font-weight:700; color:#374151; margin:0 0 14px; }
+
+    /* Analysis cards grid */
+    .analysis-cards-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+        gap:14px;
+        margin-bottom:24px;
+    }
+    .analysis-card {
+        background:white; border:1px solid #e5e7eb; border-radius:12px;
+        padding:18px 16px; display:flex; flex-direction:column; gap:4px;
+        box-shadow:0 1px 4px rgba(0,0,0,.04);
+        border-left:4px solid #e5e7eb;
+    }
+    .analysis-card--warn { border-left-color:#f59e0b; background:#fffdf5; }
+    .analysis-card--ok   { border-left-color:#22c55e; background:#f0fdf4; }
+    .ac-icon  { font-size:22px; margin-bottom:4px; }
+    .ac-title { font-size:12px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.04em; }
+    .ac-value { font-size:22px; font-weight:800; color:#0f172a; line-height:1.2; margin:4px 0; }
+    .ac-value--empty { font-size:15px; color:#9ca3af; font-weight:600; }
+    .ac-note  { font-size:12px; color:#6b7280; line-height:1.5; }
+    .ac-note--warn { color:#b45309; }
+    .ac-note--ok   { color:#15803d; }
+
+    /* SGK tool cards grid */
+    .sgk-tools-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+        gap:14px;
+        margin-bottom:20px;
+    }
+    .sgk-tool-card {
+        background:white; border:1px solid #e5e7eb; border-radius:12px;
+        padding:18px; display:flex; flex-direction:column; gap:6px;
+        text-decoration:none; color:inherit;
+        box-shadow:0 1px 4px rgba(0,0,0,.04);
+        transition:box-shadow .15s, transform .15s, border-color .15s;
+        position:relative;
+    }
+    .sgk-tool-card:hover {
+        box-shadow:0 4px 16px rgba(0,91,172,.12);
+        transform:translateY(-2px);
+        border-color:#005BAC;
+        text-decoration:none;
+    }
+    .sgk-tool-card--recommended {
+        border-color:#005BAC;
+        border-left:4px solid #005BAC;
+        background:#f0f7ff;
+    }
+    .sgk-badge-recommended {
+        display:inline-block; background:#005BAC; color:white;
+        font-size:10px; font-weight:700; border-radius:4px;
+        padding:2px 7px; letter-spacing:.04em; margin-bottom:4px;
+    }
+    .sgk-tool-icon  { font-size:24px; }
+    .sgk-tool-title { font-weight:700; color:#111827; font-size:14px; line-height:1.3; }
+    .sgk-tool-desc  { font-size:12px; color:#6b7280; line-height:1.5; flex:1; }
+    .sgk-tool-btn   { font-size:12px; font-weight:700; color:#005BAC; margin-top:4px; }
+
+    /* Form */
+    .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .form-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+    .form-group  { display:flex; flex-direction:column; gap:4px; }
     .form-group label { font-weight:600; color:#374151; font-size:13px; }
-    .form-input {
-        height:40px; border:1px solid #d1d5db; border-radius:7px;
-        padding:0 10px; font-size:14px; background:white;
+    .form-input  { height:38px; border:1px solid #d1d5db; border-radius:7px; padding:0 10px; font-size:14px; background:white; }
+    .btn-primary {
+        padding:10px 26px; background:#005BAC; color:white;
+        border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:14px;
     }
-
-    .checklist { display:flex; flex-direction:column; gap:2px; }
-    .checklist-item {
-        display:flex; align-items:center; gap:12px;
-        padding:10px 14px; border-radius:8px; font-size:14px;
-    }
-    .check-ok      { background:#f0fdf4; color:#15803d; }
-    .check-missing { background:#fffbeb; color:#92400e; }
-    .check-icon    { font-weight:700; font-size:16px; width:20px; text-align:center; }
-    .check-link    { margin-left:auto; color:#005BAC; font-weight:700; font-size:13px; text-decoration:none; }
-    .check-hint    { margin-left:auto; color:#6b7280; font-size:12px; }
-
-    .prim-yorum-listesi { display:flex; flex-direction:column; }
-    .yorum-satiri {
-        display:grid; grid-template-columns:200px 1fr;
-        gap:20px; padding:16px 0;
-        border-bottom:1px solid #e5e7eb; align-items:start;
-    }
-    .yorum-baslik { font-weight:700; color:#004B93; font-size:13px; padding-top:2px; }
-    .yorum-metin  { color:#4b5563; line-height:1.7; font-size:14px; }
+    .btn-primary:hover { background:#004990; }
 
     details > summary { list-style:none; }
     details > summary::-webkit-details-marker { display:none; }
-    details[open] > summary { color:#003d7a; }
+
+    /* Genel Bilgi — kavram kartları (accordion) */
+    .info-cards-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+        gap:12px;
+        align-items:start;
+        margin-bottom:8px;
+    }
+    .info-card {
+        background:white; border:1px solid #e5e7eb; border-radius:12px;
+        box-shadow:0 1px 4px rgba(0,0,0,.04);
+        overflow:hidden;
+    }
+    .info-card[open] { border-color:#cbd5e1; }
+    .info-card-summary {
+        display:flex; align-items:flex-start; gap:12px;
+        padding:16px; cursor:pointer; user-select:none;
+    }
+    .info-card-summary:hover { background:#f9fafb; }
+    .info-card-icon { font-size:22px; line-height:1.3; flex-shrink:0; }
+    .info-card-text { display:flex; flex-direction:column; gap:3px; flex:1; }
+    .info-card-title { font-weight:700; color:#111827; font-size:14px; }
+    .info-card-short { font-size:12px; color:#6b7280; line-height:1.5; }
+    .info-card-chevron {
+        font-size:13px; color:#9ca3af; flex-shrink:0;
+        transition:transform .2s; padding-top:2px;
+    }
+    .info-card[open] .info-card-chevron { transform:rotate(180deg); }
+    .info-card-detail {
+        padding:0 16px 16px 50px;
+        display:flex; flex-direction:column; gap:8px;
+    }
+    .info-card-detail p {
+        margin:0; font-size:13px; color:#4b5563; line-height:1.65;
+    }
+    .info-card-btn {
+        align-self:flex-start; margin-top:4px;
+        font-size:12px; font-weight:700; color:#005BAC;
+        text-decoration:none; padding:6px 0;
+    }
+    .info-card-btn:hover { text-decoration:underline; }
+    .info-card-btn--internal { color:#15803d; }
 
     @@media (max-width:800px) {
-        .veri-kaynak-grid,
-        .form-grid-2,
-        .form-grid-3   { grid-template-columns:1fr; }
-        .yorum-satiri  { grid-template-columns:1fr; gap:4px; }
+        .veri-kaynak-grid, .form-grid-2, .form-grid-3,
+        .analysis-cards-grid, .sgk-tools-grid, .info-cards-grid { grid-template-columns:1fr; }
+        .section-nav { gap:4px; }
+        .section-nav a { font-size:12px; padding:6px 12px; }
+        .info-card-detail { padding-left:16px; }
     }
 </style>
+
+<script>
+// Sidebar alt linklerinde aktif bölüm highlight (scroll-based)
+(function () {
+    var sections = document.querySelectorAll('section[id]');
+    var navLinks = document.querySelectorAll('.sidebar-sub a');
+    if (!sections.length || !navLinks.length) return;
+
+    function onScroll() {
+        var scrollY = window.scrollY + 120;
+        var current = '';
+        sections.forEach(function (sec) {
+            if (sec.offsetTop <= scrollY) current = sec.id;
+        });
+        navLinks.forEach(function (a) {
+            a.classList.toggle('sidebar-sub--current', a.href.includes('#' + current));
+        });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+})();
+</script>

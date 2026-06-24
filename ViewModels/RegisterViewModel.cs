@@ -28,7 +28,7 @@ namespace EmekliRehberi.ViewModels
         [Compare("Password", ErrorMessage = "Şifreler eşleşmiyor.")]
         public string ConfirmPassword { get; set; } = "";
 
-        [Required(ErrorMessage = "Kullanıcı tipi seçilmelidir.")]
+        // Rol formdan alınmaz; controller tarafından her zaman "Vatandas" olarak atanır.
         public string Role { get; set; } = "Vatandas";
     }
 }

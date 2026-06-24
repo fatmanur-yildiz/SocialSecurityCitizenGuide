@@ -1,84 +1,727 @@
-@using EmekliRehberi.Models
-
 @{
-    ViewData["Title"] = "Borçlanma İşlemleri";
+    ViewData["Title"]      = "Borçlanma İşlemleri";
     ViewData["ActivePage"] = "DebtOptions";
-    var latestStatement = ViewBag.LatestStatement as ServiceStatement;
+
+    const string sgkGenelBorclanmaLink = "https://www.sgk.gov.tr/Content/Post/2aaf666a-5503-4b38-ab29-95a52de38512/Borclanmalar-2026-05-11-10-49-45";
 }
+
 <section class="dashboard-page">
     @await Html.PartialAsync("_CitizenSidebar")
 
     <main class="dashboard-content">
-        <div class="page-title">
+
+        <div class="page-title" style="margin-bottom:16px;">
             <h1>Borçlanma İşlemleri</h1>
-            <p>
-                Doğum, askerlik ve diğer borçlanma türleri hakkında temel bilgilere ulaşabilirsiniz.
+            <p>Doğum, askerlik, yurt dışı ve diğer borçlanma türleri hakkında sade bilgilendirme ve resmi SGK/e-Devlet yönlendirmesi.</p>
+        </div>
+
+        @* ── 1. Uyarı / Bilgilendirme Bannerı ─────────────────────────── *@
+        <div class="debt-banner">
+            <span class="debt-banner-icon">ℹ️</span>
+            <span>
+                Bu ekran yalnızca ön bilgilendirme ve yönlendirme amaçlıdır. Borçlanma hakkı, kesin borç tutarı
+                ve başvuru sonucu SGK/e-Devlet kayıtlarına göre belirlenir.
+            </span>
+        </div>
+
+        @* ── 2. Borçlanma Nedir? ──────────────────────────────────────── *@
+        <section class="debt-section">
+            <div class="debt-section-header">
+                <span class="debt-section-icon">📘</span>
+                <h2>Borçlanma Nedir?</h2>
+            </div>
+            <p style="color:#6b7280;font-size:14px;line-height:1.7;margin:0;">
+                Borçlanma, bazı çalışılmayan veya prim bildirilmeyen sürelerin belirli şartlarla SGK'ya
+                prim günü olarak kazandırılabilmesini ifade eder.
+            </p>
+        </section>
+
+        @* ── 3. Borçlanma Türleri ─────────────────────────────────────── *@
+        <section class="debt-section">
+            <div class="debt-section-header">
+                <span class="debt-section-icon">🗂️</span>
+                <h2>Borçlanma Türleri</h2>
+            </div>
+
+            <div class="debt-cards-grid">
+
+                <details class="debt-info-card">
+                    <summary class="debt-info-summary">
+                        <span class="debt-info-icon">👶</span>
+                        <span class="debt-info-text">
+                            <span class="debt-info-title">Doğum Borçlanması</span>
+                            <span class="debt-info-short">Doğum sonrası primsiz geçen bazı sürelerin belirli şartlarla prim gününe eklenebilmesini sağlar.</span>
+                        </span>
+                        <span class="debt-info-chevron">▾</span>
+                    </summary>
+                    <div class="debt-info-detail">
+                        <p>Doğum borçlanması, sigortalı kadının doğumdan sonraki belirli süreleri için borçlanma yapabilmesine imkan tanır. Değerlendirmede doğum tarihi, sigorta başlangıcı, doğum sonrası prim bildirimi ve çocuğun yaşaması gibi bilgiler önemlidir. Bu ekran yalnızca genel bilgi verir; kesin değerlendirme SGK kayıtlarına göre yapılır.</p>
+                        <a href="https://www.sgk.gov.tr/Content/Post/4aa4cd49-4af5-43f2-8ecc-ec00326153ff/Dogum-Borclanmasi-2026-05-11-10-54-53"
+                           target="_blank" rel="noopener noreferrer" class="debt-info-btn">SGK'da İncele →</a>
+                    </div>
+                </details>
+
+                <details class="debt-info-card">
+                    <summary class="debt-info-summary">
+                        <span class="debt-info-icon">🎖️</span>
+                        <span class="debt-info-text">
+                            <span class="debt-info-title">Askerlik Borçlanması</span>
+                            <span class="debt-info-short">Askerlikte geçen sürelerin belirli şartlarla prim gününe eklenebilmesini sağlar.</span>
+                        </span>
+                        <span class="debt-info-chevron">▾</span>
+                    </summary>
+                    <div class="debt-info-detail">
+                        <p>Askerlik borçlanması, er, erbaş veya yedek subay okulunda geçen sürelerin borçlanılarak prim gününe eklenebilmesini sağlayabilir. Askerlik sigorta başlangıcından önce yapılmışsa sigorta başlangıç tarihine etkisi ayrıca değerlendirilebilir. Kesin sonuç SGK tarafından belirlenir.</p>
+                        <a href="@sgkGenelBorclanmaLink"
+                           target="_blank" rel="noopener noreferrer" class="debt-info-btn">SGK Borçlanmalar Sayfası →</a>
+                    </div>
+                </details>
+
+                <details class="debt-info-card">
+                    <summary class="debt-info-summary">
+                        <span class="debt-info-icon">✈️</span>
+                        <span class="debt-info-text">
+                            <span class="debt-info-title">Yurt Dışı Borçlanması</span>
+                            <span class="debt-info-short">Yurt dışında geçen bazı sürelerin Türkiye'deki emeklilik hesabına dahil edilmesi için kullanılan borçlanma türüdür.</span>
+                        </span>
+                        <span class="debt-info-chevron">▾</span>
+                    </summary>
+                    <div class="debt-info-detail">
+                        <p>Yurt dışı borçlanması, yurt dışında geçen çalışma veya belirli ikamet sürelerinin Türkiye'deki sosyal güvenlik hesabına dahil edilmesi için başvurulan bir işlemdir. Bu konu ayrıntılı şartlar içerdiği için resmi SGK/e-Devlet kaynaklarıyla kontrol edilmelidir.</p>
+                        <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-yurt-disi-borclanma-basvurusu-sorgulama-ve-tebligat-goruntuleme"
+                           target="_blank" rel="noopener noreferrer" class="debt-info-btn">e-Devlet'te Aç →</a>
+                    </div>
+                </details>
+
+                <details class="debt-info-card">
+                    <summary class="debt-info-summary">
+                        <span class="debt-info-icon">🏛️</span>
+                        <span class="debt-info-text">
+                            <span class="debt-info-title">Kamu Görevlileri Borçlanmaları</span>
+                            <span class="debt-info-short">4C kapsamındaki kamu görevlilerinin bazı aylıksız izin veya hizmet süreleri için borçlanma gündeme gelebilir.</span>
+                        </span>
+                        <span class="debt-info-chevron">▾</span>
+                    </summary>
+                    <div class="debt-info-detail">
+                        <p>Kamu görevlileri için borçlanma değerlendirmesi kişinin 4C durumu, hizmet geçmişi ve ilgili hizmet türüne göre değişebilir. Aylıksız izin, hizmet ihyası veya kamu görevlilerine özel borçlanmalar ayrıntılı kontrol gerektirir. Bu nedenle bu kart yalnızca genel bilgilendirme amaçlıdır.</p>
+                        <a href="@sgkGenelBorclanmaLink"
+                           target="_blank" rel="noopener noreferrer" class="debt-info-btn">SGK Borçlanmalar Sayfası →</a>
+                    </div>
+                </details>
+
+                <details class="debt-info-card">
+                    <summary class="debt-info-summary">
+                        <span class="debt-info-icon">🎓</span>
+                        <span class="debt-info-text">
+                            <span class="debt-info-title">Eğitim, Staj ve Uzmanlık Borçlanmaları</span>
+                            <span class="debt-info-short">Doktora, tıpta uzmanlık veya avukatlık stajı gibi bazı süreler için borçlanma mümkün olabilir.</span>
+                        </span>
+                        <span class="debt-info-chevron">▾</span>
+                    </summary>
+                    <div class="debt-info-detail">
+                        <p>SGK mevzuatında sigortalı olmaksızın geçirilen bazı doktora, tıpta uzmanlık veya avukatlık stajı süreleri için borçlanma yapılabilen durumlar bulunabilir. Bu tür borçlanmalar kişiye ve belgelere göre değiştiği için sistem kesin uygunluk sonucu vermez.</p>
+                        <a href="@sgkGenelBorclanmaLink"
+                           target="_blank" rel="noopener noreferrer" class="debt-info-btn">SGK'da İncele →</a>
+                    </div>
+                </details>
+
+                <details class="debt-info-card">
+                    <summary class="debt-info-summary">
+                        <span class="debt-info-icon">⏳</span>
+                        <span class="debt-info-text">
+                            <span class="debt-info-title">Kısmi Süreli Çalışma ve Eksik Gün Borçlanması</span>
+                            <span class="debt-info-short">Bazı kısmi süreli çalışma dönemlerindeki eksik süreler için borçlanma gündeme gelebilir.</span>
+                        </span>
+                        <span class="debt-info-chevron">▾</span>
+                    </summary>
+                    <div class="debt-info-detail">
+                        <p>Kısmi süreli çalışan sigortalıların bazı dönemlerde 30 günden eksik kalan süreleri olabilir. Bu eksik sürelerin borçlanılabilmesi, çalışma dönemi ve SGK kayıtlarına göre değerlendirilir. Bu konu kişiye özel olduğu için resmi kaynakla kontrol edilmelidir.</p>
+                        <a href="@sgkGenelBorclanmaLink"
+                           target="_blank" rel="noopener noreferrer" class="debt-info-btn">SGK Borçlanmalar Sayfası →</a>
+                    </div>
+                </details>
+
+                <details class="debt-info-card">
+                    <summary class="debt-info-summary">
+                        <span class="debt-info-icon">📌</span>
+                        <span class="debt-info-text">
+                            <span class="debt-info-title">Diğer Özel Borçlanma Türleri</span>
+                            <span class="debt-info-short">Bazı özel durumlarda açıkta geçen süreler, tutuklulukta geçen süreler veya benzeri özel süreler için borçlanma olabilir.</span>
+                        </span>
+                        <span class="debt-info-chevron">▾</span>
+                    </summary>
+                    <div class="debt-info-detail">
+                        <p>Borçlanma yalnızca doğum, askerlik ve yurt dışı süreleriyle sınırlı değildir. Bazı özel çalışma, eğitim, görevden ayrılma veya hak sahipliği durumlarında da borçlanma gündeme gelebilir. Bu tür durumlar ayrıntılı belge ve SGK değerlendirmesi gerektirir.</p>
+                        <a href="@sgkGenelBorclanmaLink"
+                           target="_blank" rel="noopener noreferrer" class="debt-info-btn">SGK'da İncele →</a>
+                    </div>
+                </details>
+
+                <details class="debt-info-card">
+                    <summary class="debt-info-summary">
+                        <span class="debt-info-icon">💰</span>
+                        <span class="debt-info-text">
+                            <span class="debt-info-title">Borçlanma Tutarı Nasıl Hesaplanır?</span>
+                            <span class="debt-info-short">Borçlanma tutarı; borçlanılacak gün sayısı, başvuru tarihindeki günlük kazanç ve borçlanma türüne göre hesaplanır.</span>
+                        </span>
+                        <span class="debt-info-chevron">▾</span>
+                    </summary>
+                    <div class="debt-info-detail">
+                        <p>Borçlanma tutarı başvuru tarihindeki resmi değerlere göre hesaplanır. Doğum borçlanması ve diğer borçlanma türlerinde uygulanacak oranlar farklı olabilir. Bu nedenle bu sayfa yalnızca genel bilgi verir; kesin tutar için SGK/e-Devlet borçlanma tutarı hesaplama hizmeti kullanılmalıdır.</p>
+                        <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-borclanma-tutari-hesaplama"
+                           target="_blank" rel="noopener noreferrer" class="debt-info-btn">e-Devlet'te Tutar Hesapla →</a>
+                    </div>
+                </details>
+
+            </div>
+        </section>
+
+        @* ── 4. Borçlanma Sihirbazı ────────────────────────────────────── *@
+        <section class="debt-section">
+            <div class="debt-section-header">
+                <span class="debt-section-icon">🧮</span>
+                <h2>Borçlanma Sihirbazı</h2>
+            </div>
+            <p style="color:#6b7280;font-size:14px;line-height:1.7;margin:0 0 18px;">
+                Borçlanmak istediğiniz süre türünü seçerek yaklaşık gün ve tutar hesabı yapabilirsiniz.
+                Bu hesaplama yalnızca ön bilgilendirme amaçlıdır; kesin tutar ve hak sahipliği SGK tarafından belirlenir.
+            </p>
+
+            @* Tür seçimi *@
+            <div class="debt-type-selector">
+                <button type="button" class="debt-type-card debt-type-card--active" data-type="dogum" onclick="selectDebtType('dogum')">
+                    <span class="debt-type-icon">👶</span>
+                    <span class="debt-type-label">Doğum Borçlanması</span>
+                </button>
+                <button type="button" class="debt-type-card" data-type="askerlik" onclick="selectDebtType('askerlik')">
+                    <span class="debt-type-icon">🎖️</span>
+                    <span class="debt-type-label">Askerlik Borçlanması</span>
+                </button>
+                <button type="button" class="debt-type-card" data-type="yurtdisi" onclick="selectDebtType('yurtdisi')">
+                    <span class="debt-type-icon">✈️</span>
+                    <span class="debt-type-label">Yurt Dışı Borçlanması</span>
+                </button>
+                <button type="button" class="debt-type-card" data-type="diger" onclick="selectDebtType('diger')">
+                    <span class="debt-type-icon">📌</span>
+                    <span class="debt-type-label">Diğer Borçlanmalar</span>
+                </button>
+            </div>
+
+            @* ── Doğum Borçlanması formu ─────────────────────────────────── *@
+            <div class="debt-wizard-form" id="form-dogum">
+                <div class="debt-form-grid">
+                    <div class="debt-form-group">
+                        <label for="dogum-cocuk">Çocuk Sayısı</label>
+                        <select id="dogum-cocuk" class="debt-form-input">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                    <div class="debt-form-group">
+                        <label for="dogum-gun">Borçlanmak İstenen Gün Sayısı</label>
+                        <input type="number" id="dogum-gun" class="debt-form-input" min="1" placeholder="Örn: 720" />
+                    </div>
+                    <div class="debt-form-group">
+                        <label for="dogum-kazanc">Seçilecek Günlük Kazanç Tutarı (TL)</label>
+                        <input type="number" id="dogum-kazanc" class="debt-form-input" value="1101" min="1" step="0.01" />
+                    </div>
+                    <div class="debt-form-group">
+                        <label for="dogum-ilk-sigorta">İlk Sigorta Tarihi (opsiyonel)</label>
+                        <input type="date" id="dogum-ilk-sigorta" class="debt-form-input" />
+                    </div>
+                </div>
+                <p class="debt-form-note">
+                    Günlük kazanç tutarı başvuru tarihindeki prime esas kazanç sınırlarına göre belirlenir.
+                    Buradaki değer tahmini hesap içindir.
+                </p>
+                <div class="debt-form-warning" id="dogum-uyari"></div>
+                <button type="button" class="debt-calc-btn" onclick="calculateDogum()">Tahmini Hesapla</button>
+            </div>
+
+            @* ── Askerlik Borçlanması formu ──────────────────────────────── *@
+            <div class="debt-wizard-form" id="form-askerlik" style="display:none;">
+                <div class="debt-form-grid">
+                    <div class="debt-form-group">
+                        <label for="ask-baslangic">Askerlik Başlangıç Tarihi</label>
+                        <input type="date" id="ask-baslangic" class="debt-form-input" />
+                    </div>
+                    <div class="debt-form-group">
+                        <label for="ask-bitis">Askerlik Bitiş Tarihi</label>
+                        <input type="date" id="ask-bitis" class="debt-form-input" />
+                    </div>
+                    <div class="debt-form-group">
+                        <label for="ask-gun">Borçlanmak İstenen Gün Sayısı</label>
+                        <input type="number" id="ask-gun" class="debt-form-input" min="1" placeholder="Örn: 365" />
+                    </div>
+                    <div class="debt-form-group">
+                        <label for="ask-kazanc">Seçilecek Günlük Kazanç Tutarı (TL)</label>
+                        <input type="number" id="ask-kazanc" class="debt-form-input" value="1101" min="1" step="0.01" />
+                    </div>
+                    <div class="debt-form-group">
+                        <label for="ask-ilk-sigorta">İlk Sigorta Tarihi (opsiyonel)</label>
+                        <input type="date" id="ask-ilk-sigorta" class="debt-form-input" />
+                    </div>
+                </div>
+                <p class="debt-form-note" id="ask-sure-bilgi"></p>
+                <p class="debt-form-note">
+                    Günlük kazanç tutarı başvuru tarihindeki prime esas kazanç sınırlarına göre belirlenir.
+                    Buradaki değer tahmini hesap içindir.
+                </p>
+                <div class="debt-form-warning" id="askerlik-uyari"></div>
+                <button type="button" class="debt-calc-btn" onclick="calculateAskerlik()">Tahmini Hesapla</button>
+            </div>
+
+            @* ── Yurt Dışı Borçlanması formu ─────────────────────────────── *@
+            <div class="debt-wizard-form" id="form-yurtdisi" style="display:none;">
+                <div class="debt-form-grid">
+                    <div class="debt-form-group">
+                        <label for="yd-gun">Borçlanmak İstenen Gün Sayısı</label>
+                        <input type="number" id="yd-gun" class="debt-form-input" min="1" placeholder="Örn: 365" />
+                    </div>
+                    <div class="debt-form-group">
+                        <label for="yd-kazanc">Seçilecek Günlük Kazanç Tutarı (TL)</label>
+                        <input type="number" id="yd-kazanc" class="debt-form-input" value="1101" min="1" step="0.01" />
+                    </div>
+                </div>
+                <p class="debt-form-note">
+                    Günlük kazanç tutarı başvuru tarihindeki prime esas kazanç sınırlarına göre belirlenir.
+                    Buradaki değer tahmini hesap içindir.
+                </p>
+                <p class="debt-form-note">
+                    2026 yılı için yurt dışı borçlanmasında bir gün için ödenmesi gereken tutarın alt sınırı
+                    495,45 TL, üst sınırı 4.459,05 TL olarak açıklanmıştır. Bu değerler başvuru tarihine göre değişebilir.
+                </p>
+                <div class="debt-form-warning" id="yurtdisi-uyari"></div>
+                <button type="button" class="debt-calc-btn" onclick="calculateYurtdisi()">Tahmini Hesapla</button>
+            </div>
+
+            @* ── Diğer Borçlanmalar ──────────────────────────────────────── *@
+            <div class="debt-wizard-form" id="form-diger" style="display:none;">
+                <p style="color:#4b5563;font-size:13px;line-height:1.7;margin:0 0 14px;">
+                    Bu borçlanma türü için ön hesaplama bu sürümde sunulmamaktadır.
+                    Eğitim/staj/uzmanlık, kamu görevlileri, kısmi süreli çalışma veya diğer özel borçlanma
+                    türleri hakkında bilgi almak için SGK'nın resmi Borçlanmalar sayfasını inceleyebilirsiniz.
+                </p>
+                <a href="@sgkGenelBorclanmaLink" target="_blank" rel="noopener noreferrer" class="debt-calc-btn" style="display:inline-block;text-decoration:none;">
+                    SGK Borçlanmalar Bilgi Sayfasına Git →
+                </a>
+            </div>
+
+            @* ── Sonuç alanı ──────────────────────────────────────────────── *@
+            <div class="debt-result-empty" id="debt-result-empty">Henüz hesaplama yapılmadı.</div>
+
+            <div class="debt-result-area" id="debt-result" style="display:none;">
+                <h3 class="rs-subsection-title" style="margin-top:6px;">Tahmini Sonuç</h3>
+                <div class="debt-cards-grid" style="grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));">
+                    <div class="analysis-card">
+                        <div class="ac-icon">📆</div>
+                        <div class="ac-title">Tahmini Kazanılacak Gün</div>
+                        <div class="ac-value" id="result-gun">—</div>
+                        <div class="ac-note" id="result-gun-not"></div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="ac-icon">💰</div>
+                        <div class="ac-title">Tahmini Borçlanma Tutarı</div>
+                        <div class="ac-value" id="result-tutar">—</div>
+                        <div class="ac-note">Oran ve günlük kazanca göre hesaplanan ön tutardır.</div>
+                    </div>
+                    <div class="analysis-card">
+                        <div class="ac-icon">🧭</div>
+                        <div class="ac-title">Emekliliğe Olası Etki</div>
+                        <div class="ac-value" style="font-size:13px;font-weight:600;color:#374151;" id="result-etki">—</div>
+                    </div>
+                    <div class="analysis-card analysis-card--warn">
+                        <div class="ac-icon">⚠️</div>
+                        <div class="ac-title">Dikkat / Resmi Sonuç Uyarısı</div>
+                        <div class="ac-note">
+                            Bu hesaplama resmi borç çıkarmaz. Kesin borç tutarı, başvuru tarihindeki SGK/e-Devlet
+                            kayıtlarına ve seçilen günlük kazanç tutarına göre belirlenir.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        @* ── 5. Resmi SGK / e-Devlet Araçları ─────────────────────────── *@
+        <section class="debt-section">
+            <div class="debt-section-header">
+                <span class="debt-section-icon">🌐</span>
+                <h2>Resmi SGK / e-Devlet Araçları</h2>
+            </div>
+            <p style="color:#6b7280;font-size:13px;margin:0 0 16px;">
+                Başvuru ve kesin hesaplama için resmi SGK/e-Devlet ekranlarını kullanın.
+            </p>
+
+            <div class="debt-tools-grid">
+
+                <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-4a-dogum-borclanmasi-basvurusu" target="_blank" rel="noopener noreferrer" class="debt-tool-card">
+                    <div class="debt-tool-icon">👶</div>
+                    <div class="debt-tool-title">4A Doğum Borçlanması Başvurusu</div>
+                    <div class="debt-tool-desc">4A statüsündeki sigortalılar için doğum borçlanması başvuru ekranıdır.</div>
+                    <div class="debt-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
+                <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-4a-askerlik-borclanmasi-basvurusu" target="_blank" rel="noopener noreferrer" class="debt-tool-card">
+                    <div class="debt-tool-icon">🎖️</div>
+                    <div class="debt-tool-title">4A Askerlik Borçlanması Başvurusu</div>
+                    <div class="debt-tool-desc">4A statüsündeki sigortalılar için askerlik borçlanması başvuru ekranıdır.</div>
+                    <div class="debt-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
+                <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-4b-dogum-borclanmasi-basvurusu" target="_blank" rel="noopener noreferrer" class="debt-tool-card">
+                    <div class="debt-tool-icon">👶</div>
+                    <div class="debt-tool-title">4B Doğum Borçlanması Başvurusu</div>
+                    <div class="debt-tool-desc">4B statüsündeki sigortalılar için doğum borçlanması başvuru ekranıdır.</div>
+                    <div class="debt-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
+                <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-4b-askerlik-borclanmasi-basvurusu" target="_blank" rel="noopener noreferrer" class="debt-tool-card">
+                    <div class="debt-tool-icon">🎖️</div>
+                    <div class="debt-tool-title">4B Askerlik Borçlanması Başvurusu</div>
+                    <div class="debt-tool-desc">4B statüsündeki sigortalılar için askerlik borçlanması başvuru ekranıdır.</div>
+                    <div class="debt-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
+                <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-yurt-disi-borclanma-basvurusu-sorgulama-ve-tebligat-goruntuleme" target="_blank" rel="noopener noreferrer" class="debt-tool-card">
+                    <div class="debt-tool-icon">✈️</div>
+                    <div class="debt-tool-title">Yurt Dışı Borçlanma Başvurusu / Sorgulama</div>
+                    <div class="debt-tool-desc">Yurt dışı borçlanma başvurusu, sorgulama ve tebligat görüntüleme işlemleri için kullanılır.</div>
+                    <div class="debt-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
+                <a href="https://www.turkiye.gov.tr/sosyal-guvenlik-borclanma-tutari-hesaplama" target="_blank" rel="noopener noreferrer" class="debt-tool-card">
+                    <div class="debt-tool-icon">💰</div>
+                    <div class="debt-tool-title">Borçlanma Tutarı Hesaplama</div>
+                    <div class="debt-tool-desc">Borçlanmak istediğiniz süreler için resmi tutar hesabını e-Devlet üzerinden kontrol edebilirsiniz.</div>
+                    <div class="debt-tool-btn">e-Devlet'te Aç →</div>
+                </a>
+
+                <a href="@sgkGenelBorclanmaLink" target="_blank" rel="noopener noreferrer" class="debt-tool-card">
+                    <div class="debt-tool-icon">📘</div>
+                    <div class="debt-tool-title">SGK Borçlanmalar Bilgi Sayfası</div>
+                    <div class="debt-tool-desc">Borçlanma türleri ve resmi açıklamalar için SGK'nın genel bilgi sayfasını inceleyebilirsiniz.</div>
+                    <div class="debt-tool-btn">SGK'da Aç →</div>
+                </a>
+
+            </div>
+        </section>
+
+        @* Bilgilendirme notu *@
+        <div class="premium-detail-card" style="border-left:4px solid #005BAC;margin-top:8px;">
+            <p style="color:#4b5563;font-size:13px;line-height:1.7;margin:0;">
+                Bu sayfa yalnızca genel bilgilendirme ve resmi kaynaklara yönlendirme amaçlıdır; borçlanma türü seçimi,
+                tahmini tutar ve emekliliğe etki hesaplaması ileride bu sayfaya eklenecektir.
+                <strong>Kesin borçlanma hakkı ve tutarı için SGK/e-Devlet kayıtları esas alınır.</strong>
             </p>
         </div>
 
-        @if (latestStatement == null)
-        {
-            <div class="empty-service-warning">
-                <h2>Borçlanma değerlendirmesi için hizmet dökümü önerilir</h2>
-                <p>
-                    Borçlanma seçeneklerinin daha doğru yorumlanabilmesi için önce hizmet dökümü belgenizi yüklemeniz önerilir.
-                </p>
-                <a href="/Citizen/ServiceStatement">Hizmet Dökümü Yükle</a>
-            </div>
-        }
-        else
-        {
-            <div class="uploaded-main-card">
-                <div>
-                    <h2>Hizmet dökümünüz bulundu</h2>
-                    <p>
-                        <strong>@latestStatement.OriginalFileName</strong> adlı belge
-                        @latestStatement.CreatedAt.ToString("dd.MM.yyyy HH:mm") tarihinde yüklenmiştir.
-                        Borçlanma bilgilendirmelerinde bu kayıt dikkate alınacaktır.
-                    </p>
-                </div>
-
-                <span class="document-status">@latestStatement.Status</span>
-            </div>
-        }
-
-        <div class="service-dashboard-grid">
-            <div class="service-tile">
-                <h3>Doğum Borçlanması</h3>
-                <p>
-                    Kadın sigortalıların doğum nedeniyle çalışamadıkları bazı süreleri borçlanabilmesine ilişkin bilgilendirme.
-                </p>
-            </div>
-
-            <div class="service-tile">
-                <h3>Askerlik Borçlanması</h3>
-                <p>
-                    Askerlikte geçen sürelerin belirli şartlarla borçlanılmasına ilişkin başvuru ve süreç bilgileri.
-                </p>
-            </div>
-
-            <div class="service-tile">
-                <h3>Yurtdışı Borçlanması</h3>
-                <p>
-                    Yurtdışında geçen çalışma veya ikamet sürelerine ilişkin genel bilgilendirme.
-                </p>
-            </div>
-
-            <div class="service-tile">
-                <h3>Borçlanma Başvurusu Öncesi</h3>
-                <p>
-                    Başvuru öncesinde hizmet dökümü, sigorta başlangıcı ve eksik prim günlerinin kontrol edilmesi önerilir.
-                </p>
-            </div>
-        </div>
-
-        <div class="guidance-card">
-            <h2>Bu sayfada ileride neler olacak?</h2>
-            <ul>
-                <li>Kullanıcıdan çocuk sayısı, doğum tarihi veya askerlik bilgisi alınacak.</li>
-                <li>Sistem, girilen bilgilere göre hangi borçlanma türünün incelenebileceğini gösterecek.</li>
-                <li>Sonuçlar kesin karar değil, ön bilgilendirme olarak sunulacak.</li>
-            </ul>
-        </div>
     </main>
 </section>
+
+<style>
+    /* Uyarı bannerı */
+    .debt-banner {
+        display:flex; align-items:flex-start; gap:10px;
+        background:#eff6ff; border:1px solid #bfdbfe; border-left:4px solid #2563eb;
+        border-radius:10px; padding:14px 16px; margin-bottom:24px;
+        font-size:13px; color:#1e3a5f; line-height:1.6;
+    }
+    .debt-banner-icon { font-size:16px; flex-shrink:0; }
+
+    /* Bölüm başlıkları */
+    .debt-section { margin-bottom:30px; }
+    .debt-section-header {
+        display:flex; align-items:center; gap:10px;
+        margin-bottom:16px; padding-bottom:10px;
+        border-bottom:2px solid #e5e7eb;
+    }
+    .debt-section-header h2 { margin:0; font-size:17px; color:#111827; font-weight:800; }
+    .debt-section-icon { font-size:19px; }
+
+    /* Borçlanma türü kartları (accordion) */
+    .debt-cards-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+        gap:12px;
+        align-items:start;
+    }
+    .debt-info-card {
+        background:white; border:1px solid #e5e7eb; border-radius:12px;
+        box-shadow:0 1px 4px rgba(0,0,0,.04);
+        overflow:hidden;
+    }
+    .debt-info-card[open] { border-color:#cbd5e1; }
+    .debt-info-summary {
+        display:flex; align-items:flex-start; gap:12px;
+        padding:16px; cursor:pointer; user-select:none;
+    }
+    .debt-info-summary:hover { background:#f9fafb; }
+    .debt-info-icon { font-size:22px; line-height:1.3; flex-shrink:0; }
+    .debt-info-text { display:flex; flex-direction:column; gap:3px; flex:1; }
+    .debt-info-title { font-weight:700; color:#111827; font-size:14px; }
+    .debt-info-short { font-size:12px; color:#6b7280; line-height:1.5; }
+    .debt-info-chevron {
+        font-size:13px; color:#9ca3af; flex-shrink:0;
+        transition:transform .2s; padding-top:2px;
+    }
+    .debt-info-card[open] .debt-info-chevron { transform:rotate(180deg); }
+    .debt-info-detail {
+        padding:0 16px 16px 50px;
+        display:flex; flex-direction:column; gap:8px;
+    }
+    .debt-info-detail p { margin:0; font-size:13px; color:#4b5563; line-height:1.65; }
+    .debt-info-btn {
+        align-self:flex-start; margin-top:4px;
+        font-size:12px; font-weight:700; color:#005BAC;
+        text-decoration:none; padding:6px 0;
+    }
+    .debt-info-btn:hover { text-decoration:underline; }
+
+    /* Resmi araç kartları */
+    .debt-tools-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+        gap:14px;
+    }
+    .debt-tool-card {
+        background:white; border:1px solid #e5e7eb; border-radius:12px;
+        padding:18px; display:flex; flex-direction:column; gap:6px;
+        text-decoration:none; color:inherit;
+        box-shadow:0 1px 4px rgba(0,0,0,.04);
+        transition:box-shadow .15s, transform .15s, border-color .15s;
+    }
+    .debt-tool-card:hover {
+        box-shadow:0 4px 16px rgba(0,91,172,.12);
+        transform:translateY(-2px);
+        border-color:#005BAC;
+        text-decoration:none;
+    }
+    .debt-tool-icon  { font-size:24px; }
+    .debt-tool-title { font-weight:700; color:#111827; font-size:14px; line-height:1.3; }
+    .debt-tool-desc  { font-size:12px; color:#6b7280; line-height:1.5; flex:1; }
+    .debt-tool-btn   { font-size:12px; font-weight:700; color:#005BAC; margin-top:4px; }
+
+    details > summary { list-style:none; }
+    details > summary::-webkit-details-marker { display:none; }
+
+    /* ── Borçlanma Sihirbazı ────────────────────────────────────────── */
+    .debt-type-selector {
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+        gap:10px;
+        margin-bottom:20px;
+    }
+    .debt-type-card {
+        display:flex; flex-direction:column; align-items:center; gap:6px;
+        background:white; border:2px solid #e5e7eb; border-radius:12px;
+        padding:16px 10px; cursor:pointer; text-align:center;
+        font-family:inherit; transition:border-color .15s, background .15s, transform .15s;
+        box-shadow:0 1px 4px rgba(0,0,0,.04);
+    }
+    .debt-type-card:hover { border-color:#93c5fd; transform:translateY(-1px); }
+    .debt-type-card.debt-type-card--active {
+        border-color:#005BAC; background:#f0f7ff;
+    }
+    .debt-type-icon  { font-size:24px; }
+    .debt-type-label { font-size:13px; font-weight:700; color:#111827; }
+
+    .debt-wizard-form {
+        background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px;
+        padding:18px; margin-bottom:18px;
+    }
+    .debt-form-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+        gap:14px; margin-bottom:10px;
+    }
+    .debt-form-group { display:flex; flex-direction:column; gap:4px; }
+    .debt-form-group label { font-weight:600; color:#374151; font-size:12px; }
+    .debt-form-input {
+        height:38px; border:1px solid #d1d5db; border-radius:7px;
+        padding:0 10px; font-size:14px; background:white;
+    }
+    .debt-form-note { font-size:12px; color:#9ca3af; margin:6px 0; line-height:1.5; }
+    .debt-form-warning {
+        font-size:12px; color:#b45309; font-weight:600;
+        margin:8px 0; min-height:0;
+    }
+    .debt-form-warning:empty { display:none; }
+    .debt-calc-btn {
+        padding:10px 24px; background:#005BAC; color:white;
+        border:none; border-radius:8px; font-weight:700; cursor:pointer;
+        font-size:14px; margin-top:6px;
+    }
+    .debt-calc-btn:hover { background:#004990; }
+
+    .debt-result-empty {
+        color:#9ca3af; font-size:13px; font-style:italic;
+        padding:14px 0;
+    }
+    .debt-result-area { margin-top:6px; }
+
+    /* Sonuç kartları — Emeklilik Durumu analiz kartlarıyla aynı dil */
+    .analysis-card {
+        background:white; border:1px solid #e5e7eb; border-radius:12px;
+        padding:18px 16px; display:flex; flex-direction:column; gap:4px;
+        box-shadow:0 1px 4px rgba(0,0,0,.04);
+        border-left:4px solid #e5e7eb;
+    }
+    .analysis-card--warn { border-left-color:#f59e0b; background:#fffdf5; }
+    .ac-icon  { font-size:22px; margin-bottom:4px; }
+    .ac-title { font-size:12px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.04em; }
+    .ac-value { font-size:22px; font-weight:800; color:#0f172a; line-height:1.2; margin:4px 0; }
+    .ac-note  { font-size:12px; color:#6b7280; line-height:1.5; }
+    .rs-subsection-title { font-size:15px; font-weight:700; color:#374151; margin:0 0 14px; }
+
+    @@media (max-width:800px) {
+        .debt-cards-grid, .debt-tools-grid { grid-template-columns:1fr; }
+        .debt-info-detail { padding-left:16px; }
+        .debt-type-selector { grid-template-columns:1fr 1fr; }
+    }
+</style>
+
+<script>
+(function () {
+    var DAILY_WAGE_DEFAULT = 1101;
+
+    window.selectDebtType = function (type) {
+        document.querySelectorAll('.debt-type-card').forEach(function (card) {
+            card.classList.toggle('debt-type-card--active', card.getAttribute('data-type') === type);
+        });
+
+        ['dogum', 'askerlik', 'yurtdisi', 'diger'].forEach(function (t) {
+            var form = document.getElementById('form-' + t);
+            if (form) form.style.display = (t === type) ? '' : 'none';
+        });
+
+        // Tür değişince eski sonucu gizle
+        hideResult();
+    };
+
+    function hideResult() {
+        document.getElementById('debt-result').style.display = 'none';
+        document.getElementById('debt-result-empty').style.display = '';
+    }
+
+    function showResult(gunText, gunNot, tutar, etkiText, warnExtra) {
+        document.getElementById('result-gun').textContent = gunText;
+        document.getElementById('result-gun-not').textContent = gunNot || '';
+        document.getElementById('result-tutar').textContent = formatTL(tutar);
+        document.getElementById('result-etki').textContent = etkiText;
+        document.getElementById('debt-result-empty').style.display = 'none';
+        document.getElementById('debt-result').style.display = '';
+        document.getElementById('debt-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function formatTL(amount) {
+        var formatted = amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return formatted + ' TL';
+    }
+
+    function validateGunVeKazanc(gun, kazanc, warnEl) {
+        warnEl.textContent = '';
+        if (!gun || gun <= 0 || isNaN(gun)) {
+            warnEl.textContent = 'Lütfen geçerli bir gün sayısı girin (0\'dan büyük olmalı).';
+            return false;
+        }
+        if (!kazanc || kazanc <= 0 || isNaN(kazanc)) {
+            warnEl.textContent = 'Lütfen geçerli bir günlük kazanç tutarı girin (0\'dan büyük olmalı).';
+            return false;
+        }
+        return true;
+    }
+
+    // ── Doğum Borçlanması ────────────────────────────────────────────
+    window.calculateDogum = function () {
+        var cocukSayisi = parseInt(document.getElementById('dogum-cocuk').value, 10);
+        var gun          = parseFloat(document.getElementById('dogum-gun').value);
+        var kazanc       = parseFloat(document.getElementById('dogum-kazanc').value);
+        var warnEl       = document.getElementById('dogum-uyari');
+
+        if (!validateGunVeKazanc(gun, kazanc, warnEl)) return;
+
+        var maxGun = cocukSayisi * 720;
+        var kullanilanGun = gun;
+        var gunNot = '';
+
+        if (gun > maxGun) {
+            warnEl.textContent = 'Girilen gün sayısı, ' + cocukSayisi + ' çocuk için üst sınır olan ' +
+                maxGun + ' günü aşıyor. Hesaplama ' + maxGun + ' gün üzerinden yapıldı.';
+            kullanilanGun = maxGun;
+        } else {
+            warnEl.textContent = '';
+        }
+
+        var tutar = kullanilanGun * kazanc * 0.32;
+
+        showResult(
+            kullanilanGun.toLocaleString('tr-TR') + ' gün',
+            gunNot,
+            tutar,
+            'Prim gününü artırabilir. Kesin uygunluk doğum tarihi, primsiz süre ve SGK kayıtlarına göre belirlenir.'
+        );
+    };
+
+    // ── Askerlik Borçlanması ─────────────────────────────────────────
+    window.calculateAskerlik = function () {
+        var baslangic = document.getElementById('ask-baslangic').value;
+        var bitis     = document.getElementById('ask-bitis').value;
+        var gun       = parseFloat(document.getElementById('ask-gun').value);
+        var kazanc    = parseFloat(document.getElementById('ask-kazanc').value);
+        var ilkSigorta = document.getElementById('ask-ilk-sigorta').value;
+        var warnEl    = document.getElementById('askerlik-uyari');
+        var sureBilgi = document.getElementById('ask-sure-bilgi');
+
+        sureBilgi.textContent = '';
+        if (baslangic && bitis) {
+            var d1 = new Date(baslangic), d2 = new Date(bitis);
+            if (d2 > d1) {
+                var farkGun = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+                sureBilgi.textContent = 'Girilen tarihlere göre yaklaşık askerlik süresi: ' + farkGun + ' gün.';
+            }
+        }
+
+        if (!validateGunVeKazanc(gun, kazanc, warnEl)) return;
+
+        var tutar = gun * kazanc * 0.45;
+
+        var etkiText;
+        if (ilkSigorta && baslangic) {
+            var askBas = new Date(baslangic), ilkSig = new Date(ilkSigorta);
+            if (askBas < ilkSig) {
+                etkiText = 'Askerlik sigorta başlangıcından önce görünüyor. Borçlanma, koşullar sağlanırsa sigorta başlangıç tarihini geriye çekebilir ve prim gününü artırabilir.';
+            } else {
+                etkiText = 'Askerlik sigorta başlangıcından sonra görünüyor. Borçlanma daha çok prim gününü artırmaya yardımcı olabilir.';
+            }
+        } else {
+            etkiText = 'İlk sigorta tarihi girilmediği için başlangıç tarihine etkisi yorumlanamadı. Yine de tahmini prim günü ve tutar hesabı yapılabilir.';
+        }
+
+        showResult(
+            gun.toLocaleString('tr-TR') + ' gün',
+            '',
+            tutar,
+            etkiText
+        );
+    };
+
+    // ── Yurt Dışı Borçlanması ────────────────────────────────────────
+    window.calculateYurtdisi = function () {
+        var gun    = parseFloat(document.getElementById('yd-gun').value);
+        var kazanc = parseFloat(document.getElementById('yd-kazanc').value);
+        var warnEl = document.getElementById('yurtdisi-uyari');
+
+        if (!validateGunVeKazanc(gun, kazanc, warnEl)) return;
+
+        var tutar = gun * kazanc * 0.45;
+
+        showResult(
+            gun.toLocaleString('tr-TR') + ' gün',
+            '',
+            tutar,
+            'Yurt dışında geçen bazı sürelerin Türkiye\'deki sosyal güvenlik hesabına dahil edilmesine yardımcı olabilir. Kesin değerlendirme SGK tarafından yapılır.'
+        );
+    };
+})();
+</script>

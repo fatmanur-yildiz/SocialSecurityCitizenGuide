@@ -178,10 +178,12 @@ foreach (var item in analysis.Records)
 {
     premiumDocument.Records.Add(new PremiumRecord
     {
-        Period = item.Period,
-        Days = item.Days,
-        PekAmount = item.PekAmount,
-        IsYearTotal = item.IsYearTotal   // ← bu satırı ekle
+        Period     = item.Period,
+        Days       = item.Days,
+        PekAmount  = item.PekAmount,
+        IsYearTotal = item.IsYearTotal,
+        EntryDate  = item.EntryDate,
+        ExitDate   = item.ExitDate
     });
 }
 _context.PremiumDocuments.Add(premiumDocument);
@@ -209,48 +211,15 @@ public async Task<IActionResult> RetirementStatus()
     ViewBag.LatestPremium = latestPremium;
     ViewBag.LatestSocialSecurity = latestSocialSecurity;
 
-    DateTime? estimatedFirstDate = null;
+    // İlk sigorta başlangıcı: tek ve tutarlı kaynak — InsuranceDateResolver.
+    // GET aşamasında henüz kullanıcıdan manuel bir giriş olmadığı için
+    // manualDate = null veriliyor; form alanı da bilerek BOŞ bırakılıyor
+    // (sistemin tahminiyle önceden doldurulmuyor) — aksi halde formu hiç
+    // değiştirmeden gönderen kullanıcı, sistemin kendi tahminini "manuel giriş"
+    // olarak geri göndermiş gibi görünür ve öncelik sırası bozulurdu.
+    ViewBag.ResolvedInsuranceDate = InsuranceDateResolver.Resolve(null, latestPremium, latestSocialSecurity);
 
-    if (latestPremium?.Records != null)
-    {
-        var firstEntry = latestPremium.Records
-            .Where(r => r.EntryDate.HasValue)
-            .OrderBy(r => r.EntryDate)
-            .FirstOrDefault();
-
-        if (firstEntry?.EntryDate != null)
-        {
-            estimatedFirstDate = firstEntry.EntryDate;
-        }
-        else
-        {
-            var firstPeriod = latestPremium.Records
-                .Where(r => !r.IsYearTotal && !string.IsNullOrWhiteSpace(r.Period))
-                .OrderBy(r => r.Period)
-                .FirstOrDefault();
-
-            if (firstPeriod != null &&
-                DateTime.TryParseExact(
-                    firstPeriod.Period + "/01",
-                    "yyyy/MM/dd",
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None,
-                    out var pd))
-            {
-                estimatedFirstDate = pd;
-            }
-        }
-    }
-
-    if (latestSocialSecurity?.FirstRegistrationDate.HasValue == true)
-    {
-        estimatedFirstDate = latestSocialSecurity.FirstRegistrationDate;
-    }
-
-    var model = new RetirementInputViewModel
-    {
-        FirstInsuranceDate = estimatedFirstDate
-    };
+    var model = new RetirementInputViewModel();
 
     return View(model);
 }
@@ -308,6 +277,10 @@ public async Task<IActionResult> RetirementStatus(RetirementInputViewModel model
     ViewBag.LatestPremium = latestPremium;
     ViewBag.LatestSocialSecurity = latestSocialSecurity;
     ViewBag.ManualInput = model;
+
+    // model.FirstInsuranceDate artık SADECE kullanıcının formda gerçekten
+    // yazdığı tarihi temsil ediyor (GET'te boş bırakıldığı için).
+    ViewBag.ResolvedInsuranceDate = InsuranceDateResolver.Resolve(model.FirstInsuranceDate, latestPremium, latestSocialSecurity);
 
     return View(model);
 }
@@ -379,6 +352,13 @@ public async Task<IActionResult> RetirementStatus(RetirementInputViewModel model
         }
 
         public IActionResult ApplicationGuide()
+        {
+            return View();
+        }
+
+        // SIK SORULAN SORULAR — tüm sistem için tek, ortak sayfa; giriş zorunlu değil.
+        [AllowAnonymous]
+        public IActionResult Faq()
         {
             return View();
         }

@@ -1,56 +1,65 @@
-﻿@{
+@{
     ViewData["Title"] = "Ana Sayfa";
 }
 
-<section class="hero-section">
-    <div class="hero-content">
-        <span class="official-badge">Vatandaş Odaklı Sosyal Güvenlik Rehberi</span>
-<h1>Sosyal güvenlik bilgilerinizi anlaşılır ve düzenli şekilde takip edin.</h1>
-<p>
-    Hizmet dökümü, prim durumu, emeklilik süreci ve başvuru adımları hakkında
-    sade, yönlendirici ve kullanıcı dostu bilgilendirme sunar.
-</p>
+<section style="min-height: 520px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 70px 0 70px 7%; background: linear-gradient(90deg, #f8fafc 0%, #f8fafc 58%, #eef6ff 100%); border-bottom: 1px solid #dbeafe; overflow: hidden;">
+    <div style="max-width: 720px; flex: 1;">
+        <span class="official-badge">Sosyal Güvenlik Kurumu Bilgilendirme Sistemi</span>
 
-        <div class="hero-actions">
-    <a class="btn-primary-custom" href="/Account/Login">Giriş Yap</a>
-    <a class="btn-outline-custom" href="/Account/Register">Kayıt Ol</a>
-</div>
+        <h1 style="margin: 24px 0 22px; color: #111827; font-size: 52px; line-height: 1.14; font-weight: 800; letter-spacing: -0.8px;">
+            Sosyal Güvenlik Bilgilerinize Yönelik Ön Bilgilendirme ve Rehberlik Hizmeti
+        </h1>
+
+        <p style="max-width: 680px; margin: 0; color: #334155; font-size: 21px; line-height: 1.55;">
+            Prim bilgileri, emeklilik durumu, borçlanma işlemleri ve hizmet birleştirme süreçlerine ilişkin kullanıcı odaklı bilgilendirme sunar.
+        </p>
+
+        <div class="hero-actions" style="margin-top: 32px;">
+            <a class="btn-primary-custom" href="/Account/Login">Giriş Yap</a>
+            <a class="btn-outline-custom" href="/Account/Register">Kayıt Ol</a>
+        </div>
     </div>
+
+   <div style="width: 760px; max-width: 50%; height: 390px; overflow: hidden; display: flex; align-items: center; justify-content: flex-end; position: relative;">
+    <img src="/images/sgk-hero.png"
+         alt="Sosyal güvenlik rehberi görseli"
+         style="width: 100%; height: 100%; object-fit: cover; object-position: right center; display: block;" />
+
+    <div style="position: absolute; inset: 0; background: linear-gradient(90deg, #f8fafc 0%, rgba(248, 250, 252, 0.92) 18%, rgba(248, 250, 252, 0.45) 38%, rgba(248, 250, 252, 0) 65%); pointer-events: none;"></div>
+</div>
 </section>
 
 <section class="services-section">
     <h2>Vatandaş Hizmetleri</h2>
-    <p class="section-desc">Yapmak istediğiniz işlemi seçerek başlayabilirsiniz.</p>
+    <p class="section-desc">İşlem yapmak istediğiniz alanı seçerek ilgili bilgilendirme sayfasına ulaşabilirsiniz.</p>
 
     <div class="service-grid">
-        <div class="service-card">
-            <h3>Hizmet Dökümü Analizi</h3>
-            <p>4A hizmet dökümü belgenizi yükleyerek temel bilgileri sade şekilde görüntüleyin.</p>
-        </div>
-
-        <div class="service-card">
+        <a class="service-card" href="/Account/Login">
             <h3>Prim Analizi</h3>
-            <p>Toplam prim gününüzü, son dönem primlerinizi ve eksik gün durumunuzu anlayın.</p>
-        </div>
+            <p>Toplam prim günü, son bildirilen dönem, eksik gün durumu ve prime esas kazanç bilgileri gösterilir.</p>
+        </a>
 
-        <div class="service-card">
-            <h3>Emekliliğime Ne Kadar Kaldı?</h3>
-            <p>Girilen bilgiler üzerinden demo amaçlı ön değerlendirme alın.</p>
-        </div>
+        <a class="service-card" href="/Account/Login">
+            <h3>Emeklilik Durumu</h3>
+            <p>Yüklenen belge ve kullanıcı bilgileri doğrultusunda emeklilik sürecine ilişkin bilgilendirme sunulur.</p>
+        </a>
 
-        <div class="service-card">
-            <h3>Borçlanma Kontrolü</h3>
-            <p>Doğum veya askerlik borçlanması gibi haklar hakkında bilgilendirme alın.</p>
-        </div>
+        <a class="service-card" href="/Account/Login">
+            <h3>Borçlanma İşlemleri</h3>
+            <p>Doğum, askerlik ve yurt dışı borçlanması gibi süreçler hakkında genel bilgilendirme ve hesaplama desteği sağlanır.</p>
+        </a>
 
-        <div class="service-card">
+        <a class="service-card" href="/Account/Login">
             <h3>Hizmet Birleştirme</h3>
-            <p>Farklı sigorta türleri varsa hizmet birleştirme konusunda rehberlik görün.</p>
-        </div>
+            <p>Farklı sigorta statülerindeki hizmet süreleri hakkında ön bilgilendirme ve yönlendirme sunulur.</p>
+        </a>
 
-        <div class="service-card">
-            <h3>Sık Sorulan Sorular</h3>
-            <p>SGK terimlerini ve vatandaşların en çok merak ettiği konuları sade şekilde öğrenin.</p>
-        </div>
+        <a class="service-card" href="/Citizen/Faq">
+            <h3>Sık Sorulan Sorular</h3>SGK terimleri ve vatandaşların sık karşılaştığı konular hakkında açıklamalara ulaşılabilir.</p>
+        </a>
+        <a class="service-card" href="/Account/Login">
+            <h3>Resmi SGK/e-Devlet İşlemleri</h3>
+            <p>Kesin başvuru, doğrulama ve resmi işlem gerektiren durumlar için ilgili SGK ve e-Devlet hizmetlerine yönlendirme sağlanır.</p>
+        </a>
     </div>
 </section>

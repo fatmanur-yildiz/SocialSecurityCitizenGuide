@@ -34,6 +34,13 @@ namespace EmekliRehberi.Services
             @"Toplam\s*4\s*[Aa]\s*Uzun\s*Vade\s*P[ÖO]GS\s*[:\-]?\s*(?<days>\d{3,5})",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        // Giriş/Çıkış tarihi — üç ayraç biçimini de destekler: dd.MM.yyyy, dd/MM/yyyy, dd-MM-yyyy
+        private static readonly Regex FlexibleDateRegex = new Regex(
+            @"^\d{2}[./\-]\d{2}[./\-]\d{4}$",
+            RegexOptions.Compiled);
+
+        private static readonly string[] DateFormats = { "dd.MM.yyyy", "dd/MM/yyyy", "dd-MM-yyyy" };
+
         // ─── Public API ──────────────────────────────────────────────────────────
 
         public PremiumAnalysisResult AnalyzePdf(string filePath)
@@ -44,7 +51,8 @@ namespace EmekliRehberi.Services
                 var debugLines  = BuildDebugText(allPageData);
 
                 var officialTotal = FindOfficialTotal(allPageData);
-                var records       = ParseRecordsCoordinateBased(allPageData);
+                var dateDebugLog  = new List<string>();
+                var records       = ParseRecordsCoordinateBased(allPageData, dateDebugLog);
 
                 int? totalDays = officialTotal
                     ?? SumFromYearTotals(records)
@@ -58,9 +66,16 @@ namespace EmekliRehberi.Services
                 bool hasMissing = records
                     .Any(r => !r.IsYearTotal && r.Days > 0 && r.Days < 30);
 
+                string fullDebug = debugLines;
+                if (dateDebugLog.Count > 0)
+                {
+                    fullDebug += Environment.NewLine + "=== Giriş/Çıkış Tarihi Debug ===" + Environment.NewLine
+                              +  string.Join(Environment.NewLine, dateDebugLog);
+                }
+
                 return new PremiumAnalysisResult
                 {
-                    ExtractedText    = debugLines,
+                    ExtractedText    = fullDebug,
                     Records          = records,
                     TotalPremiumDays = totalDays,
                     LastPeriod       = lastPeriod,
@@ -154,7 +169,7 @@ namespace EmekliRehberi.Services
         // ─── Koordinat bazlı kayıt çözümleme ────────────────────────────────────
 
         private List<PremiumParsedRecord> ParseRecordsCoordinateBased(
-            List<List<List<WordInfo>>> allPageData)
+            List<List<List<WordInfo>>> allPageData, List<string> dateDebugLog)
         {
             var records = new List<PremiumParsedRecord>();
 
@@ -168,7 +183,7 @@ namespace EmekliRehberi.Services
                     continue;
                 }
 
-                ParseDataRows(pageRows, colMap, records);
+                ParseDataRows(pageRows, colMap, records, dateDebugLog);
             }
 
             var merged = MergeRecords(records);
@@ -179,12 +194,14 @@ namespace EmekliRehberi.Services
 
         private class ColumnMap
         {
-            public double  HeaderY     { get; set; }
-            public double? DönemX      { get; set; }
-            public double? GünX        { get; set; }
-            public double? PekX        { get; set; }
-            public double? BelgeTürüX  { get; set; }
-            public double? BelgeKdX    { get; set; }
+            public double  HeaderY       { get; set; }
+            public double? DönemX        { get; set; }
+            public double? GünX          { get; set; }
+            public double? PekX          { get; set; }
+            public double? BelgeTürüX    { get; set; }
+            public double? BelgeKdX      { get; set; }
+            public double? GirisTarihiX  { get; set; }
+            public double? CikisTarihiX  { get; set; }
         }
 
         private ColumnMap? DetectColumnMap(List<List<WordInfo>> pageRows)
@@ -223,6 +240,25 @@ namespace EmekliRehberi.Services
                  || w.Text.Contains("Bsmk", StringComparison.OrdinalIgnoreCase));
                 map.BelgeKdX = belgeKd?.CenterX;
 
+                // Giriş Tarihi / Çıkış Tarihi sütunları çok satırlı başlık hücreleridir
+                // ("Giriş" / "Tarihi" alt alta). Üst satır (ilk satır) diğer tek satırlık
+                // başlıklarla (Dönem, Gün, vb.) AYNI Y konumunda olduğu için bu `row`
+                // içinde yakalanabilir; alt satır ("Tarihi") farklı bir satıra düşer.
+                map.GirisTarihiX = row
+                    .Where(w => w.Text.IndexOf("Giri", StringComparison.OrdinalIgnoreCase) >= 0)
+                    .OrderBy(w => w.Left)
+                    .FirstOrDefault()?.CenterX;
+
+                // "Çıkış" kelimesi iki farklı kolonda geçebilir: "Çıkış Tarihi" (üst satırda
+                // "Çıkış") ve "İşten Çıkış Nedeni" (üst satırda "İşten", "Çıkış" alt satırda).
+                // Bu nedenle bu satırda en SOLDAKİ "Çık" eşleşmesi güvenle "Çıkış Tarihi"
+                // sütununa aittir.
+                map.CikisTarihiX = row
+                    .Where(w => w.Text.IndexOf("Çık", StringComparison.OrdinalIgnoreCase) >= 0
+                             || w.Text.IndexOf("Cik", StringComparison.OrdinalIgnoreCase) >= 0)
+                    .OrderBy(w => w.Left)
+                    .FirstOrDefault()?.CenterX;
+
                 return map;
             }
 
@@ -240,7 +276,8 @@ namespace EmekliRehberi.Services
         private void ParseDataRows(
             List<List<WordInfo>> pageRows,
             ColumnMap colMap,
-            List<PremiumParsedRecord> records)
+            List<PremiumParsedRecord> records,
+            List<string> dateDebugLog)
         {
             var dataRows = pageRows
                 .Where(r => r[0].Bottom < colMap.HeaderY - RowTolerance)
@@ -268,12 +305,16 @@ namespace EmekliRehberi.Services
 
                 if (days < 0 || days > 30) days = 0;
 
+                var (entryDate, exitDate) = ExtractEntryExitDates(row, colMap, period, dateDebugLog);
+
                 records.Add(new PremiumParsedRecord
                 {
                     Period      = period,
                     Days        = days,
                     PekAmount   = pek,
-                    IsYearTotal = false
+                    IsYearTotal = false,
+                    EntryDate   = entryDate,
+                    ExitDate    = exitDate
                 });
             }
         }
@@ -468,12 +509,17 @@ namespace EmekliRehberi.Services
                         ? g.Where(r => r.PekAmount.HasValue).Sum(r => r.PekAmount!.Value)
                         : null;
 
+                    var entryDates = g.Where(r => r.EntryDate.HasValue).Select(r => r.EntryDate!.Value).ToList();
+                    var exitDates  = g.Where(r => r.ExitDate.HasValue).Select(r => r.ExitDate!.Value).ToList();
+
                     return new PremiumParsedRecord
                     {
                         Period      = g.Key,
                         Days        = total,
                         PekAmount   = pek,
-                        IsYearTotal = false
+                        IsYearTotal = false,
+                        EntryDate   = entryDates.Any() ? entryDates.Min() : (DateTime?)null,
+                        ExitDate    = exitDates.Any()  ? exitDates.Max()  : (DateTime?)null
                     };
                 })
                 .ToList();
@@ -602,6 +648,84 @@ namespace EmekliRehberi.Services
             }
 
             return sb.ToString();
+        }
+
+        // ─── Giriş/Çıkış tarihi çıkarma ─────────────────────────────────────────
+        // Öncelik sırası:
+        //   1) Başlıkta tespit edilen "Giriş Tarihi" / "Çıkış Tarihi" sütun X
+        //      konumuna en yakın tarih tokenı (en güvenilir yöntem).
+        //   2) Başlık sütunu hiç tespit edilemediyse: satırdaki kelimeleri X'e göre
+        //      sıraya koyup 11. sütunu (index 10) dene — kullanıcının istediği
+        //      pozisyonel fallback.
+        //   3) O da bulunamazsa: satırdaki ilk/ikinci tarih-biçimli token (en eski
+        //      davranış, son çare).
+        // Üç format da desteklenir: dd.MM.yyyy, dd/MM/yyyy, dd-MM-yyyy.
+        private (DateTime? entry, DateTime? exit) ExtractEntryExitDates(
+            List<WordInfo> row, ColumnMap colMap, string period, List<string> debugLog)
+        {
+            var dateTokens = row
+                .Where(w => FlexibleDateRegex.IsMatch(w.Text))
+                .OrderBy(w => w.Left)
+                .ToList();
+
+            WordInfo? entryToken = null;
+            WordInfo? exitToken  = null;
+
+            // 1) Başlık sütunu X konumu
+            if (colMap.GirisTarihiX.HasValue)
+            {
+                entryToken = dateTokens
+                    .Where(t => Math.Abs(t.CenterX - colMap.GirisTarihiX.Value) < ColTolerance * 4)
+                    .OrderBy(t => Math.Abs(t.CenterX - colMap.GirisTarihiX.Value))
+                    .FirstOrDefault();
+            }
+
+            if (colMap.CikisTarihiX.HasValue)
+            {
+                exitToken = dateTokens
+                    .Where(t => Math.Abs(t.CenterX - colMap.CikisTarihiX.Value) < ColTolerance * 4)
+                    .OrderBy(t => Math.Abs(t.CenterX - colMap.CikisTarihiX.Value))
+                    .FirstOrDefault();
+            }
+
+            // 2) Başlık sütunu hiç tespit edilemediyse: 11. sütun (index 10) fallback
+            if (entryToken == null && !colMap.GirisTarihiX.HasValue)
+            {
+                var sortedRow = row.OrderBy(w => w.Left).ToList();
+                if (sortedRow.Count > 10 && FlexibleDateRegex.IsMatch(sortedRow[10].Text))
+                    entryToken = sortedRow[10];
+            }
+
+            // 3) Son çare: satırdaki ilk/ikinci tarih tokenı
+            if (entryToken == null && dateTokens.Count >= 1)
+                entryToken = dateTokens[0];
+
+            if (exitToken == null && dateTokens.Count >= 2)
+                exitToken = dateTokens.FirstOrDefault(t => !ReferenceEquals(t, entryToken)) ?? dateTokens[1];
+
+            DateTime? entry = entryToken != null ? TryParseFlexibleDate(entryToken.Text) : null;
+            DateTime? exit  = exitToken  != null ? TryParseFlexibleDate(exitToken.Text)  : null;
+
+            string rawRow    = string.Join(" ", row.Select(w => w.Text));
+            string tokensStr = dateTokens.Count > 0 ? string.Join(", ", dateTokens.Select(t => t.Text)) : "—";
+
+            string debugLine =
+                $"Period={period} | RawRow=\"{rawRow}\" | DateTokens=[{tokensStr}] | " +
+                $"GirisToken={(entryToken?.Text ?? "—")} | CikisToken={(exitToken?.Text ?? "—")} | " +
+                $"EntryDate={(entry?.ToString("dd.MM.yyyy") ?? "—")} | ExitDate={(exit?.ToString("dd.MM.yyyy") ?? "—")}";
+
+            debugLog.Add(debugLine);
+            System.Diagnostics.Debug.WriteLine("[PremiumPdfParser] " + debugLine);
+
+            return (entry, exit);
+        }
+
+        private DateTime? TryParseFlexibleDate(string text)
+        {
+            if (DateTime.TryParseExact(text, DateFormats, CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out var d))
+                return d;
+            return null;
         }
 
         // ─── Para birimi çevirici ────────────────────────────────────────────────

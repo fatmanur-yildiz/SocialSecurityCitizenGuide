@@ -1,0 +1,744 @@
+@{
+    ViewData["Title"]      = "Sık Sorulan Sorular";
+    ViewData["ActivePage"] = "Faq";
+
+    const string sgkFaqLink = "https://www.sgk.gov.tr/diger/sss/cd8eb02c-9cf0-4fba-b732-c7a59bb7c7e0/";
+}
+
+<section class="dashboard-page">
+    @await Html.PartialAsync("_CitizenSidebar")
+
+    <main class="dashboard-content faq-main">
+
+        <div class="faq-hero">
+            <div class="faq-hero__text">
+                <h1 class="faq-hero__title">Sık Sorulan Sorular</h1>
+                <p class="faq-hero__desc">
+                    Emeklilik, prim, hizmet dökümü, borçlanma, hizmet birleştirme ve e-Devlet işlemleri
+                    hakkında sık karşılaşılan sorulara sade cevaplar.
+                </p>
+            </div>
+            <div class="faq-hero__badge">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>Ön bilgilendirme platformu</span>
+            </div>
+        </div>
+
+        <div class="faq-info-banner">
+            <svg class="faq-info-banner__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <p>
+                Bu sayfa, kullanıcıların SGK/e-Devlet belgelerini ve emeklilik sürecindeki temel kavramları daha kolay
+                anlaması için hazırlanmıştır. Verilen bilgiler <strong>ön bilgilendirme amaçlıdır</strong>;
+                kesin işlemler için SGK ve e-Devlet kayıtları esas alınır.
+            </p>
+        </div>
+
+        <div class="faq-search-wrap">
+            <svg class="faq-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+                type="search"
+                id="faqSearch"
+                class="faq-search"
+                placeholder="Soru ara... Örn: eksik gün, PEK, borçlanma"
+                autocomplete="off"
+            />
+            <button class="faq-search-clear" id="faqSearchClear" aria-label="Aramayı temizle" style="display:none;">&#x2715;</button>
+        </div>
+
+        <div class="faq-layout">
+
+            <aside class="faq-categories" aria-label="SSS kategorileri">
+                <p class="faq-cat-label">Kategoriler</p>
+                <ul class="faq-catlist" id="faqCatList">
+                    <li>
+                        <button class="faq-catbtn faq-catbtn--active" data-cat="tumsorular">
+                            <span class="faq-catbtn__name">Tüm Sorular</span>
+                            <span class="faq-catbtn__badge" data-badge="tumsorular"></span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="faq-catbtn" data-cat="emeklilik">
+                            <span class="faq-catbtn__name">Emeklilik</span>
+                            <span class="faq-catbtn__badge" data-badge="emeklilik"></span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="faq-catbtn" data-cat="prim">
+                            <span class="faq-catbtn__name">Prim ve Hizmet Dökümü</span>
+                            <span class="faq-catbtn__badge" data-badge="prim"></span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="faq-catbtn" data-cat="borclanma">
+                            <span class="faq-catbtn__name">Borçlanma İşlemleri</span>
+                            <span class="faq-catbtn__badge" data-badge="borclanma"></span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="faq-catbtn" data-cat="hizmet">
+                            <span class="faq-catbtn__name">Hizmet Birleştirme</span>
+                            <span class="faq-catbtn__badge" data-badge="hizmet"></span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="faq-catbtn" data-cat="edevlet">
+                            <span class="faq-catbtn__name">Başvuru ve e-Devlet</span>
+                            <span class="faq-catbtn__badge" data-badge="edevlet"></span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="faq-catbtn" data-cat="gss">
+                            <span class="faq-catbtn__name">GSS / Sağlık</span>
+                            <span class="faq-catbtn__badge" data-badge="gss"></span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="faq-catbtn" data-cat="isveren">
+                            <span class="faq-catbtn__name">Çalışan ve İşveren</span>
+                            <span class="faq-catbtn__badge" data-badge="isveren"></span>
+                        </button>
+                    </li>
+                </ul>
+
+                <a href="@sgkFaqLink" target="_blank" rel="noopener noreferrer" class="faq-sgk-extlink">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        <polyline points="15 3 21 3 21 9"/>
+                        <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                    SGK Resmi SSS Sayfası
+                </a>
+            </aside>
+
+            <section class="faq-questions">
+                <div class="faq-qheader">
+                    <span class="faq-qheader__title" id="faqCatTitle">Tüm Sorular</span>
+                    <span class="faq-qheader__count" id="faqQCount"></span>
+                </div>
+
+                <div id="faqList" class="faq-list"></div>
+
+                <div id="faqEmpty" class="faq-empty" style="display:none;">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <p>Aramanıza uygun soru bulunamadı.</p>
+                </div>
+            </section>
+
+        </div>
+
+        <div class="faq-refcards">
+            <p class="faq-refcards__label">İlgili Sayfalara Git</p>
+            <div class="faq-refcards__grid">
+                <a href="/Citizen/PremiumInfo" class="faq-refcard">
+                    <span class="faq-refcard__name">Prim Bilgilerim</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+                <a href="/Citizen/RetirementStatus" class="faq-refcard">
+                    <span class="faq-refcard__name">Emeklilik Durumu</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+                <a href="/Citizen/DebtOptions" class="faq-refcard">
+                    <span class="faq-refcard__name">Borçlanma İşlemleri</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+                <a href="/Citizen/ServiceMerge" class="faq-refcard">
+                    <span class="faq-refcard__name">Hizmet Birleştirme</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+            </div>
+        </div>
+
+    </main>
+</section>
+
+<style>
+.faq-main {
+    --faq-blue:      #005BAC;
+    --faq-blue-dk:   #004490;
+    --faq-blue-pale: #EBF4FF;
+    --faq-blue-bg:   #F4F8FF;
+    --faq-text:      #1E293B;
+    --faq-muted:     #64748B;
+    --faq-border:    #E2E8F0;
+    --faq-white:     #FFFFFF;
+    --faq-radius:    10px;
+    --faq-shadow:    0 1px 4px rgba(0,0,0,.07);
+}
+
+/* Hero */
+.faq-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.faq-hero__title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--faq-text);
+    margin: 0 0 6px;
+    letter-spacing: -.4px;
+}
+.faq-hero__desc {
+    font-size: 13.5px;
+    color: var(--faq-muted);
+    margin: 0;
+    line-height: 1.65;
+    max-width: 560px;
+}
+.faq-hero__badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--faq-blue-pale);
+    color: var(--faq-blue);
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 7px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Bilgi banner */
+.faq-info-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--faq-blue-bg);
+    border: 1px solid #C7DCF5;
+    border-left: 4px solid var(--faq-blue);
+    border-radius: var(--faq-radius);
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+.faq-info-banner__icon {
+    color: var(--faq-blue);
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.faq-info-banner p {
+    margin: 0;
+    font-size: 12.5px;
+    color: #374151;
+    line-height: 1.7;
+}
+
+/* Arama */
+.faq-search-wrap {
+    position: relative;
+    margin-bottom: 24px;
+}
+.faq-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--faq-muted);
+    pointer-events: none;
+}
+.faq-search {
+    width: 100%;
+    padding: 12px 44px;
+    border: 1.5px solid var(--faq-border);
+    border-radius: var(--faq-radius);
+    font-size: 14px;
+    color: var(--faq-text);
+    background: var(--faq-white);
+    box-shadow: var(--faq-shadow);
+    transition: border-color .15s, box-shadow .15s;
+    box-sizing: border-box;
+    outline: none;
+    font-family: inherit;
+}
+.faq-search:focus {
+    border-color: var(--faq-blue);
+    box-shadow: 0 0 0 3px rgba(0,91,172,.1);
+}
+.faq-search::placeholder { color: #9ca3af; }
+.faq-search-clear {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--faq-muted);
+    font-size: 14px;
+    padding: 4px;
+    border-radius: 4px;
+    line-height: 1;
+}
+.faq-search-clear:hover { color: var(--faq-text); }
+
+/* Ana layout - iki kolon, sticky YOK */
+.faq-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+    margin-bottom: 28px;
+}
+
+/* Kategori paneli - position: static */
+.faq-categories {
+    position: static;
+    background: var(--faq-white);
+    border: 1px solid var(--faq-border);
+    border-radius: var(--faq-radius);
+    box-shadow: var(--faq-shadow);
+    overflow: hidden;
+}
+.faq-cat-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--faq-muted);
+    margin: 0;
+    padding: 12px 16px 8px;
+    border-bottom: 1px solid var(--faq-border);
+}
+.faq-catlist {
+    list-style: none;
+    margin: 0;
+    padding: 6px 0;
+}
+.faq-catlist li { margin: 0; }
+.faq-catbtn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    background: none;
+    border: none;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--faq-muted);
+    font-weight: 500;
+    text-align: left;
+    transition: background .12s, color .12s, border-color .12s;
+    font-family: inherit;
+}
+.faq-catbtn:hover {
+    background: var(--faq-blue-bg);
+    color: var(--faq-text);
+}
+.faq-catbtn--active {
+    background: var(--faq-blue-pale);
+    border-left-color: var(--faq-blue);
+    color: var(--faq-blue);
+    font-weight: 700;
+}
+.faq-catbtn__name { flex: 1; line-height: 1.3; }
+.faq-catbtn__badge {
+    background: var(--faq-border);
+    color: var(--faq-muted);
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    flex-shrink: 0;
+}
+.faq-catbtn--active .faq-catbtn__badge {
+    background: var(--faq-blue);
+    color: white;
+}
+.faq-sgk-extlink {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    font-size: 11px;
+    color: var(--faq-muted);
+    font-weight: 500;
+    text-decoration: none;
+    border-top: 1px solid var(--faq-border);
+    transition: background .12s, color .12s;
+}
+.faq-sgk-extlink:hover {
+    background: var(--faq-blue-bg);
+    color: var(--faq-blue);
+    text-decoration: underline;
+}
+
+/* Sorular paneli */
+.faq-questions { min-width: 0; }
+.faq-qheader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.faq-qheader__title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--faq-text);
+    letter-spacing: -.2px;
+}
+.faq-qheader__count {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--faq-muted);
+    background: var(--faq-border);
+    padding: 3px 9px;
+    border-radius: 10px;
+}
+
+/* Soru listesi */
+.faq-list { display: flex; flex-direction: column; gap: 8px; }
+
+.faq-item {
+    background: var(--faq-white);
+    border: 1.5px solid var(--faq-border);
+    border-radius: var(--faq-radius);
+    overflow: hidden;
+    box-shadow: var(--faq-shadow);
+    transition: border-color .15s;
+}
+.faq-item[open] { border-color: #B8D4F0; }
+.faq-item[open] .faq-item__summary { background: var(--faq-blue-bg); color: var(--faq-blue); }
+
+.faq-item__summary {
+    padding: 13px 16px;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 700;
+    color: var(--faq-text);
+    font-size: 13.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+    transition: background .12s, color .12s;
+}
+.faq-item__summary::-webkit-details-marker { display: none; }
+.faq-item__summary:hover { background: var(--faq-blue-bg); }
+
+.faq-item__qtext { flex: 1; }
+
+.faq-item__chevron {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: #9ca3af;
+    transition: transform .2s;
+}
+.faq-item[open] .faq-item__chevron { transform: rotate(180deg); color: var(--faq-blue); }
+
+.faq-item__catbadge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: var(--faq-blue-pale);
+    color: var(--faq-blue);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.faq-item__answer {
+    padding: 4px 16px 14px;
+    border-top: 1px solid var(--faq-border);
+    background: var(--faq-white);
+}
+.faq-item__answer p {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: #374151;
+    line-height: 1.75;
+}
+
+.faq-highlight {
+    background: #FEF08A;
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+/* Boş durum */
+.faq-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 48px 20px;
+    color: #9ca3af;
+    font-size: 13px;
+    text-align: center;
+}
+.faq-empty p { margin: 0; }
+
+/* Alt referans kartlar */
+.faq-refcards { margin-top: 4px; }
+.faq-refcards__label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--faq-muted);
+    margin: 0 0 10px;
+}
+.faq-refcards__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+.faq-refcard {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--faq-white);
+    border: 1.5px solid var(--faq-border);
+    border-radius: var(--faq-radius);
+    padding: 11px 14px;
+    text-decoration: none;
+    color: var(--faq-text);
+    font-size: 12.5px;
+    font-weight: 700;
+    transition: border-color .15s, background .15s, color .15s;
+    box-shadow: var(--faq-shadow);
+}
+.faq-refcard:hover {
+    border-color: var(--faq-blue);
+    background: var(--faq-blue-pale);
+    color: var(--faq-blue);
+}
+.faq-refcard__name { flex: 1; line-height: 1.3; }
+.faq-refcard svg { flex-shrink: 0; opacity: .4; }
+.faq-refcard:hover svg { opacity: 1; }
+
+/* Mobil */
+@@media (max-width: 900px) {
+    .faq-layout {
+        grid-template-columns: 1fr;
+    }
+    .faq-catlist {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 8px;
+        gap: 6px;
+    }
+    .faq-catlist li { flex: none; }
+    .faq-catbtn {
+        border: 1.5px solid var(--faq-border);
+        border-left: 1.5px solid var(--faq-border);
+        border-radius: 20px;
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+    .faq-catbtn--active {
+        border-color: var(--faq-blue);
+        border-left-color: var(--faq-blue);
+    }
+    .faq-cat-label { display: none; }
+    .faq-catbtn__badge { display: none; }
+    .faq-refcards__grid { grid-template-columns: 1fr 1fr; }
+}
+
+@@media (max-width: 520px) {
+    .faq-hero { flex-direction: column; }
+    .faq-hero__badge { display: none; }
+    .faq-refcards__grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+(function () {
+    var CATS = {
+        tumsorular: 'Tüm Sorular',
+        emeklilik:  'Emeklilik',
+        prim:       'Prim ve Hizmet Dökümü',
+        borclanma:  'Borçlanma İşlemleri',
+        hizmet:     'Hizmet Birleştirme',
+        edevlet:    'Başvuru ve e-Devlet',
+        gss:        'GSS / Sağlık',
+        isveren:    'Çalışan ve İşveren'
+    };
+
+    var QS = [
+        /* Emeklilik */
+        { cat: 'emeklilik', q: 'Emeklilik için sadece prim günü yeterli mi?', a: 'Hayır. Emeklilik değerlendirmesinde prim günüyle birlikte yaş, ilk sigorta başlangıç tarihi, sigortalılık süresi ve sigorta statüsü gibi bilgiler de dikkate alınır.' },
+        { cat: 'emeklilik', q: 'İlk sigorta başlangıcı neden önemlidir?', a: 'İlk sigorta başlangıç tarihi, hangi emeklilik şartlarına tabi olunacağını etkileyebilir. Bu nedenle hizmet dökümündeki ilk giriş tarihi dikkatle kontrol edilmelidir.' },
+        { cat: 'emeklilik', q: 'Sigortalılık süresi ne demektir?', a: 'Sigortalılık süresi, ilk sigortalı olunan tarihten itibaren geçen süreyi ifade eder. Prim günüyle aynı şey değildir; emeklilik değerlendirmesinde ayrı bir unsur olarak dikkate alınabilir.' },
+        { cat: 'emeklilik', q: 'Yaş şartı neden kişiye göre değişir?', a: 'Yaş şartı; ilk sigorta başlangıcı, sigorta statüsü, cinsiyet ve ilgili mevzuat dönemine göre değişebilir. Bu nedenle herkes için tek bir yaş şartı söylemek doğru değildir.' },
+        { cat: 'emeklilik', q: '4A, 4B ve 4C emeklilik şartları aynı mı?', a: 'Hayır. 4A, 4B ve 4C farklı sigorta statüleridir. Emeklilik şartları ve değerlendirme yöntemi kişinin statüsüne ve hizmet geçmişine göre değişebilir.' },
+        { cat: 'emeklilik', q: 'Emeklilik Durumu sayfası kesin sonuç verir mi?', a: 'Hayır. Emeklilik Durumu sayfası, yüklenen belgeler ve kullanıcı bilgileri üzerinden ön değerlendirme sunar. Kesin karar SGK kayıtlarına göre verilir.' },
+        { cat: 'emeklilik', q: 'Emekli aylığı bu sistemde kesin hesaplanır mı?', a: 'Hayır. Bu sistem kesin emekli aylığı hesaplamaz. Emekli aylığı için SGK\'nın resmi hesaplama araçları ve güncel kayıtları esas alınmalıdır.' },
+        { cat: 'emeklilik', q: 'EYT kapsamında olup olmadığımı bu sistem kesin söyler mi?', a: 'Hayır. Sistem yalnızca başlangıç tarihi ve mevcut belge bilgilerine göre ön bilgi verebilir. EYT kapsamı ve kesin hak durumu SGK tarafından değerlendirilmelidir.' },
+
+        /* Prim ve Hizmet Dökümü */
+        { cat: 'prim', q: 'Prim günü nedir?', a: 'Prim günü, sigortalı olarak çalışılan ve SGK\'ya bildirilen gün sayısını ifade eder. Emeklilik değerlendirmesinde önemli kriterlerden biridir.' },
+        { cat: 'prim', q: 'Uzun vade prim gün sayısı ne anlama gelir?', a: 'Uzun vade prim günleri; yaşlılık, malullük ve ölüm sigortaları açısından değerlendirilen prim günlerini ifade eder. Emeklilik analizlerinde genellikle bu günler esas alınır.' },
+        { cat: 'prim', q: 'PEK nedir?', a: 'PEK, prime esas kazanç anlamına gelir. SGK\'ya bildirilen kazanç tutarıdır ve emekli aylığını etkileyen unsurlardan biri olabilir.' },
+        { cat: 'prim', q: 'PEK emekli aylığını etkiler mi?', a: 'PEK, emekli aylığı hesabında dikkate alınabilen unsurlardan biridir. Ancak aylık hesabı sadece PEK\'e değil, prim günü, dönem, statü ve mevzuat gibi birçok bilgiye bağlıdır.' },
+        { cat: 'prim', q: 'Eksik gün ne anlama gelir?', a: 'Bir ayda 30 günden az prim bildirilmesi eksik gün olarak görülebilir. İşe giriş/çıkış, rapor, ücretsiz izin veya kısmi çalışma gibi nedenlerle oluşabilir.' },
+        { cat: 'prim', q: 'Son bildirilen dönem neden görünmeyebilir?', a: 'SGK bildirimleri bazı dönemlerde sisteme gecikmeli yansıyabilir. En güncel bilgi için e-Devlet üzerinden hizmet dökümü kontrol edilmelidir.' },
+        { cat: 'prim', q: 'Hizmet dökümünde 30 günden az gün görünürse ne yapılmalı?', a: 'Öncelikle dönemin işe giriş/çıkış, rapor veya kısmi çalışma gibi bir nedenle eksik olup olmadığı kontrol edilmelidir. Bilginiz dışında bir eksiklik varsa işveren veya SGK ile görüşülmelidir.' },
+        { cat: 'prim', q: 'İlk işe giriş tarihi hizmet dökümünde nereden anlaşılır?', a: 'Hizmet dökümündeki en eski dönem veya giriş tarihi bilgisi ilk sigortalılık hakkında fikir verebilir. Ancak kesin ilk sigorta başlangıcı resmi SGK kayıtlarından kontrol edilmelidir.' },
+        { cat: 'prim', q: 'Aynı ayda birden fazla kayıt görünmesi normal mi?', a: 'Aynı ay içinde işyeri değişikliği, birden fazla işyerinde çalışma veya farklı bildirimler nedeniyle birden fazla kayıt görünebilir. Bu durum her zaman hata anlamına gelmez.' },
+        { cat: 'prim', q: 'Eski çalışmalar hizmet dökümünde görünmüyorsa ne yapılmalı?', a: 'Eski çalışmalar görünmüyorsa e-Devlet kayıtları, işyeri bilgileri ve SGK hizmetleri üzerinden kontrol yapılmalıdır. Gerekirse SGK\'ya başvurarak kayıtların incelenmesi istenebilir.' },
+
+        /* Borçlanma */
+        { cat: 'borclanma', q: 'Borçlanma nedir?', a: 'Borçlanma, belirli şartları sağlayan bazı sürelerin prim günü olarak değerlendirilmesi için SGK\'ya başvuru yapılmasıdır.' },
+        { cat: 'borclanma', q: 'Doğum borçlanması herkese uygulanır mı?', a: 'Hayır. Doğum borçlanması için belirli sigortalılık ve çocukla ilgili şartların sağlanması gerekir. Kesin hak durumu SGK kayıtlarına göre değerlendirilir.' },
+        { cat: 'borclanma', q: 'Askerlik borçlanması emekliliği etkiler mi?', a: 'Askerlik borçlanması, kişinin durumuna göre prim gününü ve bazı hallerde sigorta başlangıcını etkileyebilir. Kesin etki kişinin kayıtlarına göre değişir.' },
+        { cat: 'borclanma', q: 'Yurt dışı borçlanması nedir?', a: 'Yurt dışında geçen bazı sürelerin belirli şartlarla Türkiye\'de sosyal güvenlik hesabına dahil edilmesi için yapılan borçlanma türüdür.' },
+        { cat: 'borclanma', q: 'Borçlanma prim günümü artırır mı?', a: 'Borçlanma kabul edilip ödemesi yapıldığında prim gününe katkı sağlayabilir. Ancak hangi sürelerin borçlanılabileceği kişinin durumuna göre değişir.' },
+        { cat: 'borclanma', q: 'Borçlanma sigorta başlangıcımı geri çeker mi?', a: 'Bazı borçlanma türleri kişinin durumuna göre sigorta başlangıcını etkileyebilir. Bu etki kesin olarak SGK kayıtları ve başvuru türüne göre değerlendirilmelidir.' },
+        { cat: 'borclanma', q: 'Borçlanma tutarı nasıl belirlenir?', a: 'Borçlanma tutarı; borçlanılacak gün sayısı, seçilen kazanç tutarı ve ilgili oranlara göre belirlenir. Kesin tutar resmi başvuru ve SGK hesaplamasıyla oluşur.' },
+        { cat: 'borclanma', q: 'Bu sistem borçlanma hakkımı kesin hesaplar mı?', a: 'Hayır. Sistem yalnızca genel bilgilendirme ve tahmini ön hesaplama sunar. Kesin borçlanma hakkı ve tutarı SGK tarafından belirlenir.' },
+
+        /* Hizmet Birleştirme */
+        { cat: 'hizmet', q: 'Hizmet birleştirme nedir?', a: 'Farklı sigorta statülerinde geçen hizmetlerin emeklilik değerlendirmesinde birlikte dikkate alınmasıdır.' },
+        { cat: 'hizmet', q: '4A, 4B ve 4C hizmetleri birlikte değerlendirilir mi?', a: 'Farklı statülerde hizmet varsa SGK kayıtları üzerinden birlikte değerlendirme yapılabilir. Hangi statüden emekli olunacağı kişinin hizmet dağılımına göre belirlenir.' },
+        { cat: 'hizmet', q: 'Farklı statülerde hizmetim varsa ne olur?', a: 'Farklı statülerde hizmet bulunması, emeklilik statüsü ve şartları açısından ayrıca değerlendirme gerektirebilir. Bu nedenle hizmet birleştirme ve statü dağılımı kontrol edilmelidir.' },
+        { cat: 'hizmet', q: 'Hangi statüden emekli olacağım nasıl belirlenir?', a: 'Hangi statüden emekli olunacağı, kişinin hizmet süreleri, çalışma dönemleri ve ilgili mevzuata göre belirlenir. Kesin değerlendirme SGK tarafından yapılır.' },
+        { cat: 'hizmet', q: '1261 gün kuralı nedir?', a: 'Birden fazla statüde hizmeti olan kişilerde, özellikle eski sigortalılık dönemlerinde, son dönem hizmet dağılımı emeklilik statüsünü etkileyebilir. Kesin karar SGK tarafından verilir.' },
+        { cat: 'hizmet', q: 'Son 7 yıl hesabı herkes için geçerli midir?', a: 'Son 7 yıl hesabı her durumda aynı şekilde uygulanmaz. Kişinin sigorta başlangıcı, hizmet dönemleri ve statü dağılımına göre değerlendirme değişebilir.' },
+        { cat: 'hizmet', q: 'Hizmet birleştirme başvurusu zorunlu mudur?', a: 'Farklı kurum veya statülerde hizmeti olan kişilerde hizmetlerin birlikte değerlendirilmesi gerekebilir. Başvuru gerekliliği kişinin kayıtlarına göre değişir.' },
+        { cat: 'hizmet', q: 'Bu sistem hizmet birleştirme kararı verir mi?', a: 'Hayır. Sistem yalnızca yüklenen belgelerden farklı statü olup olmadığını anlamaya yardımcı olur. Resmi hizmet birleştirme ve statü kararı SGK tarafından verilir.' },
+
+        /* Başvuru ve e-Devlet */
+        { cat: 'edevlet', q: 'Bu sistem resmi başvuru yapar mı?', a: 'Hayır. Bu sistem resmi başvuru yapmaz. Kullanıcıyı ilgili SGK/e-Devlet ekranlarına yönlendiren bir ön bilgilendirme platformudur.' },
+        { cat: 'edevlet', q: 'PDF yüklemek resmi işlem yerine geçer mi?', a: 'Hayır. PDF yükleme yalnızca sistemin belgeyi okuyup kullanıcıya sade bir özet sunması içindir. Resmi işlemler SGK ve e-Devlet üzerinden yapılır.' },
+        { cat: 'edevlet', q: 'Yanlış bilgi görürsem ne yapmalıyım?', a: 'Yüklenen belgede veya analizde hatalı görünen bilgi varsa resmi e-Devlet/SGK kayıtları kontrol edilmeli, gerekirse SGK ile iletişime geçilmelidir.' },
+        { cat: 'edevlet', q: 'Güncel hizmet dökümümü nereden alabilirim?', a: 'Güncel hizmet dökümü e-Devlet üzerindeki SGK hizmetleri aracılığıyla alınabilir. Sistemimize yüklenen PDF yalnızca kullanıcının seçip yüklediği belgeye göre analiz yapılmasını sağlar.' },
+        { cat: 'edevlet', q: 'Sosyal Güvenlik Kayıt Belgesi ne işe yarar?', a: 'Sosyal Güvenlik Kayıt Belgesi, kişinin sigorta kayıt bilgilerini gösteren barkodlu bir belgedir. Farklı statü bilgilerini kontrol etmek için yardımcı olabilir.' },
+        { cat: 'edevlet', q: 'SGK başvuru ve evrak takibini nereden yapabilirim?', a: 'SGK\'ya yapılan başvuru ve evrak süreçleri e-Devlet üzerindeki ilgili SGK evrak takip hizmetlerinden kontrol edilebilir.' },
+        { cat: 'edevlet', q: 'e-Devlet bağlantıları neden ayrı açılıyor?', a: 'Resmi işlemler yalnızca e-Devlet ve SGK sistemleri üzerinden yapılır. Bu nedenle dış bağlantılar kullanıcıyı resmi hizmet ekranlarına yönlendirmek için ayrı açılabilir.' },
+        { cat: 'edevlet', q: 'Bu sitede TC kimlik ve belge bilgileri neden hassas kabul edilir?', a: 'SGK belgeleri ve kimlik bilgileri kişisel veri niteliğindedir. Bu nedenle kullanıcıların belgelerini ve hesap bilgilerini dikkatli kullanması gerekir.' },
+
+        /* GSS / Sağlık */
+        { cat: 'gss', q: 'GSS prim borcu nedir?', a: 'Genel Sağlık Sigortası kapsamında prim ödeme yükümlülüğü bulunan kişilerin sağlık sigortası prim borçlarını ifade eder.' },
+        { cat: 'gss', q: 'GSS bilgileri bu sistemde hesaplanır mı?', a: 'Hayır. GSS tescil ve prim borcu bilgileri için e-Devlet üzerindeki resmi GSS sorgulama ekranları kullanılmalıdır.' },
+        { cat: 'gss', q: 'Çalışmayan kişilerde GSS nasıl kontrol edilir?', a: 'Çalışmayan kişiler GSS tescil ve prim borcu durumlarını e-Devlet üzerindeki resmi sorgulama hizmetlerinden kontrol etmelidir.' },
+        { cat: 'gss', q: 'Sağlık provizyonu ile emeklilik aynı şey mi?', a: 'Hayır. Sağlık provizyonu sağlık hizmetlerinden yararlanma durumuyla ilgilidir. Emeklilik ise prim günü, yaş, sigortalılık süresi ve statü gibi bilgilerle değerlendirilir.' },
+        { cat: 'gss', q: 'GSS borcu emeklilik prim günü yerine geçer mi?', a: 'GSS primi sağlık sigortası kapsamıyla ilgilidir. Emeklilik prim günü yerine geçip geçmeyeceği konusunda resmi SGK kayıtları esas alınmalıdır.' },
+        { cat: 'gss', q: 'GSS borcumu nereden sorgulamalıyım?', a: 'GSS tescil ve prim borcu bilgileri e-Devlet üzerindeki resmi SGK hizmetlerinden sorgulanmalıdır.' },
+
+        /* Çalışan ve İşveren */
+        { cat: 'isveren', q: 'İşveren prim bildirimini ne zaman yapar?', a: 'İşverenlerin prim ve hizmet bildirimleri belirli dönemlerde SGK\'ya iletilir. Bildirimlerin hizmet dökümüne yansıması zaman zaman gecikebilir.' },
+        { cat: 'isveren', q: 'İşveren primimi eksik bildirmiş olabilir mi?', a: 'Hizmet dökümünde beklenenden az gün veya düşük kazanç görünüyorsa kayıtlar kontrol edilmelidir. Bilginiz dışında bir eksiklik varsa işveren veya SGK ile görüşmeniz önerilir.' },
+        { cat: 'isveren', q: 'Kısmi süreli çalışma prim gününü etkiler mi?', a: 'Evet, kısmi süreli çalışma durumunda ay içinde bildirilen prim günü 30\'dan az olabilir. Bu durum çalışma biçimine göre normal olabilir.' },
+        { cat: 'isveren', q: 'Raporlu günler hizmet dökümünde nasıl görünebilir?', a: 'Raporlu olunan dönemlerde prim günleri farklı görünebilir. Bu durumun nedeni resmi kayıtlar ve işveren bildirimleri üzerinden kontrol edilmelidir.' },
+        { cat: 'isveren', q: 'İşe giriş ve işten çıkış aynı ayda olursa neden eksik gün görünür?', a: 'Ayın tamamında çalışılmadığı için bildirilen prim günü 30\'dan az olabilir. Bu durum işe giriş veya çıkış tarihine bağlı olarak normal olabilir.' },
+        { cat: 'isveren', q: 'İşyeri değişince hizmet dökümünde farklı kayıt görünmesi normal mi?', a: 'Evet. Farklı işyerlerinde çalışıldıysa hizmet dökümünde farklı işyeri kayıtları görünebilir. Beklenmeyen kayıtlar varsa resmi belgeler üzerinden kontrol edilmelidir.' }
+    ];
+
+    /* Rozet sayılarını doldur */
+    var counts = { tumsorular: QS.length };
+    QS.forEach(function (q) {
+        counts[q.cat] = (counts[q.cat] || 0) + 1;
+    });
+    document.querySelectorAll('[data-badge]').forEach(function (el) {
+        var key = el.getAttribute('data-badge');
+        el.textContent = counts[key] || 0;
+    });
+
+    /* Durum */
+    var activeCat = 'tumsorular';
+    var searchVal = '';
+
+    /* DOM */
+    var listEl      = document.getElementById('faqList');
+    var emptyEl     = document.getElementById('faqEmpty');
+    var catTitleEl  = document.getElementById('faqCatTitle');
+    var countEl     = document.getElementById('faqQCount');
+    var searchInput = document.getElementById('faqSearch');
+    var clearBtn    = document.getElementById('faqSearchClear');
+    var catBtns     = document.querySelectorAll('.faq-catbtn');
+
+    /* Yardımcılar */
+    function esc(str) {
+        return str.replace(/[&<>"']/g, function (c) {
+            return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+        });
+    }
+    function highlight(str, term) {
+        if (!term) return esc(str);
+        var re = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+        return esc(str).replace(re, '<mark class="faq-highlight">$1</mark>');
+    }
+
+    /* Render */
+    function render() {
+        var term   = searchVal.toLowerCase().trim();
+        var isAll  = activeCat === 'tumsorular';
+
+        var filtered = QS.filter(function (q) {
+            var catOk  = isAll || q.cat === activeCat;
+            var termOk = !term || q.q.toLowerCase().indexOf(term) !== -1
+                                || q.a.toLowerCase().indexOf(term) !== -1;
+            return catOk && termOk;
+        });
+
+        catTitleEl.textContent = CATS[activeCat] || 'Tüm Sorular';
+        countEl.textContent    = filtered.length + ' soru';
+
+        if (filtered.length === 0) {
+            listEl.innerHTML = '';
+            emptyEl.style.display = 'flex';
+            return;
+        }
+        emptyEl.style.display = 'none';
+
+        listEl.innerHTML = filtered.map(function (q) {
+            var catLabel = isAll
+                ? '<span class="faq-item__catbadge">' + esc(CATS[q.cat]) + '</span>'
+                : '';
+            return '<details class="faq-item">'
+                + '<summary class="faq-item__summary">'
+                +   '<span class="faq-item__qtext">' + highlight(q.q, searchVal.trim()) + '</span>'
+                +   catLabel
+                +   '<svg class="faq-item__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'
+                + '</summary>'
+                + '<div class="faq-item__answer"><p>' + highlight(q.a, searchVal.trim()) + '</p></div>'
+                + '</details>';
+        }).join('');
+    }
+
+    /* Kategori seçimi */
+    catBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            activeCat = btn.getAttribute('data-cat');
+            catBtns.forEach(function (b) { b.classList.remove('faq-catbtn--active'); });
+            btn.classList.add('faq-catbtn--active');
+            render();
+        });
+    });
+
+    /* Arama */
+    searchInput.addEventListener('input', function () {
+        searchVal = searchInput.value;
+        clearBtn.style.display = searchVal ? 'block' : 'none';
+        render();
+    });
+    clearBtn.addEventListener('click', function () {
+        searchInput.value = '';
+        searchVal = '';
+        clearBtn.style.display = 'none';
+        searchInput.focus();
+        render();
+    });
+
+    /* İlk render */
+    render();
+})();
+</script>

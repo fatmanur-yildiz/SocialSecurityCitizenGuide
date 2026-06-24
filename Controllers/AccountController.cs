@@ -48,7 +48,7 @@ namespace EmekliRehberi.Controllers
                 TcKimlikNo = model.TcKimlikNo,
                 Email = model.Email,
                 PasswordHash = HashPassword(model.Password),
-                Role = model.Role
+                Role = "Vatandas" // Rol her zaman sabit; formdan alınmaz.
             };
 
             _context.Users.Add(user);

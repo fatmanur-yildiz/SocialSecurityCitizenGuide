@@ -7,43 +7,50 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+    <div class="top-accent-bar"></div>
     <header class="topbar">
         <div class="topbar-left">
+            <button type="button" class="hamburger-btn" onclick="toggleMobileNav()" aria-label="Menü">
+                <span></span><span></span><span></span>
+            </button>
             <div class="logo-mark">SGK</div>
             <div>
-                <div class="brand-title">Sosyal Güvenlik Vatandaş Rehberi</div>
+                <div class="brand-title">Sosyal Güvenlik Kurumu Vatandaş Rehberi</div>
                 <div class="brand-subtitle">Emeklilik ve Hizmet Bilgilendirme Sistemi</div>
             </div>
         </div>
 
-        <nav class="topbar-nav">
-            @if (User.Identity != null && User.Identity.IsAuthenticated)
-{
-    if (User.IsInRole("Vatandas"))
-    {
-        <a href="/Citizen">Ana Sayfa</a>
-    }
-    else if (User.IsInRole("Memur"))
-    {
-        <a href="/Officer">Ana Sayfa</a>
-    }
-    else if (User.IsInRole("Admin"))
-    {
-        <a href="/Admin">Ana Sayfa</a>
-    }
-}
-else
-{
-    <a href="/">Ana Sayfa</a>
-}
-            <a href="#">Rehber</a>
-            <a href="#">Sık Sorulan Sorular</a>
-        </nav>
-
-        <div class="topbar-auth">
+        <nav class="topbar-nav" id="topbarNav">
     @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
-        <span class="user-name">@User.Identity.Name</span>
+        if (User.IsInRole("Vatandas"))
+        {
+            <a href="/Citizen">Ana Sayfa</a>
+        }
+        else if (User.IsInRole("Admin"))
+        {
+            <a href="/Admin">Ana Sayfa</a>
+        }
+        else
+        {
+            <a href="/">Ana Sayfa</a>
+        }
+    }
+    else
+    {
+        <a href="/">Ana Sayfa</a>
+    }
+
+    <a href="/Citizen/Faq">Sık Sorulan Sorular</a>
+    <a href="#iletisim">İletişim</a>
+</nav>
+
+        <div class="topbar-right">
+            <span class="topbar-search-icon" title="Ara">🔍</span>
+            <div class="topbar-auth">
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <a class="login-link" href="/Citizen/Profile">Profilim</a>
         <a class="login-link" href="/Account/Logout">Çıkış Yap</a>
     }
     else
@@ -52,25 +59,66 @@ else
         <a class="register-link" href="/Account/Register">Kayıt Ol</a>
     }
 </div>
+        </div>
     </header>
 
     <main>
         @RenderBody()
     </main>
 
-    <footer class="footer">
-    <div class="footer-content">
-        <div>
-            <strong>Sosyal Güvenlik Vatandaş Rehberi</strong>
-            <p>Emeklilik, hizmet dökümü ve prim süreçleri için bilgilendirme platformu.</p>
+    <footer class="footer" id="iletisim">
+        <div class="footer-top">
+            <div class="footer-brand-block">
+                <div class="logo-mark logo-mark--footer">🛡️</div>
+                <div>
+                    <div class="footer-brand-name">Sosyal Güvenlik Vatandaş Rehberi</div>
+                    <div class="footer-tagline">Belgenizi Anlamanıza Yardımcı Oluyoruz</div>
+                </div>
+            </div>
+
+            <div class="footer-social-block">
+                <div class="footer-social-title">Bizi Takip Edin</div>
+                <div class="footer-social-icons">
+                    <a href="#" aria-label="Facebook">📘</a>
+                    <a href="#" aria-label="X">✖️</a>
+                    <a href="#" aria-label="Instagram">📷</a>
+                    <a href="#" aria-label="YouTube">▶️</a>
+                </div>
+            </div>
         </div>
 
-        <div class="footer-links">
-            <a href="#">Kullanım Koşulları</a>
-            <a href="#">Gizlilik</a>
-            <a href="#">İletişim</a>
+        <div class="footer-bottom-row">
+            <div class="footer-bottom-links">
+                <a href="#">Gizlilik</a>
+                <span class="footer-dot">·</span>
+                <a href="#">Kullanım Koşulları</a>
+                <span class="footer-dot">·</span>
+                <a href="#">Site Haritası</a>
+            </div>
+            <div class="footer-copyright">
+                Tüm Hakları Saklıdır © @DateTime.Now.Year Sosyal Güvenlik Vatandaş Rehberi
+            </div>
         </div>
-    </div>
-</footer>
+
+        <div class="footer-disclaimer">
+        
+        </div>
+    </footer>
+
+    <button type="button" class="a11y-button" title="Erişilebilirlik" aria-label="Erişilebilirlik">♿</button>
+    <button type="button" class="scroll-top-button" id="scrollTopBtn" title="Yukarı çık" aria-label="Yukarı çık" onclick="window.scrollTo({top:0,behavior:'smooth'})">⌃</button>
 </body>
 </html>
+
+<script>
+    function toggleMobileNav() {
+        var nav = document.getElementById('topbarNav');
+        if (nav) { nav.classList.toggle('topbar-nav--open'); }
+    }
+
+    window.addEventListener('scroll', function () {
+        var btn = document.getElementById('scrollTopBtn');
+        if (!btn) return;
+        btn.classList.toggle('scroll-top-button--visible', window.scrollY > 300);
+    });
+</script>
