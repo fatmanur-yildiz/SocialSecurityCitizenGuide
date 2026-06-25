@@ -1,0 +1,1430 @@
+{
+  "version": "1.0",
+  "language": "tr-TR",
+  "project": "EmekliRehberi",
+  "assistantName": "SGK AI Assistant",
+  "description": "Knowledge base for an AI-style SGK question-answer assistant. Answers are designed for user guidance inside the web application.",
+  "createdAt": "2026-06-25",
+  "matchFields": [
+    "title",
+    "questions",
+    "keywords",
+    "category"
+  ],
+  "entries": [
+    {
+      "id": "premium_001",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "SGK hizmet dökümündeki Ş, K, S harfleri ne anlama gelir?",
+      "questions": [
+        "SGK hizmet dökümümdeki Ş, K, S gibi harfler ne anlama geliyor?",
+        "S harfi ne demek?",
+        "K harfi ne demek?",
+        "Ş harfi ne demek?",
+        "Hizmet dökümünde şüpheli işyeri ne demek?"
+      ],
+      "keywords": [
+        "s harfi",
+        "k harfi",
+        "ş harfi",
+        "sgk harfleri",
+        "işyeri kodu",
+        "sahte işyeri",
+        "kontrollü işyeri",
+        "şüpheli işyeri",
+        "hizmet dökümü"
+      ],
+      "answer": "SGK hizmet dökümündeki Ş, K ve S gibi harfler işyerinin denetim durumuyla ilgilidir. S sahte işyeri, K kontrollü işyeri, Ş ise şüpheli işyeri anlamında kullanılabilir. Sahte olduğu kesinleşen işyerindeki prim günleri iptal edilebilir; kontrollü veya şüpheli işyerlerinde ise denetim sonucu önemlidir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "premium_002",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "Şubat ayında prim neden 30 gün görünür?",
+      "questions": [
+        "Şubat ayı 28 gün ama primim neden 30 gün?",
+        "31 çeken ayda neden 31 gün prim görünmüyor?",
+        "SGK bir ayı kaç gün sayar?"
+      ],
+      "keywords": [
+        "şubat",
+        "28 gün",
+        "29 gün",
+        "31 gün",
+        "30 gün",
+        "aylık prim",
+        "tam ay",
+        "sgk ay hesabı"
+      ],
+      "answer": "SGK uygulamasında tam çalışan bir kişi için ayın kaç gün çektiğine bakılmadan aylık çalışma 30 gün kabul edilir. Bu yüzden Şubat ayında da Ocak ayında da tam çalışma varsa prim günü 30 görünür. İşe giriş, işten çıkış veya eksik çalışma olan aylarda gün sayısı farklı olabilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "premium_003",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "Aynı ayda prim günüm neden 30 günden fazla görünüyor?",
+      "questions": [
+        "Aynı ay içinde prim günüm 45 görünüyor, bu nasıl olur?",
+        "30 günden fazla prim günü emekliliği hızlandırır mı?",
+        "Bir ayda 45 gün prim olur mu?"
+      ],
+      "keywords": [
+        "30 günden fazla",
+        "45 gün",
+        "birden fazla işyeri",
+        "çift sigorta",
+        "aynı ay",
+        "prim günü",
+        "emeklilik hızlandırır mı"
+      ],
+      "answer": "Aynı ay içinde birden fazla işyerinde sigortalı çalıştıysanız hizmet dökümünde toplam gün 30’u aşmış gibi görünebilir. Ancak emeklilik gün hesabında bir ay için en fazla 30 gün dikkate alınır. Fazla görünen günler emeklilik tarihini öne çekmez; fakat o ayki PEK toplamını artırabilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "premium_004",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "Eksik gün nedeni ne demektir?",
+      "questions": [
+        "Hizmet dökümümde eksik gün nedeni yazıyor, bu ne demek?",
+        "Eksik gün kodu nedir?",
+        "01 07 13 eksik gün kodları ne anlama gelir?"
+      ],
+      "keywords": [
+        "eksik gün",
+        "eksik gün nedeni",
+        "kod 01",
+        "kod 07",
+        "kod 13",
+        "rapor",
+        "ücretsiz izin",
+        "kısmi çalışma",
+        "part time"
+      ],
+      "answer": "Bir ayda 30 günden az prim bildirildiyse işveren bunun nedenini SGK’ya bir kodla bildirir. Rapor, ücretsiz izin veya kısmi çalışma gibi nedenler eksik gün sebebi olabilir. Bu kod, o ay primin neden tam 30 gün yatmadığını açıklar.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "premium_005",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "Dönem bilgisindeki 2026/01, 2026/02 neyi gösterir?",
+      "questions": [
+        "Hizmet dökümünde dönem 2026/01 ne demek?",
+        "Dönem sütunu neyi gösteriyor?",
+        "2026/04 hangi ay demek?"
+      ],
+      "keywords": [
+        "dönem",
+        "2026/01",
+        "2026/02",
+        "ay",
+        "yıl",
+        "prim dönemi",
+        "hizmet dönemi"
+      ],
+      "answer": "Hizmet dökümündeki dönem bilgisi primin ait olduğu yıl ve ayı gösterir. Örneğin 2026/04 ifadesi, 2026 yılının Nisan ayındaki çalışma günlerini ve o dönem için bildirilen kazanç bilgisini ifade eder.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "premium_006",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "Belge türü sütunundaki kodlar ne anlama gelir?",
+      "questions": [
+        "Belge türü 01 ne demek?",
+        "Belge türü 02 ne anlama gelir?",
+        "Hizmet dökümündeki belge türü kodları nedir?"
+      ],
+      "keywords": [
+        "belge türü",
+        "01",
+        "02",
+        "19",
+        "43",
+        "sgdp",
+        "tüm sigorta kolları",
+        "kod"
+      ],
+      "answer": "Belge türü kodları, işverenin çalışmayı hangi sigorta kapsamında bildirdiğini gösterir. Örneğin 01 genellikle tüm sigorta kollarına tabi normal çalışan bildirimi, 02 ise emeklilikten sonra çalışma durumunda SGDP bildirimi için kullanılır. Kodun anlamı çalışmanın niteliğine göre değişebilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "premium_007",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "Asıl, Ek ve İptal satırları nasıl yorumlanır?",
+      "questions": [
+        "Hizmet dökümünde iptal yazıyor, primim silindi mi?",
+        "Asıl Ek İptal satırı ne demek?",
+        "İptal satırı varsa ne yapmalıyım?"
+      ],
+      "keywords": [
+        "iptal",
+        "asıl",
+        "ek",
+        "a e i",
+        "hatalı bildirim",
+        "prim silindi",
+        "hizmet dökümü satırı"
+      ],
+      "answer": "İşveren hatalı bildirim yaptığında ilgili satır iptal edilebilir ve ardından doğru bilgiyi içeren asıl veya ek bildirim yapılabilir. Aynı aya ait iptal satırının yanında doğru gün ve kazanç içeren yeni bir kayıt varsa genellikle kayıt düzeltilmiş olur. Sadece iptal görünüyorsa ve yeni kayıt yoksa o dönem ayrıca kontrol edilmelidir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "premium_008",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "İşyeri numarası neden farklı olabilir?",
+      "questions": [
+        "İşyeri no neden değişiyor?",
+        "Hizmet dökümündeki uzun işyeri numarası ne demek?",
+        "Her ay farklı işyeri no görünüyor"
+      ],
+      "keywords": [
+        "işyeri no",
+        "işyeri sicil",
+        "şube",
+        "farklı işyeri",
+        "sicil numarası"
+      ],
+      "answer": "İşyeri numarası, çalıştığınız işyerinin SGK’daki sicil numarasıdır. Aynı şirketin farklı şubeleri veya farklı işyerleri farklı numaralarla görünebilir. Numaranın değişmesi, bildirimin farklı bir işyeri veya şube üzerinden yapıldığını gösterebilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "premium_009",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "Aktif ve pasif durumu ne anlama gelir?",
+      "questions": [
+        "e-Devlet belgesinde aktif ne demek?",
+        "Pasif yazıyor, emekli olamaz mıyım?",
+        "SGK aktif pasif durumu nedir?"
+      ],
+      "keywords": [
+        "aktif",
+        "pasif",
+        "sigorta durumu",
+        "çalışıyor",
+        "işsiz",
+        "tescil"
+      ],
+      "answer": "Aktif ifadesi genellikle şu anda sigortalı olarak çalıştığınızı veya bildirimin devam ettiğini gösterir. Pasif ifadesi ise o anda aktif bir sigortalı çalışma kaydı görünmediği anlamına gelir. Pasif olmak geçmiş primlerinizin silindiği veya emekli olamayacağınız anlamına gelmez.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "premium_010",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "Geçmiş yıllara ait aylar hiç görünmüyorsa ne yapılmalıdır?",
+      "questions": [
+        "Geçmiş yıllar hizmet dökümümde görünmüyor, ne yapmalıyım?",
+        "Çalıştığım aylar hizmet dökümünde yok",
+        "Sigortasız çalıştırıldım mı?"
+      ],
+      "keywords": [
+        "geçmiş aylar yok",
+        "boş ay",
+        "sigortasız çalışma",
+        "hizmet tespit",
+        "görünmeyen prim",
+        "kayıt yok"
+      ],
+      "answer": "Çalıştığınız halde bazı dönemler hizmet dökümünde hiç görünmüyorsa işveren tarafından bildirim yapılmamış olabilir. Bu durumda önce işyeri kayıtları, maaş bordrosu ve SGK kayıtları kontrol edilmelidir. Geriye dönük hak iddiası için hukuki süreler ve hizmet tespit davası gibi yollar gündeme gelebilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "premium_011",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "Toplam prim günü tek başına emeklilik için yeterli midir?",
+      "questions": [
+        "Toplam prim gün sayısı emekli olmam için yeterli mi?",
+        "Prim günüm dolduysa emekli olabilir miyim?",
+        "Sadece prim günü yeter mi?"
+      ],
+      "keywords": [
+        "toplam prim",
+        "prim günü yeterli mi",
+        "yaş",
+        "sigortalılık süresi",
+        "emeklilik şartı"
+      ],
+      "answer": "Toplam prim günü emeklilik için önemli bir koşuldur ancak tek başına yeterli değildir. Emeklilikte genellikle prim günü, sigortalılık süresi ve yaş şartı birlikte değerlendirilir.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "premium_012",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "Uzun vade ve kısa vade sigorta kolları ne demektir?",
+      "questions": [
+        "Uzun vade prim gün sayısı ne demek?",
+        "Kısa vade sigorta ne demek?",
+        "Emeklilikte hangi primler sayılır?"
+      ],
+      "keywords": [
+        "uzun vade",
+        "kısa vade",
+        "malullük",
+        "yaşlılık",
+        "ölüm",
+        "iş kazası",
+        "emeklilik primi"
+      ],
+      "answer": "Uzun vadeli sigorta kolları emeklilik hesabında dikkate alınan malullük, yaşlılık ve ölüm sigortalarıyla ilgilidir. Kısa vadeli sigorta kolları iş kazası, meslek hastalığı ve hastalık gibi durumları kapsar. Emeklilik hesabında özellikle uzun vadeli primlerin başlangıcı ve gün sayısı önemlidir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "premium_013",
+      "category": "Prim Bilgileri ve Hizmet Dökümü",
+      "title": "PDF yükledim ama sistem bazı bilgileri okuyamadı, neden olabilir?",
+      "questions": [
+        "PDF yükledim ama sonuç çıkmadı",
+        "Hizmet dökümü okunmadı",
+        "PDF analizi neden çalışmadı?",
+        "Sistem belgeyi okuyamadı"
+      ],
+      "keywords": [
+        "pdf",
+        "belge okunmadı",
+        "analiz",
+        "hizmet dökümü pdf",
+        "format",
+        "bozuk pdf",
+        "tarama"
+      ],
+      "answer": "PDF dosyalarının yapısı her zaman aynı olmayabilir. Bazı belgelerde metin seçilebilir değildir, bazı sayfalarda tablo düzeni farklıdır veya belge korunmuş olabilir. Bu durumda sistem bazı alanları okuyamayabilir; güncel ve barkodlu e-Devlet PDF belgesini tekrar indirip yüklemek daha sağlıklı sonuç verebilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "pek_001",
+      "category": "PEK ve Kazanç Bilgileri",
+      "title": "PEK nedir ve neden önemlidir?",
+      "questions": [
+        "PEK nedir?",
+        "PEK ne demek?",
+        "Prime esas kazanç nedir?",
+        "PEK neden önemli?"
+      ],
+      "keywords": [
+        "pek",
+        "prime esas kazanç",
+        "kazanç",
+        "brüt maaş",
+        "emekli aylığı",
+        "bildirilen kazanç"
+      ],
+      "answer": "PEK, prime esas kazanç anlamına gelir. İşverenin sizin adınıza SGK’ya bildirdiği brüt kazanç ve prim niteliğindeki ödemelerin toplamını ifade eder. Emekli aylığı hesabında yalnızca prim gün sayısı değil, primlerin hangi kazanç üzerinden bildirildiği de önemlidir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "pek_002",
+      "category": "PEK ve Kazanç Bilgileri",
+      "title": "Maaş yüksek olmasına rağmen PEK neden düşük görünebilir?",
+      "questions": [
+        "Maaşım yüksek ama PEK düşük görünüyor",
+        "Kazanç asgari ücretten yatıyor",
+        "Maaşım elden veriliyor PEK düşük"
+      ],
+      "keywords": [
+        "pek düşük",
+        "asgari ücret",
+        "elden maaş",
+        "brüt maaş",
+        "kayıt dışı",
+        "düşük gösterme"
+      ],
+      "answer": "Hizmet dökümündeki PEK tutarı gerçek brüt maaşınızdan düşük görünüyorsa işveren kazancınızı eksik bildiriyor olabilir. Bu durum emekli aylığınızı ve sosyal güvenlik haklarınızı olumsuz etkileyebilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "pek_003",
+      "category": "PEK ve Kazanç Bilgileri",
+      "title": "PEK emekli maaşını nasıl etkiler?",
+      "questions": [
+        "PEK emekli maaşımı etkiler mi?",
+        "Emekli maaşını prim günü mü PEK mi belirler?",
+        "Çok prim günü yüksek maaş getirir mi?"
+      ],
+      "keywords": [
+        "emekli maaşı",
+        "pek etkisi",
+        "prim günü",
+        "yüksek kazanç",
+        "asgari ücret"
+      ],
+      "answer": "Emekli aylığında prim günü önemlidir; ancak aylık tutarını etkileyen en önemli unsurlardan biri PEK değeridir. Asgari ücretten bildirilen çok sayıda prim günü, yüksek kazançtan bildirilen primlere göre daha düşük aylık sonucuna neden olabilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "pek_004",
+      "category": "PEK ve Kazanç Bilgileri",
+      "title": "Son dönem PEK neden önemlidir?",
+      "questions": [
+        "Son dönem PEK ne demek?",
+        "Son PEK neden önemli?",
+        "Son bildirilen kazanç nedir?"
+      ],
+      "keywords": [
+        "son dönem pek",
+        "son pek",
+        "bildirilen kazanç",
+        "son ay",
+        "ortalama pek"
+      ],
+      "answer": "Son dönem PEK, hizmet dökümünde en son bildirilen döneme ait prime esas kazanç değeridir. Bu değer son çalışma döneminizde SGK’ya hangi kazanç üzerinden bildirildiğinizi gösterir. Ortalama PEK ile karşılaştırıldığında kazanç eğilimi hakkında fikir verebilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "retirement_001",
+      "category": "Emeklilik Durumu",
+      "title": "Emeklilik şartlarımı e-Devlet’te nereden görebilirim?",
+      "questions": [
+        "Emeklilik şartlarımı e-Devlet’te nereden görebilirim?",
+        "Ne zaman emekli olabilirim nereden bakılır?",
+        "Emeklilik şartı sorgulama"
+      ],
+      "keywords": [
+        "emeklilik şartları",
+        "e-devlet",
+        "ne zaman emekli olabilirim",
+        "yaş",
+        "prim gün sayısı",
+        "sigortalılık süresi"
+      ],
+      "answer": "e-Devlet arama çubuğunda “Ne Zaman Emekli Olabilirim?” veya “SGK Tescil ve Hizmet Dökümü” hizmetlerini arayarak emeklilikle ilgili resmi bilgilere ulaşabilirsiniz. Yaş, prim günü ve sigortalılık süresi koşulları kişisel kayıtlara göre değişir.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "retirement_002",
+      "category": "Emeklilik Durumu",
+      "title": "Sigortalılık süresi nedir?",
+      "questions": [
+        "Sigortalılık süresi nedir?",
+        "Prim ödenmeyen günler sigortalılık süresine sayılır mı?",
+        "20 yıl 25 yıl şartı nedir?"
+      ],
+      "keywords": [
+        "sigortalılık süresi",
+        "ilk sigorta",
+        "prim ödenmeyen gün",
+        "20 yıl",
+        "25 yıl",
+        "zaman"
+      ],
+      "answer": "Sigortalılık süresi, ilk defa sigortalı olunan tarih ile emeklilik talebi arasında geçen süredir. Bu süre her gün prim ödenmiş olması anlamına gelmez; zamanın geçmesiyle oluşan bir koşuldur. Prim günü ise ayrıca hesaplanan farklı bir koşuldur.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "retirement_003",
+      "category": "Emeklilik Durumu",
+      "title": "Staj sigortası emeklilik başlangıcı sayılır mı?",
+      "questions": [
+        "Staj sigortam emeklilikte sayılır mı?",
+        "Staj başlangıcı neden emeklilikte başlangıç olmuyor?",
+        "Çıraklık sigortası emekliliği başlatır mı?"
+      ],
+      "keywords": [
+        "staj",
+        "çıraklık",
+        "ilk işe giriş",
+        "uzun vadeli prim",
+        "emeklilik başlangıcı",
+        "sigorta başlangıcı"
+      ],
+      "answer": "Staj ve çıraklık dönemlerinde çoğunlukla emeklilik için gerekli uzun vadeli sigorta primi ödenmez. Bu nedenle belgede staj tarihi görünse bile emeklilik hesabında genellikle ilk uzun vadeli primin yattığı tarih esas alınır.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "retirement_004",
+      "category": "Emeklilik Durumu",
+      "title": "Malulen emeklilik ile engelli emekliliği arasındaki fark nedir?",
+      "questions": [
+        "Malulen emeklilik ve engelli emekliliği farkı nedir?",
+        "Engelli hakkıyla emeklilik ne demek?",
+        "Malulen emekli olmak için ne gerekir?"
+      ],
+      "keywords": [
+        "malulen emeklilik",
+        "engelli emekliliği",
+        "çalışma gücü",
+        "rapor",
+        "1800 gün",
+        "yaş şartı"
+      ],
+      "answer": "Malulen emeklilik, çalışma gücünün önemli ölçüde kaybedilmesi durumunda değerlendirilir ve sağlık kurulu süreci içerir. Engelli hakkıyla emeklilik ise engellilik oranı ve sigortalılık koşullarına göre farklı bir yaşlılık emekliliği yoludur.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "retirement_005",
+      "category": "Emeklilik Durumu",
+      "title": "Prim günüm doldu ama yaşım dolmadı, primlerim silinir mi?",
+      "questions": [
+        "Prim günüm doldu yaşım dolmadı primler silinir mi?",
+        "Yaşı beklersem primim yanar mı?",
+        "İşten ayrılıp yaşı bekleyebilir miyim?"
+      ],
+      "keywords": [
+        "prim doldu",
+        "yaş dolmadı",
+        "yaşı beklemek",
+        "prim silinir mi",
+        "emeklilik"
+      ],
+      "answer": "Prim gününüz dolsa bile yaş şartı tamamlanmadıysa emeklilik için yaşın dolması beklenebilir. Ödenmiş primler SGK sisteminde saklanır ve işten ayrılmanız primlerin silinmesine neden olmaz.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "retirement_006",
+      "category": "Emeklilik Durumu",
+      "title": "Yaşım doldu ama prim günüm eksikse ne yapabilirim?",
+      "questions": [
+        "Yaşım doldu primim eksik ne yapabilirim?",
+        "Eksik primle emekli olunur mu?",
+        "Prim günüm eksik nasıl tamamlarım?"
+      ],
+      "keywords": [
+        "yaş doldu",
+        "prim eksik",
+        "borçlanma",
+        "isteğe bağlı sigorta",
+        "doğum borçlanması",
+        "askerlik borçlanması"
+      ],
+      "answer": "Yaş şartı dolduğu halde prim günü eksikse, uygun durumlarda askerlik, doğum veya yurt dışı gibi borçlanma seçenekleri değerlendirilebilir. Borçlanma mümkün değilse isteğe bağlı sigorta gibi yollarla prim tamamlamak gündeme gelebilir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "retirement_007",
+      "category": "Emeklilik Durumu",
+      "title": "Yıpranma payı emekliliği nasıl etkiler?",
+      "questions": [
+        "Yıpranma payı nedir?",
+        "Fiili hizmet süresi zammı emekliliği nasıl etkiler?",
+        "Yıpranma yaşı düşürür mü?"
+      ],
+      "keywords": [
+        "yıpranma payı",
+        "fiili hizmet süresi zammı",
+        "ağır iş",
+        "maden",
+        "polis",
+        "asker",
+        "yaş indirimi"
+      ],
+      "answer": "Fiili hizmet süresi zammı, bazı ağır veya riskli işlerde çalışanlara ek prim günü ve bazı durumlarda yaş indirimi sağlayabilen bir uygulamadır. Hangi mesleklerin kapsamda olduğu ve etkisi kişinin çalışma kayıtlarına göre değerlendirilir.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "retirement_008",
+      "category": "Emeklilik Durumu",
+      "title": "Aylık bağlama oranı nedir?",
+      "questions": [
+        "Aylık bağlama oranı nedir?",
+        "ABO ne demek?",
+        "Emekli maaşı nasıl bağlanır?"
+      ],
+      "keywords": [
+        "abo",
+        "aylık bağlama oranı",
+        "emekli maaşı",
+        "2000 öncesi",
+        "2008 sonrası"
+      ],
+      "answer": "Aylık bağlama oranı, emekli aylığı hesabında ortalama kazancın hangi oranla aylığa yansıtılacağını gösteren hesaplama unsurudur. Çalışma dönemleri ve mevzuat değişiklikleri nedeniyle farklı dönemler için farklı hesaplama mantıkları olabilir.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "retirement_009",
+      "category": "Emeklilik Durumu",
+      "title": "EYT kontrolünde ilk sigorta tarihi neden önemlidir?",
+      "questions": [
+        "EYT için ilk sigorta tarihi neden önemli?",
+        "EYT kapsamı nasıl anlaşılır?",
+        "08.09.1999 tarihi ne demek?"
+      ],
+      "keywords": [
+        "eyt",
+        "ilk sigorta tarihi",
+        "8 eylül 1999",
+        "08.09.1999",
+        "başlangıç tarihi"
+      ],
+      "answer": "EYT değerlendirmesinde ilk sigorta başlangıç tarihi temel kriterlerden biridir. Sistem, yüklenen belgelerden veya kullanıcı girişinden gelen ilk sigorta tarihini ilgili tarih koşullarıyla karşılaştırarak ön kontrol yapabilir. Prim günü ve sigortalılık süresi gibi diğer şartlar da ayrıca değerlendirilir.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "retirement_010",
+      "category": "Emeklilik Durumu",
+      "title": "Emekli aylığı tahmini neden hesaplanamayabilir?",
+      "questions": [
+        "Emekli aylığı neden hesaplanamadı?",
+        "Toplam hizmet günüm az olduğu için aylık hesaplanmadı ne demek?",
+        "Aylık tahmini neden çıkmıyor?"
+      ],
+      "keywords": [
+        "emekli aylığı",
+        "aylık hesaplanamadı",
+        "3600 gün",
+        "hizmet günü",
+        "maaş tahmini"
+      ],
+      "answer": "Emekli aylığı tahmini için belirli hizmet günü ve kazanç verilerinin yeterli olması gerekir. Toplam hizmet günü 3600 günden azsa bazı hesaplama araçları aylık hesaplaması yapmayabilir. Bu durumda önce hizmet günü ve eksik prim durumu kontrol edilmelidir.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "debt_001",
+      "category": "Borçlanma İşlemleri",
+      "title": "SGK’da borçlanma ne anlama gelir?",
+      "questions": [
+        "SGK’da borçlanma ne demek?",
+        "Borçlanma nedir?",
+        "Prim günü satın almak mümkün mü?"
+      ],
+      "keywords": [
+        "borçlanma",
+        "prim günü",
+        "geçmiş süre",
+        "askerlik",
+        "doğum",
+        "yurt dışı"
+      ],
+      "answer": "Borçlanma, mevzuatın izin verdiği bazı geçmiş sürelerin ödeme yapılarak prim günü olarak hizmete eklenmesidir. Her boş geçen süre borçlanılamaz; askerlik, doğum, yurt dışı veya bazı özel süreler gibi belirli durumlar için borçlanma yapılabilir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_002",
+      "category": "Borçlanma İşlemleri",
+      "title": "Geçmiş eksik prim günlerimi toplu para ödeyerek tamamlayabilir miyim?",
+      "questions": [
+        "Geçmiş eksik prim günlerimi satın alabilir miyim?",
+        "Boşta geçen günleri toplu parayla ödeyebilir miyim?",
+        "Eksik primleri geriye dönük tamamlayabilir miyim?"
+      ],
+      "keywords": [
+        "geçmiş prim",
+        "toplu ödeme",
+        "satın alma",
+        "boşta geçen gün",
+        "borçlanma"
+      ],
+      "answer": "Genel olarak boşta geçen geçmiş günleri istenildiği gibi toplu para ödeyerek satın alma sistemi yoktur. Yalnızca kanunun izin verdiği borçlanma türleri için geriye dönük prim ödenebilir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_003",
+      "category": "Borçlanma İşlemleri",
+      "title": "Doğum borçlanması şartları nelerdir?",
+      "questions": [
+        "Doğum borçlanması şartları nelerdir?",
+        "Her çocuk için doğum borçlanması yapılır mı?",
+        "Doğum borçlanması kaç gün?"
+      ],
+      "keywords": [
+        "doğum borçlanması",
+        "çocuk",
+        "720 gün",
+        "2160 gün",
+        "sigorta sonrası doğum",
+        "primsiz süre"
+      ],
+      "answer": "Doğum borçlanması, sigorta başlangıcından sonra doğan çocuklar için doğumdan sonraki primsiz geçen sürelerin borçlanılabilmesini sağlar. Genel mantıkta her çocuk için en fazla 720 gün, toplamda en fazla 3 çocuk için 2160 gün borçlanma gündeme gelebilir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_004",
+      "category": "Borçlanma İşlemleri",
+      "title": "Askerlik borçlanması sigorta başlangıcını öne çeker mi?",
+      "questions": [
+        "Askerlik borçlanması sigorta başlangıcını geri çeker mi?",
+        "Askerlik borçlanması EYT etkiler mi?",
+        "Askerlik sigortadan önceyse ne olur?"
+      ],
+      "keywords": [
+        "askerlik borçlanması",
+        "sigorta başlangıcı",
+        "geriye çekme",
+        "eyt",
+        "prim günü"
+      ],
+      "answer": "Askerlik hizmeti ilk sigorta başlangıcından önce yapılmışsa, borçlanılan gün sayısı kadar başlangıç tarihini geriye çekme etkisi olabilir. Askerlik sigorta başlangıcından sonra yapılmışsa genellikle sadece prim gününü artırır.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_005",
+      "category": "Borçlanma İşlemleri",
+      "title": "Borçlanma tutarı nasıl hesaplanır?",
+      "questions": [
+        "Borçlanma tutarı nasıl hesaplanır?",
+        "Borçlanma fiyatı sabit mi?",
+        "Borçlanma ücreti neye göre değişir?"
+      ],
+      "keywords": [
+        "borçlanma tutarı",
+        "günlük kazanç",
+        "oran",
+        "%32",
+        "%45",
+        "asgari ücret",
+        "hesaplama"
+      ],
+      "answer": "Borçlanma tutarı sabit değildir. Genel hesap mantığı borçlanılacak gün sayısı, seçilen günlük kazanç tutarı ve borçlanma oranının çarpılmasıdır. Örneğin bazı borçlanmalarda oran %32, yurt dışı borçlanmasında ise farklı oran uygulanabilir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_006",
+      "category": "Borçlanma İşlemleri",
+      "title": "Borçlanma ödeme süresi ne kadardır?",
+      "questions": [
+        "Borçlanma ödemesi kaç gün içinde yapılır?",
+        "Borçlanma tebligatından sonra ödeme süresi nedir?",
+        "Borçlanma ödeme süresi geçerse ne olur?"
+      ],
+      "keywords": [
+        "ödeme süresi",
+        "tebligat",
+        "30 gün",
+        "borçlanma iptal",
+        "ödeme"
+      ],
+      "answer": "Borçlanma başvurusu sonrası SGK tarafından hesaplanan tutarın tebliğ edilmesinden sonra ödeme için belirli bir süre verilir. Süre içinde ödeme yapılmazsa başvuru geçersiz hale gelebilir ve yeniden başvuru gerekebilir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_007",
+      "category": "Borçlanma İşlemleri",
+      "title": "Yurt dışı borçlanması hangi statüye sayılır?",
+      "questions": [
+        "Yurt dışı borçlanması 4A mı 4B mi sayılır?",
+        "Yurt dışı borçlanması hangi statüye eklenir?",
+        "Yurt dışı borçlanması Bağ-Kur mu?"
+      ],
+      "keywords": [
+        "yurt dışı borçlanması",
+        "4a",
+        "4b",
+        "bağ-kur",
+        "statü"
+      ],
+      "answer": "Yurt dışı borçlanmasıyla kazanılan hizmetlerin hangi statüye sayılacağı mevzuat ve başvuru dönemine göre değerlendirilir. Güncel uygulamalarda bu konu özellikle 4B statüsüyle ilişkilendirilebilir; bu nedenle başvuru öncesi kayıtların kontrol edilmesi önemlidir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_008",
+      "category": "Borçlanma İşlemleri",
+      "title": "Borçlanma yapmak için işten ayrılmak gerekir mi?",
+      "questions": [
+        "Borçlanma için işten ayrılmak gerekir mi?",
+        "Çalışırken askerlik borçlanması yapılır mı?",
+        "Çalışırken doğum borçlanması başvurusu yapılır mı?"
+      ],
+      "keywords": [
+        "çalışırken borçlanma",
+        "işten ayrılmak",
+        "askerlik borçlanması",
+        "doğum borçlanması",
+        "başvuru"
+      ],
+      "answer": "Borçlanma başvurusu yapmak için her durumda işten ayrılmak gerekmez. Aktif çalışırken de geçmiş askerlik, doğum veya uygun diğer süreler için başvuru yapılabilir. Başvuru şartları borçlanma türüne göre değişir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_009",
+      "category": "Borçlanma İşlemleri",
+      "title": "Part-time çalışanlar eksik günlerini borçlanabilir mi?",
+      "questions": [
+        "Part-time çalışan eksik gün borçlanabilir mi?",
+        "Kısmi süreli çalışma borçlanması nedir?",
+        "Eksik günleri 30 güne tamamlama"
+      ],
+      "keywords": [
+        "part time",
+        "kısmi süreli",
+        "eksik gün",
+        "30 güne tamamlama",
+        "borçlanma"
+      ],
+      "answer": "Kısmi süreli çalışanların bazı eksik günleri belirli şartlarla borçlanma kapsamında değerlendirilebilir. Bu durumda eksik günün nedeni, dönem bilgisi ve sigortalılık kaydı önemlidir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_010",
+      "category": "Borçlanma İşlemleri",
+      "title": "Borçlanma emeklilik tarihini her zaman öne çeker mi?",
+      "questions": [
+        "Borçlanma emeklilik tarihimi öne çeker mi?",
+        "Borçlanma yaparsam erken emekli olur muyum?",
+        "Borçlanma sadece prim mi artırır?"
+      ],
+      "keywords": [
+        "borçlanma etkisi",
+        "erken emeklilik",
+        "emeklilik tarihi",
+        "prim günü",
+        "sigorta başlangıcı"
+      ],
+      "answer": "Borçlanma her zaman emeklilik tarihini öne çekmez. Bazı borçlanmalar sadece prim gününü artırır; bazı durumlarda ise özellikle askerlik sigorta başlangıcından önce yapılmışsa başlangıç tarihini etkileyebilir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_011",
+      "category": "Borçlanma İşlemleri",
+      "title": "Borçlanma taksitle ödenebilir mi?",
+      "questions": [
+        "Borçlanma taksitle ödenir mi?",
+        "Borçlanma peşin mi ödenir?",
+        "SGK borçlanma taksit olur mu?"
+      ],
+      "keywords": [
+        "taksit",
+        "peşin ödeme",
+        "borçlanma ödemesi",
+        "30 gün"
+      ],
+      "answer": "Borçlanma ödemeleri genellikle tebliğ edilen tutarın süresi içinde peşin ödenmesi şeklinde yürütülür. Ödeme şartları başvuru türüne göre kontrol edilmelidir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "merge_001",
+      "category": "Hizmet Birleştirme ve Statü Bilgisi",
+      "title": "4A, 4B ve 4C farkı nedir?",
+      "questions": [
+        "4A 4B 4C nedir?",
+        "SSK Bağ-Kur Emekli Sandığı farkı nedir?",
+        "e-Devlet’te 4A 4B 4C ne demek?"
+      ],
+      "keywords": [
+        "4a",
+        "4b",
+        "4c",
+        "ssk",
+        "bağ-kur",
+        "emekli sandığı",
+        "statü"
+      ],
+      "answer": "4A eski adıyla SSK kapsamında bir işverene bağlı çalışanları, 4B eski adıyla Bağ-Kur kapsamında kendi adına çalışanları, 4C ise kamu görevlilerini ifade eder. Emeklilik koşulları statüye göre değişebileceği için bu ayrım önemlidir.",
+      "relatedPage": "/Citizen/ServiceMerge",
+      "relatedButtonText": "Hizmet Birleştirme Sayfasına Git"
+    },
+    {
+      "id": "merge_002",
+      "category": "Hizmet Birleştirme ve Statü Bilgisi",
+      "title": "Hizmet birleştirmesi nedir?",
+      "questions": [
+        "Hizmet birleştirmesi nedir?",
+        "İntibak ne demek?",
+        "Farklı kurumlardaki günler nasıl birleşir?"
+      ],
+      "keywords": [
+        "hizmet birleştirme",
+        "intibak",
+        "4a",
+        "4b",
+        "4c",
+        "gm20",
+        "sandık",
+        "statü"
+      ],
+      "answer": "Hizmet birleştirmesi, farklı sigorta statülerinde geçen hizmet sürelerinin emeklilik sürecinde birlikte değerlendirilmesi için yapılan işlemdir. 4A, 4B, 4C veya sandık hizmeti bulunan kişilerde hizmetlerin doğru şekilde görünmesi emeklilik hesabı için önemlidir.",
+      "relatedPage": "/Citizen/ServiceMerge",
+      "relatedButtonText": "Hizmet Birleştirme Sayfasına Git"
+    },
+    {
+      "id": "merge_003",
+      "category": "Hizmet Birleştirme ve Statü Bilgisi",
+      "title": "1261 gün kuralı nedir?",
+      "questions": [
+        "1261 gün kuralı nedir?",
+        "Son 7 yıl kuralı nedir?",
+        "Son 2520 gün ne demek?"
+      ],
+      "keywords": [
+        "1261 gün",
+        "son 7 yıl",
+        "2520 gün",
+        "ağırlıklı statü",
+        "4a",
+        "4b",
+        "4c"
+      ],
+      "answer": "1261 gün kuralı, özellikle 2008 öncesi sigorta başlangıcı olan ve birden fazla statüde hizmeti bulunan kişiler için kullanılan bir değerlendirme mantığıdır. Son 7 yıllık fiili hizmet süresinde hangi statü daha ağırlıklıysa emeklilik statüsünü etkileyebilir.",
+      "relatedPage": "/Citizen/ServiceMerge",
+      "relatedButtonText": "Hizmet Birleştirme Sayfasına Git"
+    },
+    {
+      "id": "merge_004",
+      "category": "Hizmet Birleştirme ve Statü Bilgisi",
+      "title": "Son 7 yıl kuralı herkese uygulanır mı?",
+      "questions": [
+        "Son 7 yıl kuralı herkese uygulanır mı?",
+        "2008 sonrası için 1261 gün geçerli mi?",
+        "Hangi statüden emekli olacağım nasıl belirlenir?"
+      ],
+      "keywords": [
+        "son 7 yıl",
+        "2008 sonrası",
+        "1261",
+        "statü belirleme",
+        "emeklilik statüsü"
+      ],
+      "answer": "Son 7 yıl / 1261 gün mantığı özellikle 2008 öncesi sigortalılık başlangıcı olan kişiler için önemlidir. 2008 sonrası ilk defa sigortalı olanlarda değerlendirme farklı olabilir ve tüm çalışma hayatındaki prim dağılımı daha fazla önem kazanabilir.",
+      "relatedPage": "/Citizen/ServiceMerge",
+      "relatedButtonText": "Hizmet Birleştirme Sayfasına Git"
+    },
+    {
+      "id": "merge_005",
+      "category": "Hizmet Birleştirme ve Statü Bilgisi",
+      "title": "4A ve 4B hizmetim varsa hizmet birleştirme gerekir mi?",
+      "questions": [
+        "4A ve 4B hizmetim varsa hizmet birleştirme gerekir mi?",
+        "Hem SSK hem Bağ-Kur çalıştım ne yapmalıyım?",
+        "Farklı statüde prim varsa ne olur?"
+      ],
+      "keywords": [
+        "4a 4b",
+        "hizmet birleştirme",
+        "farklı statü",
+        "bağ-kur",
+        "ssk",
+        "emeklilik"
+      ],
+      "answer": "Hem 4A hem 4B gibi farklı statülerde hizmetiniz varsa bu hizmetlerin emeklilik sürecinde doğru şekilde değerlendirilmesi önemlidir. Hizmet birleştirme başvurusu veya kayıt kontrolü gerekebilir. Sayfadaki statü dağılımı bu konuda ön fikir verir.",
+      "relatedPage": "/Citizen/ServiceMerge",
+      "relatedButtonText": "Hizmet Birleştirme Sayfasına Git"
+    },
+    {
+      "id": "merge_006",
+      "category": "Hizmet Birleştirme ve Statü Bilgisi",
+      "title": "Bağ-Kur borcu olan biri 4A üzerinden emekli olabilir mi?",
+      "questions": [
+        "Bağ-Kur borcu olan 4A’dan emekli olabilir mi?",
+        "Bağ-Kur borcu emekliliği engeller mi?",
+        "4B borcum var emekli olur muyum?"
+      ],
+      "keywords": [
+        "bağ-kur borcu",
+        "4b borcu",
+        "4a emeklilik",
+        "emekli aylığı",
+        "borç"
+      ],
+      "answer": "Bağ-Kur prim borcu bulunan kişilerin emeklilik sürecinde bu borçların durumu ayrıca değerlendirilir. Borç ödenmeden, yapılandırılmadan veya mevzuata uygun şekilde kapatılmadan aylık bağlama sürecinde sorun oluşabilir.",
+      "relatedPage": "/Citizen/ServiceMerge",
+      "relatedButtonText": "Hizmet Birleştirme Sayfasına Git"
+    },
+    {
+      "id": "merge_007",
+      "category": "Hizmet Birleştirme ve Statü Bilgisi",
+      "title": "GM20 veya sandık hizmeti ne demektir?",
+      "questions": [
+        "GM20 ne demek?",
+        "506 geçici 20 sandık nedir?",
+        "Sandık hizmeti emekliliği etkiler mi?"
+      ],
+      "keywords": [
+        "gm20",
+        "sandık",
+        "506 geçici 20",
+        "hizmet birleştirme",
+        "statü"
+      ],
+      "answer": "GM20 veya sandık hizmeti, bazı banka ve özel kurum sandıkları kapsamında geçen hizmetleri ifade edebilir. Bu tür kayıtlar hizmet birleştirme ve emeklilik statüsü açısından ayrıca kontrol edilmelidir.",
+      "relatedPage": "/Citizen/ServiceMerge",
+      "relatedButtonText": "Hizmet Birleştirme Sayfasına Git"
+    },
+    {
+      "id": "health_001",
+      "category": "Sağlık Hakkı ve GSS",
+      "title": "İşten ayrılınca sağlık hizmetinden ne kadar yararlanılır?",
+      "questions": [
+        "İşten çıkınca sağlık ne kadar devam eder?",
+        "İstifa edince SGK sağlıktan kaç gün yararlanırım?",
+        "İşten çıkarılırsam sağlık hakkım biter mi?"
+      ],
+      "keywords": [
+        "işten ayrılma",
+        "sağlık hizmeti",
+        "gss",
+        "90 gün",
+        "100 gün",
+        "10 gün"
+      ],
+      "answer": "İşten ayrılmadan önceki son bir yıl içinde yeterli priminiz varsa işten ayrıldıktan sonra belirli bir süre daha sağlık hizmetinden yararlanabilirsiniz. Süre bitince GSS durumu kontrol edilmelidir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "health_002",
+      "category": "Sağlık Hakkı ve GSS",
+      "title": "Yaşı beklerken sağlık hizmetinden nasıl yararlanılır?",
+      "questions": [
+        "Yaşı beklerken sağlık hizmeti nasıl olur?",
+        "Prim günüm doldu yaş bekliyorum GSS ne olacak?",
+        "Emeklilik yaşı beklerken sağlık"
+      ],
+      "keywords": [
+        "yaşı beklemek",
+        "gss",
+        "sağlık hizmeti",
+        "gelir testi",
+        "işten ayrılma"
+      ],
+      "answer": "Prim gününü tamamlayıp yaşı bekleyen kişi çalışmıyorsa sağlık hakkı için GSS durumu önem kazanır. Ücretsiz sağlık yararlanma süresi bittikten sonra GSS tescili ve gelir testi durumu e-Devlet üzerinden kontrol edilmelidir.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "health_003",
+      "category": "Sağlık Hakkı ve GSS",
+      "title": "GSS borcu neden çıkar?",
+      "questions": [
+        "GSS borcu neden çıkar?",
+        "Genel Sağlık Sigortası borcu nedir?",
+        "Çalışmıyorum GSS borcu çıktı"
+      ],
+      "keywords": [
+        "gss borcu",
+        "genel sağlık sigortası",
+        "çalışmıyor",
+        "gelir testi",
+        "sağlık primi"
+      ],
+      "answer": "Kişi çalışmıyorsa, emekli değilse ve başka birinin bakmakla yükümlü olduğu kişi kapsamında görünmüyorsa Genel Sağlık Sigortası tescili oluşabilir. Gelir testi yapılmadığında prim borcu çıkabilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "rights_001",
+      "category": "Kayıt Dışı Çalışma ve Hak Kaybı",
+      "title": "İşveren primimi eksik yatırıyor veya maaşımı düşük gösteriyor, ne yapmalıyım?",
+      "questions": [
+        "İşveren primimi eksik yatırıyor ne yapmalıyım?",
+        "Maaşım asgari ücretten gösteriliyor kalan elden veriliyor",
+        "Sigortam düşük yatıyor"
+      ],
+      "keywords": [
+        "eksik prim",
+        "maaş düşük gösteriliyor",
+        "elden maaş",
+        "alo 170",
+        "sgk şikayet",
+        "hizmet tespit davası"
+      ],
+      "answer": "Primlerin eksik yatırılması veya gerçek maaşın SGK’ya düşük bildirilmesi hak kaybına neden olabilir. Hizmet dökümü, bordro ve banka kayıtları karşılaştırılmalıdır. ALO 170, SGK başvurusu veya hukuki yollarla hak arama gündeme gelebilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "rights_002",
+      "category": "Kayıt Dışı Çalışma ve Hak Kaybı",
+      "title": "Çalıştığım halde sigortam görünmüyorsa ne yapmalıyım?",
+      "questions": [
+        "Çalıştım ama sigortam görünmüyor",
+        "Hizmet dökümünde çalıştığım ay yok",
+        "Sigortasız çalıştırıldım ne yapmalıyım?"
+      ],
+      "keywords": [
+        "sigortasız çalışma",
+        "hizmet tespit",
+        "görünmeyen prim",
+        "iş mahkemesi",
+        "alo 170"
+      ],
+      "answer": "Çalıştığınız halde hizmet dökümünde kayıt görünmüyorsa işveren SGK bildirimi yapmamış olabilir. Önce işverenden, bordrodan ve SGK kayıtlarından kontrol yapılmalıdır. Gerekirse ALO 170, SGK başvurusu veya hizmet tespit davası gibi yollar gündeme gelebilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "rights_003",
+      "category": "Kayıt Dışı Çalışma ve Hak Kaybı",
+      "title": "Hizmet tespit davası nedir?",
+      "questions": [
+        "Hizmet tespit davası nedir?",
+        "Sigortasız çalıştığımı nasıl ispatlarım?",
+        "Geçmiş sigortam görünmüyor dava açılır mı?"
+      ],
+      "keywords": [
+        "hizmet tespit davası",
+        "sigortasız çalışma",
+        "mahkeme",
+        "hak düşürücü süre",
+        "ispat"
+      ],
+      "answer": "Hizmet tespit davası, çalıştığı halde SGK’ya bildirilmeyen kişinin bu çalışmasını mahkeme yoluyla tespit ettirmeye çalıştığı süreçtir. Tanık, banka kaydı, işyeri belgesi ve benzeri deliller önemli olabilir. Süre sınırları bulunduğu için gecikmeden hukuki destek alınmalıdır.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "rights_004",
+      "category": "Kayıt Dışı Çalışma ve Hak Kaybı",
+      "title": "ALO 170 ne için aranır?",
+      "questions": [
+        "ALO 170 ne işe yarar?",
+        "SGK şikayeti nereye yapılır?",
+        "Prim eksikliği için kimi aramalıyım?"
+      ],
+      "keywords": [
+        "alo 170",
+        "şikayet",
+        "ihbar",
+        "sgk",
+        "çalışma hayatı",
+        "prim eksik"
+      ],
+      "answer": "ALO 170, çalışma hayatı ve sosyal güvenlik konularında bilgi alma, şikayet ve ihbar süreçleri için kullanılan resmi iletişim hattıdır. Prim eksikliği, sigortasız çalışma veya işveren bildirimiyle ilgili sorunlarda başvuru yollarından biri olabilir.",
+      "relatedPage": "/Citizen/Faq",
+      "relatedButtonText": "Sık Sorulan Sorulara Git"
+    },
+    {
+      "id": "system_001",
+      "category": "Belge Yükleme ve Sistem Kullanımı",
+      "title": "Bu siteye hangi belgeyi yüklemeliyim?",
+      "questions": [
+        "Bu siteye hangi belgeyi yüklemeliyim?",
+        "Hangi PDF lazım?",
+        "Prim bilgileri için hangi belge yüklenir?"
+      ],
+      "keywords": [
+        "belge yükleme",
+        "hangi pdf",
+        "hizmet dökümü",
+        "sgk tescil ve hizmet dökümü",
+        "pdf"
+      ],
+      "answer": "Prim bilgileri için e-Devlet üzerinden alınan SGK Tescil ve Hizmet Dökümü PDF belgesi kullanılmalıdır. Emeklilik ve hizmet birleştirme sayfalarında ise Sosyal Güvenlik Kayıt Belgesi gibi ek belgeler de gerekebilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "system_002",
+      "category": "Belge Yükleme ve Sistem Kullanımı",
+      "title": "SGK Tescil ve Hizmet Dökümü nereden indirilir?",
+      "questions": [
+        "SGK hizmet dökümünü nereden indirebilirim?",
+        "Tescil ve hizmet dökümü nasıl alınır?",
+        "e-Devlet hizmet dökümü PDF indir"
+      ],
+      "keywords": [
+        "sgk tescil",
+        "hizmet dökümü",
+        "e-devlet",
+        "pdf indir",
+        "barkodlu belge"
+      ],
+      "answer": "SGK Tescil ve Hizmet Dökümü e-Devlet üzerinden alınabilir. e-Devlet arama alanına “SGK Tescil ve Hizmet Dökümü” yazıp barkodlu belge oluşturularak PDF indirilebilir.",
+      "relatedPage": "/Citizen/PremiumInfo",
+      "relatedButtonText": "Prim Bilgilerim Sayfasına Git"
+    },
+    {
+      "id": "system_003",
+      "category": "Belge Yükleme ve Sistem Kullanımı",
+      "title": "Sosyal Güvenlik Kayıt Belgesi ile Hizmet Dökümü aynı şey mi?",
+      "questions": [
+        "Sosyal Güvenlik Kayıt Belgesi ile Hizmet Dökümü aynı mı?",
+        "Kayıt belgesi nedir hizmet dökümü nedir?",
+        "Emeklilik sayfası neden farklı belge istiyor?"
+      ],
+      "keywords": [
+        "sosyal güvenlik kayıt belgesi",
+        "hizmet dökümü",
+        "farklı belge",
+        "4a 4b 4c",
+        "pdf"
+      ],
+      "answer": "Sosyal Güvenlik Kayıt Belgesi ile SGK Tescil ve Hizmet Dökümü aynı belge değildir. Hizmet Dökümü dönemsel prim ve kazanç kayıtlarını gösterirken, Kayıt Belgesi kişinin sigortalılık statüleri ve tescil bilgileri hakkında özet bilgi sağlar.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "system_004",
+      "category": "Belge Yükleme ve Sistem Kullanımı",
+      "title": "Prim Bilgilerim ve Emeklilik Durumu sayfaları neden farklı belge istiyor?",
+      "questions": [
+        "Prim Bilgilerim ve Emeklilik Durumu neden farklı belge istiyor?",
+        "Emeklilik sayfası neden kayıt belgesi istiyor?",
+        "Hangi sayfa hangi belgeyi kullanır?"
+      ],
+      "keywords": [
+        "prim bilgileri",
+        "emeklilik durumu",
+        "kayıt belgesi",
+        "hizmet dökümü",
+        "belge farkı"
+      ],
+      "answer": "Prim Bilgilerim sayfası daha çok SGK Tescil ve Hizmet Dökümü üzerinden dönemsel prim ve PEK bilgilerini analiz eder. Emeklilik Durumu sayfasında ise yaş, cinsiyet, ilk sigorta tarihi ve statü gibi bilgiler birlikte değerlendirildiği için Sosyal Güvenlik Kayıt Belgesi ve manuel bilgiler de gerekebilir.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "system_005",
+      "category": "Belge Yükleme ve Sistem Kullanımı",
+      "title": "Sistem sorumu birebir yazmazsam cevap verir mi?",
+      "questions": [
+        "Soruyu aynı yazmak zorunda mıyım?",
+        "PEK? yazsam cevap verir mi?",
+        "AI asistan farklı soruları anlar mı?"
+      ],
+      "keywords": [
+        "ai asistan",
+        "soru cevap",
+        "aynı yazmak",
+        "anahtar kelime",
+        "pek?",
+        "yardımcı"
+      ],
+      "answer": "Soruyu birebir aynı yazmanız gerekmez. Sistem sorudaki anahtar kelimeleri ve benzer ifadeleri karşılaştırarak en uygun bilgi kaydını bulmaya çalışır. Örneğin “PEK nedir?”, “PEK ne?” veya “Prime esas kazanç ne demek?” gibi sorular aynı cevaba yönlenebilir.",
+      "relatedPage": "/Citizen/Faq",
+      "relatedButtonText": "Sık Sorulan Sorulara Git"
+    },
+    {
+      "id": "official_001",
+      "category": "Resmi Başvuru ve e-Devlet Yönlendirmeleri",
+      "title": "Emeklilik başvurusu nereden yapılır?",
+      "questions": [
+        "Emeklilik başvurusu nereden yapılır?",
+        "Tahsis talep formu nereden verilir?",
+        "Emeklilik dilekçesi e-Devlet’ten verilir mi?"
+      ],
+      "keywords": [
+        "emeklilik başvurusu",
+        "tahsis talep",
+        "e-devlet",
+        "sgk başvuru",
+        "dilekçe"
+      ],
+      "answer": "Emeklilik başvuruları e-Devlet üzerinden ilgili SGK tahsis talep hizmetleriyle veya SGK müdürlükleri aracılığıyla yapılabilir. Başvuru öncesinde hizmet dökümü, prim günü, yaş ve statü bilgileri kontrol edilmelidir.",
+      "relatedPage": "/Citizen/RetirementStatus",
+      "relatedButtonText": "Emeklilik Durumu Sayfasına Git"
+    },
+    {
+      "id": "official_002",
+      "category": "Resmi Başvuru ve e-Devlet Yönlendirmeleri",
+      "title": "Borçlanma başvurusu nereden yapılır?",
+      "questions": [
+        "Borçlanma başvurusu nereden yapılır?",
+        "Askerlik borçlanması başvurusu nereye yapılır?",
+        "Doğum borçlanması e-Devlet başvurusu"
+      ],
+      "keywords": [
+        "borçlanma başvurusu",
+        "e-devlet",
+        "askerlik borçlanması",
+        "doğum borçlanması",
+        "yurt dışı borçlanması"
+      ],
+      "answer": "Doğum, askerlik ve yurt dışı borçlanması gibi başvurular için e-Devlet üzerinde ilgili SGK hizmetleri bulunur. Başvuru yapılacak borçlanma türüne göre doğru hizmet seçilmelidir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "official_003",
+      "category": "Resmi Başvuru ve e-Devlet Yönlendirmeleri",
+      "title": "Hizmet birleştirme başvurusu nereden yapılır?",
+      "questions": [
+        "Hizmet birleştirme başvurusu nereden yapılır?",
+        "4A 4B hizmet birleştirme e-Devlet",
+        "Hizmet birleştirme başvuru ekranı"
+      ],
+      "keywords": [
+        "hizmet birleştirme başvurusu",
+        "e-devlet",
+        "4a 4b",
+        "sandık",
+        "gm20"
+      ],
+      "answer": "Hizmet birleştirme başvurusu e-Devlet üzerindeki ilgili SGK hizmetleri aracılığıyla yapılabilir. Başvurudan önce hizmet dökümü ve sosyal güvenlik kayıt belgesi kontrol edilerek farklı statüde hizmet olup olmadığı incelenmelidir.",
+      "relatedPage": "/Citizen/ServiceMerge",
+      "relatedButtonText": "Hizmet Birleştirme Sayfasına Git"
+    },
+    {
+      "id": "official_004",
+      "category": "Resmi Başvuru ve e-Devlet Yönlendirmeleri",
+      "title": "SGK evrak takibini nereden yapabilirim?",
+      "questions": [
+        "SGK evrak takibi nereden yapılır?",
+        "Başvuru durumumu nasıl takip ederim?",
+        "DYS evrak takip nedir?"
+      ],
+      "keywords": [
+        "evrak takip",
+        "sgk evrak",
+        "dys",
+        "başvuru takip",
+        "e-devlet"
+      ],
+      "answer": "SGK’ya iletilen başvuru ve evrakların durumu e-Devlet üzerindeki SGK evrak takip hizmetlerinden kontrol edilebilir. Başvuru yaptıktan sonra evrak numarası veya ilgili hizmet üzerinden süreç takip edilebilir.",
+      "relatedPage": "/Citizen/ServiceMerge",
+      "relatedButtonText": "Hizmet Birleştirme Sayfasına Git"
+    },
+    {
+      "id": "official_005",
+      "category": "Resmi Başvuru ve e-Devlet Yönlendirmeleri",
+      "title": "e-Devlet sonucu ile sitedeki sonuç farklıysa hangisine bakmalıyım?",
+      "questions": [
+        "e-Devlet sonucu ile site sonucu farklıysa ne yapmalıyım?",
+        "Sitedeki sonuç e-Devlet’ten farklı",
+        "Hangi sonuç geçerli?"
+      ],
+      "keywords": [
+        "e-devlet sonucu",
+        "site sonucu",
+        "farklı sonuç",
+        "resmi kayıt",
+        "sgk"
+      ],
+      "answer": "Bu sitedeki sonuçlar yüklenen belgeler ve kullanıcı girişleri üzerinden bilgi amaçlı üretilir. e-Devlet ve SGK kayıtları resmi işlem için esas alınır. Farklılık varsa belge tarihi, yüklenen PDF ve kullanıcı girişleri kontrol edilmelidir.",
+      "relatedPage": "/Citizen/Faq",
+      "relatedButtonText": "Sık Sorulan Sorulara Git"
+    },
+    {
+      "id": "official_006",
+      "category": "Resmi Başvuru ve e-Devlet Yönlendirmeleri",
+      "title": "SGK ile nasıl iletişime geçebilirim?",
+      "questions": [
+        "SGK ile nasıl iletişime geçebilirim?",
+        "SGK’ya soru sormak istiyorum",
+        "ALO 170 dışında nereye başvurulur?"
+      ],
+      "keywords": [
+        "sgk iletişim",
+        "alo 170",
+        "sgk müdürlüğü",
+        "başvuru",
+        "şikayet"
+      ],
+      "answer": "SGK işlemleri için ilgili SGK müdürlüğüne başvurabilir, ALO 170 hattından bilgi alabilir veya e-Devlet üzerindeki ilgili başvuru ve sorgulama hizmetlerini kullanabilirsiniz. Konuya göre doğru hizmeti seçmek sürecin daha hızlı ilerlemesini sağlar.",
+      "relatedPage": "/Citizen/Faq",
+      "relatedButtonText": "Sık Sorulan Sorulara Git"
+    },
+    {
+      "id": "debt_012",
+      "category": "Borçlanma İşlemleri",
+      "title": "Ev hanımı olarak geçen süreler borçlanılabilir mi?",
+      "questions": [
+        "Ev hanımı borçlanması var mı?",
+        "Ev hanımı olarak geçen süreleri borçlanabilir miyim?",
+        "Ev kadınları geriye dönük prim ödeyebilir mi?"
+      ],
+      "keywords": [
+        "ev hanımı",
+        "ev kadınları",
+        "geriye dönük",
+        "isteğe bağlı sigorta",
+        "yurt dışı ev hanımı"
+      ],
+      "answer": "Türkiye’de yaşayan ev hanımları için geçmişe dönük genel bir ev hanımlığı borçlanması bulunmaz. Ancak yurt dışında ev hanımı olarak geçirilen bazı süreler belirli şartlarla borçlanılabilir. Türkiye’de ise ileriye dönük isteğe bağlı sigorta ödemesi yapılabilir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_013",
+      "category": "Borçlanma İşlemleri",
+      "title": "Doğum borçlanmasında çocuğun yaşaması şart mıdır?",
+      "questions": [
+        "Doğum borçlanmasında çocuğun yaşaması şart mı?",
+        "Çocuk vefat ederse doğum borçlanması olur mu?",
+        "Doğum sonrası ne kadar süre borçlanılır?"
+      ],
+      "keywords": [
+        "doğum borçlanması",
+        "çocuğun yaşaması",
+        "vefat",
+        "720 gün",
+        "doğum sonrası süre"
+      ],
+      "answer": "Doğum borçlanmasında çocuğun doğumdan sonraki dönemde yaşadığı süre önemlidir. Çocuk doğumdan sonra vefat etmişse borçlanılabilecek süre buna göre sınırlı olabilir. Kesin süre kişisel kayıtlara göre değerlendirilir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_014",
+      "category": "Borçlanma İşlemleri",
+      "title": "Ücretsiz izin süreleri borçlanılabilir mi?",
+      "questions": [
+        "Ücretsiz izin borçlanılır mı?",
+        "Aylıksız izin borçlanması olur mu?",
+        "Doğum sonrası ücretsiz izin borçlanılır mı?"
+      ],
+      "keywords": [
+        "ücretsiz izin",
+        "aylıksız izin",
+        "borçlanma",
+        "4a",
+        "4c",
+        "doğum sonrası"
+      ],
+      "answer": "Bazı ücretsiz izin veya aylıksız izin süreleri mevzuattaki koşullara göre borçlanılabilir. Özellikle yasal ücretsiz izin dönemleri ve kamu görevlilerine ilişkin bazı aylıksız izinler borçlanma kapsamında değerlendirilebilir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_015",
+      "category": "Borçlanma İşlemleri",
+      "title": "Avukatlık ve hekimlik staj süreleri borçlanılabilir mi?",
+      "questions": [
+        "Avukatlık stajı borçlanılır mı?",
+        "Hekimlik stajı borçlanılır mı?",
+        "Tıpta uzmanlık borçlanması var mı?"
+      ],
+      "keywords": [
+        "avukatlık stajı",
+        "hekimlik",
+        "tıpta uzmanlık",
+        "fahri asistanlık",
+        "staj borçlanması"
+      ],
+      "answer": "Normal okul stajları genellikle emeklilik borçlanması kapsamında değerlendirilmez. Ancak avukatlık stajı, tıpta uzmanlık veya bazı özel mesleki süreler için mevzuatta borçlanma imkanı bulunabilir. Bu tür süreler belge ve statüye göre ayrıca değerlendirilir.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    },
+    {
+      "id": "debt_016",
+      "category": "Borçlanma İşlemleri",
+      "title": "Borçlanma parasını ödedikten sonra vazgeçilebilir mi?",
+      "questions": [
+        "Borçlanma parasını geri alabilir miyim?",
+        "Borçlanmadan vazgeçtim para iade olur mu?",
+        "Borçlanma iadesi var mı?"
+      ],
+      "keywords": [
+        "borçlanma iadesi",
+        "vazgeçme",
+        "faizsiz iade",
+        "emekli aylığı bağlandıktan sonra"
+      ],
+      "answer": "Borçlanma ödemesi yapıldıktan sonra bazı durumlarda kişi aylık bağlanmadan önce başvurarak ödediği tutarın iadesini isteyebilir. Aylık bağlandıktan sonra iade durumu farklı değerlendirilir. İşlem için SGK kayıtları esas alınır.",
+      "relatedPage": "/Citizen/DebtOptions",
+      "relatedButtonText": "Borçlanma İşlemleri Sayfasına Git"
+    }
+  ]
+}
