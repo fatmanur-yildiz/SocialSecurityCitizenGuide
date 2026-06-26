@@ -1,10 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SGK Akıllı Vatandaş Rehberi</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sgk-ai-assistant.css" asp-append-version="true" />
 </head>
 <body>
     <div class="top-accent-bar"></div>
@@ -107,6 +108,64 @@
 
     <button type="button" class="a11y-button" title="Erişilebilirlik" aria-label="Erişilebilirlik">♿</button>
     <button type="button" class="scroll-top-button" id="scrollTopBtn" title="Yukarı çık" aria-label="Yukarı çık" onclick="window.scrollTo({top:0,behavior:'smooth'})">⌃</button>
+
+    <!-- ============================================================
+         SGK AI Asistanı Widget
+         ============================================================ -->
+
+    <!-- Konuşma Balonu -->
+    <div class="ai-bubble-tip" id="aiBubble">Sorularınız için buradayım.</div>
+
+    <!-- FAB: Maskotlu yuvarlak buton -->
+    <button type="button"
+            class="ai-fab"
+            id="aiFab"
+            onclick="sgkAiTogglePanel()"
+            aria-label="SGK AI Asistanı"
+            aria-expanded="false">
+        <img src="/img/ai-bear.png" alt="SGK AI Asistanı" />
+    </button>
+
+    <!-- Chat Paneli -->
+    <div class="ai-panel" id="aiPanel" role="dialog" aria-modal="true" aria-label="SGK AI Asistanı">
+
+        <!-- Panel Başlığı -->
+        <div class="ai-panel-header">
+            <img src="/img/ai-bear.png" class="ai-panel-header-avatar" alt="SGK AI" />
+            <div class="ai-panel-header-info">
+                <div class="ai-panel-title">SGK AI Asistanı</div>
+                <div class="ai-panel-subtitle">Prim, emeklilik, borçlanma ve hizmet birleştirme konularında soru sorabilirsiniz.</div>
+            </div>
+            <button type="button" class="ai-panel-close" id="aiCloseBtn" aria-label="Kapat" onclick="sgkAiClosePanel()">&#x2715;</button>
+        </div>
+
+        <!-- Mesaj Alanı -->
+        <div class="ai-messages" id="aiMessages" aria-live="polite" aria-relevant="additions"></div>
+
+        <!-- Hızlı Soru Butonları -->
+        <div class="ai-quick-row">
+            <button type="button" class="ai-quick-chip" onclick="sgkAiSendQuick('PEK nedir?')">PEK nedir?</button>
+            <button type="button" class="ai-quick-chip" onclick="sgkAiSendQuick('Eksik gün ne demek?')">Eksik gün ne demek?</button>
+            <button type="button" class="ai-quick-chip" onclick="sgkAiSendQuick('EYT kontrolü nasıl yapılır?')">EYT kontrolü nasıl yapılır?</button>
+            <button type="button" class="ai-quick-chip" onclick="sgkAiSendQuick('Askerlik borçlanması başlangıcı etkiler mi?')">Askerlik borçlanması başlangıcı etkiler mi?</button>
+            <button type="button" class="ai-quick-chip" onclick="sgkAiSendQuick('1261 gün kuralı nedir?')">1261 gün kuralı nedir?</button>
+            <button type="button" class="ai-quick-chip" onclick="sgkAiSendQuick('Hizmet dökümünü nereden yüklemeliyim?')">Hizmet dökümünü nereden yüklemeliyim?</button>
+        </div>
+
+        <!-- Input Alanı -->
+        <div class="ai-input-row">
+            <input type="text"
+                   class="ai-input"
+                   id="aiInput"
+                   placeholder="Sorunuzu yazın..."
+                   autocomplete="off"
+                   aria-label="Soru girin"
+                   maxlength="300" />
+            <button type="button" class="ai-send-btn" id="aiSendBtn" aria-label="Gönder" onclick="sgkAiSendMessage()">&#x27A4;</button>
+        </div>
+
+    </div>
+    <!-- /SGK AI Asistanı Widget -->
 </body>
 </html>
 
@@ -122,3 +181,4 @@
         btn.classList.toggle('scroll-top-button--visible', window.scrollY > 300);
     });
 </script>
+<script src="~/js/sgk-ai-assistant.js" asp-append-version="true"></script>
